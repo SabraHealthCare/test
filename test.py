@@ -652,7 +652,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
                 if BPC_value==0 and PL_value==0:
                     continue
                 diff=BPC_value-PL_value
-                if abs(diff)>=0.001*max(abs(PL_value),abs(BPC_value)):
+                if abs(diff)>=1: #.001*max(abs(PL_value),abs(BPC_value)):
                     diff_single_record=pd.DataFrame({"TIME":timeid,"ENTITY":entity,"Sabra_Account":matrix,"Sabra":BPC_value,\
                                                      "P&L":PL_value,"Diff":diff},index=[0])
                     
