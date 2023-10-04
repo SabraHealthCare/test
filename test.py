@@ -638,7 +638,6 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff","Sabra"])
-    st.write(Total_PL.columns.sort_values(),latest_month)
     for entity in entity_mapping["ENTITY"]:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             for timeid in Total_PL.columns.sort_values()[-3:-1]: # only compare two months
@@ -787,8 +786,9 @@ def View_Discrepancy_Detail():
         unsafe_allow_html=True )
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).applymap(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
+	
         download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy")
-    download_report(Total_PL_detail,"Full P&L accounts mapping")
+        download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping")
    
 
 @st.cache_data(experimental_allow_widgets=True)        
