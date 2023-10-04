@@ -640,7 +640,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff","Sabra"])
     for entity in entity_mapping["ENTITY"]:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            for timeid in Total_PL.columns.sort_values()[-2:]: # only compare two months
+            for timeid in Total_PL.columns.sort_values()[-3:latest_month]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
@@ -828,14 +828,14 @@ def PL_Process_Main(entity_i,sheet_type):
                 with col1:
                     st.write("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
                 with col2:		
-                    y=st.button("Yes")          
+                    yes=st.button("Yes")          
                 with col3:
-                    n=st.button("No")   
+                    no=st.button("No")   
 
-                if n:
+                if no:
                     st.error("Please check the month header in sheet '{}' and make sure the latest or biggest month in month header is the new reporting month.".format(sheet_name))  
                     st.stop()
-                elif not y:
+                elif not yes:
                     st.stop()
             elif latest_month!=max_month_cols:
                 st.error("The latest month in sheet '{}' is not {}. Please fix it and re-upload.".format(sheet_name,latest_month))
