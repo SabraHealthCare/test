@@ -641,7 +641,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     st.write(Total_PL.columns.sort_values(),latest_month)
     for entity in entity_mapping["ENTITY"]:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
-            for timeid in Total_PL.columns.sort_values()[-3:latest_month]: # only compare two months
+            for timeid in Total_PL.columns.sort_values()[-3:-1]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
                 except:
