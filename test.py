@@ -13,12 +13,15 @@ import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
 import pandas as pd  # pip install pandas openpyxl
-import 
+import mysql.connector
 import streamlit_authenticator as stauth  
-conn = st.experimental_connection('mysql', type='sql')
+conn = st.connector.connect(**st.secrets["mysql"])
+def run_query(query):
+	with conn.cursor() as cur:
+	return cur.fetchall()
+df=run_query('SELECT * from users;')
 # Perform query.
-df = conn.query('SELECT * from users;', ttl=600)
-# Print results.
+
 for row in df.itertuples():
     st.write(f"{row.user_name} has a :{row.password}:")
 
