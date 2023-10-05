@@ -15,7 +15,7 @@ streamlit_modal
 streamlit_tree_select
 streamlit-aggrid==0.3.4
 streamlit_authenticator
-mysql-conncetor-python==8.0.32
+mysql-connector-python==8.0.32
 #pymysql
 #sqlalchemy
 
