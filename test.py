@@ -15,18 +15,6 @@ from calendar import monthrange
 import pandas as pd  # pip install pandas openpyxl
 import mysql.connector
 import streamlit_authenticator as stauth  
-conn = mysql.connector.connect(username = "root",password = "June2021SL!",host = "127.0.0.1",port = 3306,database = "tenant_account_pw")
-def run_query(query):
-    with conn.cursor() as cur:
-        cur.execute(query)
-        return cur.fetchall()
-df=run_query('SELECT * from users;')
-# Perform query.
-
-for row in df.itertuples():
-    st.write(f"{row.user_name} has a :{row.password}:")
-
-st.write("Done")
 
 s3 = boto3.client('s3')
 
