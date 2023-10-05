@@ -17,7 +17,8 @@ import mysql.connector
 import streamlit_authenticator as stauth  
 conn = st.connector.connect(**st.secrets["mysql"])
 def run_query(query):
-	with conn.cursor() as cur:
+    with conn.cursor() as cur:
+	cur.execute(query)
 	return cur.fetchall()
 df=run_query('SELECT * from users;')
 # Perform query.
