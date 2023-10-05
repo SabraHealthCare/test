@@ -13,9 +13,8 @@ import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
 import pandas as pd  # pip install pandas openpyxl
-import plotly.express as px  # pip install plotly-express
-import streamlit as st  # pip install streamlit
-import streamlit_authenticator as stauth  # pip install streamlit-authenticator
+
+import streamlit_authenticator as stauth  
 conn = st.experimental_connection('mysql', type='sql')
 # Perform query.
 df = conn.query('SELECT * from users;', ttl=600)
