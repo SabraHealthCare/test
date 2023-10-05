@@ -15,7 +15,7 @@ from calendar import monthrange
 import pandas as pd  # pip install pandas openpyxl
 import mysql.connector
 import streamlit_authenticator as stauth  
-conn = mysql.connector.connect(username = "root",password = "June2021SL!",host = "localhost",port = 3306,database = "tenant_account_pw")
+conn = mysql.connector.connect(username = "root",password = "June2021SL!",host = "127.0.0.1",port = 3306,database = "tenant_account_pw")
 def run_query(query):
     with conn.cursor() as cur:
         cur.execute(query)
