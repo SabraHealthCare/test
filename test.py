@@ -715,9 +715,9 @@ def View_Discrepancy(percent_discrepancy_accounts):
         edited_diff_BPC_PL = st.data_editor(
 	diff_BPC_PL,
 	width = 1200,
-	column_order=("Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"),
+	column_order=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"),
 	hide_index=True,
-	disabled=("Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff"),
+	disabled=("Property_Name","TIME","Category","Sabra_Account_Full_Name","Sabra","P&L","Diff"),
 	column_config={
        		"Sabra_Account_Full_Name": "Sabra_Account",
        		 "Property_Name": "Property",
