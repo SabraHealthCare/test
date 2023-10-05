@@ -14,5 +14,9 @@ streamlit_modal
 
 streamlit_tree_select
 streamlit-aggrid==0.3.4
+streamlit_authenticator
+streamlit
+pandas
+pymysql
 
 git+https://github.com/streamlit/files-connection 
