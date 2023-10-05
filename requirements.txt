@@ -15,9 +15,7 @@ streamlit_modal
 streamlit_tree_select
 streamlit-aggrid==0.3.4
 streamlit_authenticator
-mysql-connector-python==8.0.32
-#pymysql
-#sqlalchemy
+
 
 
 git+https://github.com/streamlit/files-connection 
