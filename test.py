@@ -927,60 +927,59 @@ if st.session_state["authentication_status"] is False:
 elif st.session_state["authentication_status"] is None:
     st.warning('Please enter your username and password')
 elif st.session_state["authentication_status"]:
-        authenticator.logout('Logout', 'main')
+    authenticator.logout('Logout', 'main')
 
 
 #s33 = boto3.resource("s3").Bucket(bucket_PL)
 #json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
 #json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-	menu=["Upload P&L","Manage Mapping","Instructions"]
-	choice=st.sidebar.selectbox("Menu", menu)
-	status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
+    menu=["Upload P&L","Manage Mapping","Instructions"]
+    choice=st.sidebar.selectbox("Menu", menu)
+    status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
 	
-	if choice=="Upload P&L" and operator!='select operator':
-	    st.subheader("Upload P&L:")
-	    col1,col2=st.columns(2) 
-	    with col1:
-	        with st.form("my-form", clear_on_submit=True):
-	            uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
-	            col3,col4=st.columns([1,3]) 
-	            with col3:
-	                submitted = st.form_submit_button("Upload")
-	            with col4:
-	                if submitted:
+    if choice=="Upload P&L" and operator!='select operator':
+	st.subheader("Upload P&L:")
+	col1,col2=st.columns(2) 
+	with col1:
+	    with st.form("my-form", clear_on_submit=True):
+                uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
+                col3,col4=st.columns([1,3]) 
+                with col3:
+                    submitted = st.form_submit_button("Upload")
+                with col4:
+	            if submitted:
 			# clear cache for every upload
-	                    st.cache_data.clear()
-	                    st.cache_resource.clear()
-	                    st.write("{} uploaded.".format(uploaded_file.name))
+	                st.cache_data.clear()
+	                st.cache_resource.clear()
+	                st.write("{} uploaded.".format(uploaded_file.name))
 	     
-	    if uploaded_file:
-		# initial parameter
-	        TENANT_ID=format_table["Tenant_ID"][0]
-	        global latest_month
-	        latest_month="2023"
-	        Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+                        if uploaded_file:
+		        # initial parameter
+	                    TENANT_ID=format_table["Tenant_ID"][0]
+	                    global latest_month
+	                    latest_month="2023"
+	                    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
 	
-	        # 1 Summary
-	        with st.expander("Summary of P&L" ,expanded=True):
-	            ChangeWidgetFontSize('Summary of P&L', '25px')
-	            View_Summary()
+	                    # 1 Summary
+	                    with st.expander("Summary of P&L" ,expanded=True):
+	                        ChangeWidgetFontSize('Summary of P&L', '25px')
+	                        View_Summary()
 	        
-	        # 2 Discrepancy of Historic Data
-	        with st.expander("Discrepancy for Historic Data",expanded=True):
-	            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-	            View_Discrepancy(percent_discrepancy_accounts)
-	            View_Discrepancy_Detail()
+	                    # 2 Discrepancy of Historic Data
+	                    with st.expander("Discrepancy for Historic Data",expanded=True):
+	                        ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+	                        View_Discrepancy(percent_discrepancy_accounts)
+	                        View_Discrepancy_Detail()
 	    time.sleep(200)               
-		
-	elif choice=="Manage Mapping" and operator!='select operator':
-	    with st.expander("Manage Property Mapping" ,expanded=True):
-	        ChangeWidgetFontSize('Manage Property Mapping', '25px')
-	        entity_mapping=Manage_Property_Mapping(operator)
-	    with st.expander("Manage Account Mapping",expanded=True):
-	        ChangeWidgetFontSize('Manage Account Mapping', '25px')
-	        col1,col2=st.columns(2)
-	        with col1:
-	            new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
+    elif choice=="Manage Mapping" and operator!='select operator':
+        with st.expander("Manage Property Mapping" ,expanded=True):
+	    ChangeWidgetFontSize('Manage Property Mapping', '25px')
+	    entity_mapping=Manage_Property_Mapping(operator)
+        with st.expander("Manage Account Mapping",expanded=True):
+	    ChangeWidgetFontSize('Manage Account Mapping', '25px')
+	    col1,col2=st.columns(2)
+	    with col1:
+	        new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
 	        if new_tenant_account:
 	            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
 	            Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
