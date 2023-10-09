@@ -14,6 +14,7 @@ import streamlit.components.v1 as components
 from calendar import monthrange
 from  authenticate import Authenticate
 import json
+import yaml
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
