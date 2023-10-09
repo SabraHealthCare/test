@@ -90,7 +90,12 @@ def Save_File_toS3(uploaded_file, bucket, key):
 
 
 #s3.Object(bucket_PL, "config.yaml").put(Body=config)
-s3.put_object(Body=config, Bucket=bucket_PL, Key='config.yaml')
+import json
+s33 = boto3.resource("s3").Bucket(bucket_PL)
+json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+#Now you can use json.load_s3 and json.dump_s3 with the same API as load and dump
+
+json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
 
 
 #s33.Object(bucket_PL, 'config.yaml').put(Body=config)
