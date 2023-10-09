@@ -35,16 +35,17 @@ bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
 
 
-@st.cache_data
-def get_operator_list(bucket_mapping):
-    operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
-    operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
-    return operator_list
-operator_list=get_operator_list(bucket_mapping)
+#@st.cache_data
+#def get_operator_list(bucket_mapping):
+    #operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
+    #operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
+    #return operator_list
+#operator_list=get_operator_list(bucket_mapping)
 
-col1,col2=st.columns(2)
-with col1:
-    operator= st.selectbox('Operator Name',(operator_list))
+#col1,col2=st.columns(2)
+#with col1:
+    #operator= st.selectbox('Operator Name',(operator_list))
+
 
 @st.cache_data
 def Initial_Paramaters(operator):
@@ -71,7 +72,7 @@ def Initial_Paramaters(operator):
     else:
         st.stop()
     return PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic
-PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
+
 
 @st.cache_resource
 def Initial_Mapping(operator):
@@ -84,7 +85,7 @@ def Initial_Mapping(operator):
     entity_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=mapping_path)
     entity_mapping=pd.read_excel(entity_mapping_obj['Body'].read(),sheet_name=sheet_name_entity_mapping,header=0)
     return entity_mapping,account_mapping
-entity_mapping,account_mapping=Initial_Mapping(operator)
+
 
 # Intialize a list of tuples containing the CSS styles for table headers
 th_props = [('font-size', '14px'), ('text-align', 'left'),
@@ -907,8 +908,9 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL['Operator']=operator
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 #----------------------------------website widges------------------------------------
-response = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
-config = yaml.safe_load(response["Body"])
+
+config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
+config = yaml.safe_load(config_obj["Body"])
 
 # Creating the authenticator object
 
@@ -920,7 +922,7 @@ authenticator = Authenticate(
         config['preauthorized']
     )
 
-    # creating a login widget
+# login widget
 authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
@@ -928,6 +930,9 @@ elif st.session_state["authentication_status"] is None:
     st.warning('Please enter your username and password')
 elif st.session_state["authentication_status"]:
     authenticator.logout('Logout', 'main')
+    operator='Ensign'
+    PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
+    entity_mapping,account_mapping=Initial_Mapping(operator)
 
 
 #s33 = boto3.resource("s3").Bucket(bucket_PL)
