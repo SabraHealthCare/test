@@ -973,12 +973,12 @@ elif st.session_state["authentication_status"]:
                
     elif choice=="Manage Mapping" and operator!='select operator':
         with st.expander("Manage Property Mapping" ,expanded=True):
-	    ChangeWidgetFontSize('Manage Property Mapping', '25px')
-	    entity_mapping=Manage_Property_Mapping(operator)
+            ChangeWidgetFontSize('Manage Property Mapping', '25px')
+            entity_mapping=Manage_Property_Mapping(operator)
         with st.expander("Manage Account Mapping",expanded=True):
-	    ChangeWidgetFontSize('Manage Account Mapping', '25px')
-	    col1,col2=st.columns(2)
-	    with col1:
+            ChangeWidgetFontSize('Manage Account Mapping', '25px')
+            col1,col2=st.columns(2)
+            with col1:
 	        new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
 	        if new_tenant_account:
 	            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
