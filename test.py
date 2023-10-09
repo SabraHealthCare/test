@@ -13,7 +13,6 @@ import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
 import pandas as pd  # pip install pandas openpyxl
-import mysql.connector
 import streamlit_authenticator as stauth  
 
 
