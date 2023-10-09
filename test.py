@@ -89,8 +89,13 @@ def Save_File_toS3(uploaded_file, bucket, key):
         st.error(e)
 
 
-s3.Object(bucket_PL, "config.yaml").put(Body=config)
+#s3.Object(bucket_PL, "config.yaml").put(Body=config)
+import boto3
 
+s33 = boto3.resource('s3')
+
+# Creating an empty file called "_DONE" and putting it in the S3 bucket
+s33.Object(bucket_PL, 'config.yaml').put(Body=config)
 
 #s3.upload_fileobj(data,bucket=bucket_PL,key="config.yaml")
 #Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
