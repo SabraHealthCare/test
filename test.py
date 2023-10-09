@@ -12,11 +12,8 @@ import  streamlit_tree_select
 import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
-import streamlit_authenticator as authen
-import yaml
-from yaml.loader import SafeLoader
 from  authenticate import Authenticate
-
+import json
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -37,64 +34,6 @@ sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
 
-response = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
-config = yaml.safe_load(response["Body"])
-st.write(config)
-# Creating the authenticator object
-if True:
-    authenticator = Authenticate(
-        config['credentials'],
-        config['cookie']['name'], 
-        config['cookie']['key'], 
-        config['cookie']['expiry_days'],
-        config['preauthorized']
-    )
-
-    # creating a login widget
-    authenticator.login('Login', 'main')
-    if st.session_state["authentication_status"]:
-        authenticator.logout('Logout', 'main')
-        st.write(f'Welcome *{st.session_state["name"]}*')
-        st.title('Some content_______')
-    elif st.session_state["authentication_status"] is False:
-        st.error('Username/password is incorrect')
-    elif st.session_state["authentication_status"] is None:
-        st.warning('Please enter your username and password')
-
- 
-# Creating a new user registration widget
-    try:
-        if authenticator.register_user('Register user', preauthorization=False):
-            st.success('User registered successfully')
-    except Exception as e:
-        st.error(e)
-
-    # Creating a forgot password widget
-    try:
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
-        if username_forgot_pw:
-            st.success('New password sent securely')
-            st.write(username_forgot_pw,email_forgot_password,random_password)
-            # Random password to be transferred to user securely
-        else:
-            st.error('Username not found')
-    except Exception as e:
-        st.error(e)
-
-
-#s3.Object(bucket_PL, "config.yaml").put(Body=config)
-import json
-s33 = boto3.resource("s3").Bucket(bucket_PL)
-json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-#Now you can use json.load_s3 and json.dump_s3 with the same API as load and dump
-
-json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-
-
-#s33.Object(bucket_PL, 'config.yaml').put(Body=config)
-
-#s3.upload_fileobj(data,bucket=bucket_PL,key="config.yaml")
-#Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
 
 @st.cache_data
 def get_operator_list(bucket_mapping):
@@ -968,58 +907,84 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL['Operator']=operator
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 #----------------------------------website widges------------------------------------
-menu=["Upload P&L","Manage Mapping","Instructions"]
-choice=st.sidebar.selectbox("Menu", menu)
-status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
+response = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
+config = yaml.safe_load(response["Body"])
 
-if choice=="Upload P&L" and operator!='select operator':
-    st.subheader("Upload P&L:")
-    col1,col2=st.columns(2) 
-    with col1:
-        with st.form("my-form", clear_on_submit=True):
-            uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
-            col3,col4=st.columns([1,3]) 
-            with col3:
-                submitted = st.form_submit_button("Upload")
-            with col4:
-                if submitted:
-		# clear cache for every upload
-                    st.cache_data.clear()
-                    st.cache_resource.clear()
-                    st.write("{} uploaded.".format(uploaded_file.name))
-     
-    if uploaded_file:
-	# initial parameter
-        TENANT_ID=format_table["Tenant_ID"][0]
-        global latest_month
-        latest_month="2023"
-        Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+# Creating the authenticator object
 
-        # 1 Summary
-        with st.expander("Summary of P&L" ,expanded=True):
-            ChangeWidgetFontSize('Summary of P&L', '25px')
-            View_Summary()
-        
-        # 2 Discrepancy of Historic Data
-        with st.expander("Discrepancy for Historic Data",expanded=True):
-            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-            View_Discrepancy(percent_discrepancy_accounts)
-            View_Discrepancy_Detail()
-    time.sleep(200)               
+authenticator = Authenticate(
+        config['credentials'],
+        config['cookie']['name'], 
+        config['cookie']['key'], 
+        config['cookie']['expiry_days'],
+        config['preauthorized']
+    )
+
+    # creating a login widget
+authenticator.login('Login', 'main')
+if st.session_state["authentication_status"] is False:
+    st.error('Username/password is incorrect')
+elif st.session_state["authentication_status"] is None:
+    st.warning('Please enter your username and password')
+elif st.session_state["authentication_status"]:
+        authenticator.logout('Logout', 'main')
+
+
+#s33 = boto3.resource("s3").Bucket(bucket_PL)
+#json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+#json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+	menu=["Upload P&L","Manage Mapping","Instructions"]
+	choice=st.sidebar.selectbox("Menu", menu)
+	status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
 	
-elif choice=="Manage Mapping" and operator!='select operator':
-    with st.expander("Manage Property Mapping" ,expanded=True):
-        ChangeWidgetFontSize('Manage Property Mapping', '25px')
-        entity_mapping=Manage_Property_Mapping(operator)
-    with st.expander("Manage Account Mapping",expanded=True):
-        ChangeWidgetFontSize('Manage Account Mapping', '25px')
-        col1,col2=st.columns(2)
-        with col1:
-            new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
-        if new_tenant_account:
-            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
-            Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
-            #insert new record to the bottom line of account_mapping
-            account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
-            Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
-time.sleep(5000) 
+	if choice=="Upload P&L" and operator!='select operator':
+	    st.subheader("Upload P&L:")
+	    col1,col2=st.columns(2) 
+	    with col1:
+	        with st.form("my-form", clear_on_submit=True):
+	            uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
+	            col3,col4=st.columns([1,3]) 
+	            with col3:
+	                submitted = st.form_submit_button("Upload")
+	            with col4:
+	                if submitted:
+			# clear cache for every upload
+	                    st.cache_data.clear()
+	                    st.cache_resource.clear()
+	                    st.write("{} uploaded.".format(uploaded_file.name))
+	     
+	    if uploaded_file:
+		# initial parameter
+	        TENANT_ID=format_table["Tenant_ID"][0]
+	        global latest_month
+	        latest_month="2023"
+	        Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+	
+	        # 1 Summary
+	        with st.expander("Summary of P&L" ,expanded=True):
+	            ChangeWidgetFontSize('Summary of P&L', '25px')
+	            View_Summary()
+	        
+	        # 2 Discrepancy of Historic Data
+	        with st.expander("Discrepancy for Historic Data",expanded=True):
+	            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+	            View_Discrepancy(percent_discrepancy_accounts)
+	            View_Discrepancy_Detail()
+	    time.sleep(200)               
+		
+	elif choice=="Manage Mapping" and operator!='select operator':
+	    with st.expander("Manage Property Mapping" ,expanded=True):
+	        ChangeWidgetFontSize('Manage Property Mapping', '25px')
+	        entity_mapping=Manage_Property_Mapping(operator)
+	    with st.expander("Manage Account Mapping",expanded=True):
+	        ChangeWidgetFontSize('Manage Account Mapping', '25px')
+	        col1,col2=st.columns(2)
+	        with col1:
+	            new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
+	        if new_tenant_account:
+	            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
+	            Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
+	            #insert new record to the bottom line of account_mapping
+	            account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
+	            Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
+	time.sleep(5000) 
