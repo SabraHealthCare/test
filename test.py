@@ -961,16 +961,16 @@ elif st.session_state["authentication_status"]:
                             Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
 	
 	                    # 1 Summary
-	                    with st.expander("Summary of P&L" ,expanded=True):
-	                        ChangeWidgetFontSize('Summary of P&L', '25px')
-	                        View_Summary()
+                            with st.expander("Summary of P&L" ,expanded=True):
+                                ChangeWidgetFontSize('Summary of P&L', '25px')
+                                View_Summary()
 	        
 	                    # 2 Discrepancy of Historic Data
-	                    with st.expander("Discrepancy for Historic Data",expanded=True):
+                            with st.expander("Discrepancy for Historic Data",expanded=True):
 	                        ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
 	                        View_Discrepancy(percent_discrepancy_accounts)
 	                        View_Discrepancy_Detail()
-	    time.sleep(200)               
+       time.sleep(200)               
     elif choice=="Manage Mapping" and operator!='select operator':
         with st.expander("Manage Property Mapping" ,expanded=True):
 	    ChangeWidgetFontSize('Manage Property Mapping', '25px')
