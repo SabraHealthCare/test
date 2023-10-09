@@ -11,7 +11,7 @@ streamlit
 s3fs
 boto3
 streamlit_modal
-
+streamlit_authenticator
 streamlit_tree_select
 streamlit-aggrid==0.3.4
 streamlit_authenticator
