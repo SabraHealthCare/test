@@ -12,7 +12,8 @@ import  streamlit_tree_select
 import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
-from  authenticate import Authenticate  
+import streamlit_authenticator as authenticator
+from  authenticate import Authenticate
 import yaml
 from yaml.loader import SafeLoader
 
