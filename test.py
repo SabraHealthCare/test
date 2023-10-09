@@ -88,7 +88,7 @@ def Save_File_toS3(uploaded_file, bucket, key):
     except Exception as e:
         st.error(e)
 
-Save_File_toS3(config, Bucket=bucket_PL,Key="config.yaml")
+Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
 
 @st.cache_data
 def get_operator_list(bucket_mapping):
