@@ -967,9 +967,9 @@ elif st.session_state["authentication_status"]:
 	        
 	                    # 2 Discrepancy of Historic Data
                             with st.expander("Discrepancy for Historic Data",expanded=True):
-	                        ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-	                        View_Discrepancy(percent_discrepancy_accounts)
-	                        View_Discrepancy_Detail()
+                                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                                View_Discrepancy(percent_discrepancy_accounts)
+                                View_Discrepancy_Detail()
        time.sleep(200)               
     elif choice=="Manage Mapping" and operator!='select operator':
         with st.expander("Manage Property Mapping" ,expanded=True):
