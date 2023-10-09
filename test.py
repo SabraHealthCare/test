@@ -60,6 +60,33 @@ if True:
         st.error('Username/password is incorrect')
     elif st.session_state["authentication_status"] is None:
         st.warning('Please enter your username and password')
+def Save_File_toS3(uploaded_file, bucket, key):  
+    try:
+        s3.upload_fileobj(uploaded_file, bucket, key)
+        st.success('{} successfully Uploaded'.format(uploaded_file.name))
+        return True
+    except FileNotFoundError:
+        st.error("File can't be uploaded.")
+        return False   
+ 
+# Creating a new user registration widget
+    try:
+        if authenticator.register_user('Register user', preauthorization=False):
+            st.success('User registered successfully')
+    except Exception as e:
+        st.error(e)
+
+    # Creating a forgot password widget
+    try:
+        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+        if username_forgot_pw:
+            st.success('New password sent securely')
+            st.write(username_forgot_pw,email_forgot_password,random_password)
+            # Random password to be transferred to user securely
+        else:
+            st.error('Username not found')
+    except Exception as e:
+        st.error(e)
 
 Save_File_toS3(config, Bucket=bucket_PL,Key="config.yaml")
 
