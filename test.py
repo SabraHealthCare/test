@@ -970,7 +970,7 @@ elif st.session_state["authentication_status"]:
                                 ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                                 View_Discrepancy(percent_discrepancy_accounts)
                                 View_Discrepancy_Detail()
-       time.sleep(200)               
+               
     elif choice=="Manage Mapping" and operator!='select operator':
         with st.expander("Manage Property Mapping" ,expanded=True):
 	    ChangeWidgetFontSize('Manage Property Mapping', '25px')
@@ -986,4 +986,4 @@ elif st.session_state["authentication_status"]:
 	            #insert new record to the bottom line of account_mapping
 	            account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
 	            Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
-	time.sleep(5000) 
+    time.sleep(5000) 
