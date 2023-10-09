@@ -938,7 +938,7 @@ elif st.session_state["authentication_status"]:
 #s33 = boto3.resource("s3").Bucket(bucket_PL)
 #json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
 #json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-    menu=["Upload P&L","Manage Mapping","Instructions"]
+    menu=["Upload P&L","Manage Mapping","Instructions","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
     status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
