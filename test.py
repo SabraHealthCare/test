@@ -88,9 +88,9 @@ def Save_File_toS3(uploaded_file, bucket, key):
     except Exception as e:
         st.error(e)
 with NamedTemporaryFile() as tmp:
-   workbook.save(tmp.name)
+   config.save(tmp.name)
    data = BytesIO(tmp.read())
-   s3.upload_fileobj(config,bucket=bucket_PL,key="config.yaml")
+   s3.upload_fileobj(data,bucket=bucket_PL,key="config.yaml")
 #Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
 
 @st.cache_data
