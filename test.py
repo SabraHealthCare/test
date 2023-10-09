@@ -955,10 +955,10 @@ elif st.session_state["authentication_status"]:
 	     
                         if uploaded_file:
 		        # initial parameter
-	                    TENANT_ID=format_table["Tenant_ID"][0]
-	                    global latest_month
-	                    latest_month="2023"
-	                    Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+                            TENANT_ID=format_table["Tenant_ID"][0]
+                            global latest_month
+                            latest_month="2023"
+                            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
 	
 	                    # 1 Summary
 	                    with st.expander("Summary of P&L" ,expanded=True):
