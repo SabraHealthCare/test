@@ -60,14 +60,7 @@ if True:
         st.error('Username/password is incorrect')
     elif st.session_state["authentication_status"] is None:
         st.warning('Please enter your username and password')
-def Save_File_toS3(uploaded_file, bucket, key):  
-    try:
-        s3.upload_fileobj(uploaded_file, bucket, key)
-        st.success('{} successfully Uploaded'.format(uploaded_file.name))
-        return True
-    except FileNotFoundError:
-        st.error("File can't be uploaded.")
-        return False   
+
  
 # Creating a new user registration widget
     try:
