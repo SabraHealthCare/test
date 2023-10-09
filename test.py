@@ -980,10 +980,10 @@ elif st.session_state["authentication_status"]:
             col1,col2=st.columns(2)
             with col1:
                 new_tenant_account=st.text_input("Enter new tenant account and press enter to apply:")
-	        if new_tenant_account:
-	            st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
-	            Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
+                if new_tenant_account:
+                    st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account)) 
+                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
 	            #insert new record to the bottom line of account_mapping
-	            account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
-	            Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
+                    account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
+                    Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
     time.sleep(5000) 
