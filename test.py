@@ -947,7 +947,7 @@ elif st.session_state["authentication_status"]:
                 with col3:
                     submitted = st.form_submit_button("Upload")
                 with col4:
-	            if submitted:
+                    if submitted:
 			# clear cache for every upload
 	                st.cache_data.clear()
 	                st.cache_resource.clear()
