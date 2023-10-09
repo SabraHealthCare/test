@@ -12,10 +12,10 @@ import  streamlit_tree_select
 import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
-import streamlit_authenticator as authenticator
+import streamlit_authenticator as authen
 import yaml
 from yaml.loader import SafeLoader
-
+from  authenticate import Authenticate
 
 s3 = boto3.client('s3')
 
