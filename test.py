@@ -16,6 +16,13 @@ import pandas as pd  # pip install pandas openpyxl
 import mysql.connector
 import streamlit_authenticator as stauth  
 
+
+
+import streamlit_authenticator as stauth  # pip install streamlit-authenticator
+import yaml
+from yaml.loader import SafeLoader
+
+
 s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
@@ -26,6 +33,7 @@ st.set_page_config(
     layout="wide")
 placeholder = st.empty()
 
+
 st.title("Sabra HealthCare Monthly Reporting App")
 sheet_name_account_mapping="Account_Mapping"
 sheet_name_entity_mapping="Property_Mapping"
@@ -34,6 +42,11 @@ sheet_name_format='Format'
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
+
+response = s3_client.get_object(Bucket=bucket_PL, Key="config.yaml")
+configfile = yaml.safe_load(response["Body"])
+st.write(configfile)
+
 
 @st.cache_data
 def get_operator_list(bucket_mapping):
