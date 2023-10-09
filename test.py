@@ -12,12 +12,7 @@ import  streamlit_tree_select
 import copy
 import streamlit.components.v1 as components
 from calendar import monthrange
-import pandas as pd  # pip install pandas openpyxl
-import streamlit_authenticator as stauth  
-
-
-
-import streamlit_authenticator as stauth  # pip install streamlit-authenticator
+from  authenticate import Authenticate  
 import yaml
 from yaml.loader import SafeLoader
 
@@ -43,9 +38,30 @@ bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
 
 response = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
-configfile = yaml.safe_load(response["Body"])
-st.write(configfile)
+config = yaml.safe_load(response["Body"])
+st.write(config)
+# Creating the authenticator object
+if True:
+    authenticator = Authenticate(
+        config['credentials'],
+        config['cookie']['name'], 
+        config['cookie']['key'], 
+        config['cookie']['expiry_days'],
+        config['preauthorized']
+    )
 
+    # creating a login widget
+    authenticator.login('Login', 'main')
+    if st.session_state["authentication_status"]:
+        authenticator.logout('Logout', 'main')
+        st.write(f'Welcome *{st.session_state["name"]}*')
+        st.title('Some content_______')
+    elif st.session_state["authentication_status"] is False:
+        st.error('Username/password is incorrect')
+    elif st.session_state["authentication_status"] is None:
+        st.warning('Please enter your username and password')
+
+Save_File_toS3(config, Bucket=bucket_PL,Key="config.yaml")
 
 @st.cache_data
 def get_operator_list(bucket_mapping):
