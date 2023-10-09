@@ -87,10 +87,12 @@ def Save_File_toS3(uploaded_file, bucket, key):
             st.error('Username not found')
     except Exception as e:
         st.error(e)
-with NamedTemporaryFile() as tmp:
-   config.save(tmp.name)
-   data = BytesIO(tmp.read())
-   s3.upload_fileobj(data,bucket=bucket_PL,key="config.yaml")
+
+
+s3.Object(bucket_PL, "config.yaml").put(Body=config)
+
+
+#s3.upload_fileobj(data,bucket=bucket_PL,key="config.yaml")
 #Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
 
 @st.cache_data
