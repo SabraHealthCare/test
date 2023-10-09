@@ -87,8 +87,11 @@ def Save_File_toS3(uploaded_file, bucket, key):
             st.error('Username not found')
     except Exception as e:
         st.error(e)
-
-Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
+with NamedTemporaryFile() as tmp:
+   workbook.save(tmp.name)
+   data = BytesIO(tmp.read())
+   s3.upload_fileobj(config,bucket=bucket_PL,key="config.yaml")
+#Save_File_toS3(config, bucket=bucket_PL,key="config.yaml")
 
 @st.cache_data
 def get_operator_list(bucket_mapping):
