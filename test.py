@@ -941,7 +941,7 @@ elif st.session_state["authentication_status"]:
         st.subheader("Upload P&L:")
         col1,col2=st.columns(2) 
         with col1:
-	    with st.form("my-form", clear_on_submit=True):
+            with st.form("my-form", clear_on_submit=True):
                 uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
                 col3,col4=st.columns([1,3]) 
                 with col3:
