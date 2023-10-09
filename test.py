@@ -42,7 +42,7 @@ sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
 
-response = s3_client.get_object(Bucket=bucket_PL, Key="config.yaml")
+response = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 configfile = yaml.safe_load(response["Body"])
 st.write(configfile)
 
