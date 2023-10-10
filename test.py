@@ -974,8 +974,9 @@ elif st.session_state["authentication_status"]:
 	            #insert new record to the bottom line of account_mapping
                     account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
                     Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
+    
     elif choice=="Edit Account":
-	# Creating an update user details widget
+	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
                 st.success('Entries updated successfully')
