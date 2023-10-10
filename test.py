@@ -35,19 +35,6 @@ sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
 
-
-#@st.cache_data
-#def get_operator_list(bucket_mapping):
-    #operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
-    #operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
-    #return operator_list
-#operator_list=get_operator_list(bucket_mapping)
-
-#col1,col2=st.columns(2)
-#with col1:
-    #operator= st.selectbox('Operator Name',(operator_list))
-
-
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
@@ -935,14 +922,8 @@ elif st.session_state["authentication_status"]:
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
-
-#s33 = boto3.resource("s3").Bucket(bucket_PL)
-#json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-#json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-    menu=["Upload P&L","Manage Mapping","Instructions","Logout"]
+    menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
-
-    status_record=pd.DataFrame(columns=["Entity","BS","Revenue",""])
 	
     if choice=="Upload P&L":
         st.subheader("Upload P&L:")
@@ -993,6 +974,17 @@ elif st.session_state["authentication_status"]:
 	            #insert new record to the bottom line of account_mapping
                     account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
                     Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
+    elif choice=="Edit Account":
+	# Creating an update user details widget
+        try:
+            if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
+                st.success('Entries updated successfully')
+                s33 = boto3.resource("s3").Bucket(bucket_PL)
+                json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+                json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+        except Exception as e:
+            st.error(e)
+
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
     time.sleep(5000) 
