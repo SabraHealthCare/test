@@ -44,8 +44,8 @@ class Authenticate:
         self.cookie_manager = stx.CookieManager()
         self.validator = validator if validator is not None else Validator()
 
-        if 'name' not in st.session_state:
-            st.session_state['name'] = None
+        if 'operator' not in st.session_state:
+            st.session_state['operator'] = None
         if 'authentication_status' not in st.session_state:
             st.session_state['authentication_status'] = None
         if 'username' not in st.session_state:
@@ -62,7 +62,7 @@ class Authenticate:
         str
             The JWT cookie for passwordless reauthentication.
         """
-        return jwt.encode({'name':st.session_state['name'],
+        return jwt.encode({'operator':st.session_state['operator'],
             'username':st.session_state['username'],
             'exp_date':self.exp_date}, self.key, algorithm='HS256')
 
@@ -113,8 +113,8 @@ class Authenticate:
             if self.token is not False:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
-                        if 'name' and 'username' in self.token:
-                            st.session_state['name'] = self.token['name']
+                        if 'operator' and 'username' in self.token:
+                            st.session_state['operator'] = self.token['operator']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
     
@@ -136,7 +136,7 @@ class Authenticate:
             try:
                 if self._check_pw():
                     if inplace:
-                        st.session_state['name'] = self.credentials['usernames'][self.username]['name']
+                        st.session_state['operator'] = self.credentials['usernames'][self.username]['operator']
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
                         self.cookie_manager.set(self.cookie_name, self.token,
@@ -195,7 +195,7 @@ class Authenticate:
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()
 
-        return st.session_state['name'], st.session_state['authentication_status'], st.session_state['username']
+        return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
 
     def logout(self, button_name: str, location: str='main', key: str=None):
         """
@@ -214,14 +214,14 @@ class Authenticate:
             if st.button(button_name, key):
                 self.cookie_manager.delete(self.cookie_name)
                 st.session_state['logout'] = True
-                st.session_state['name'] = None
+                st.session_state['operator'] = None
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
         elif location == 'sidebar':
             if st.sidebar.button(button_name, key):
                 self.cookie_manager.delete(self.cookie_name)
                 st.session_state['logout'] = True
-                st.session_state['name'] = None
+                st.session_state['operator'] = None
                 st.session_state['username'] = None
                 st.session_state['authentication_status'] = None
 
@@ -309,7 +309,7 @@ class Authenticate:
         if not self.validator.validate_email(email):
             raise RegisterError('Email is not valid')
 
-        self.credentials['usernames'][username] = {'name': name, 
+        self.credentials['usernames'][username] = {'operator': operator, 
             'password': Hasher([password]).generate()[0], 'email': email}
         if preauthorization:
             self.preauthorized['emails'].remove(email)
@@ -345,29 +345,29 @@ class Authenticate:
         register_user_form.subheader(form_name)
         new_email = register_user_form.text_input('Email')
         new_username = register_user_form.text_input('Username').lower()
-        new_name = register_user_form.text_input('Name')
+        new_operator = register_user_form.text_input('operator')
         new_password = register_user_form.text_input('Password', type='password')
         new_password_repeat = register_user_form.text_input('Repeat password', type='password')
 
         if register_user_form.form_submit_button('Register'):
-            if len(new_email) and len(new_username) and len(new_name) and len(new_password) > 0:
+            if len(new_email) and len(new_username) and len(new_operator) and len(new_password) > 0:
                 if new_username not in self.credentials['usernames']:
                     if new_password == new_password_repeat:
                         if preauthorization:
                             if new_email in self.preauthorized['emails']:
-                                self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
+                                self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
                                 return True
                             else:
                                 raise RegisterError('User not preauthorized to register')
                         else:
-                            self._register_credentials(new_username, new_name, new_password, new_email, preauthorization)
+                            self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
                             return True
                     else:
                         raise RegisterError('Passwords do not match')
                 else:
                     raise RegisterError('Username already taken')
             else:
-                raise RegisterError('Please enter an email, username, name, and password')
+                raise RegisterError('Please enter an email, username, operator, and password')
 
     def _set_random_password(self, username: str) -> str:
         """
@@ -514,27 +514,33 @@ class Authenticate:
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
-            update_user_details_form = st.form('Update user details')
+            update_user_details_form = st.form("Update user details")
         elif location == 'sidebar':
-            update_user_details_form = st.sidebar.form('Update user details')
+            update_user_details_form = st.sidebar.form("Update user details")
         
         update_user_details_form.subheader(form_name)
         self.username = username.lower()
-        field = update_user_details_form.selectbox('Field', ['Name', 'Email']).lower()
-        new_value = update_user_details_form.text_input('New value')
+        field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+        if field=='password':
+            # Creating a password reset widget
+            try:
+                if authenticator.reset_password(st.session_state["username"], 'Reset password'):
+                    st.success('Password modified successfully')
+            except Exception as e:
+                st.error(e)
+        
+        elif field==Username:
+            new_value = update_user_details_form.text_input('New {}'.format(field))
 
-        if update_user_details_form.form_submit_button('Update'):
-            if len(new_value) > 0:
-                if new_value != self.credentials['usernames'][self.username][field]:
-                    self._update_entry(self.username, field, new_value)
-                    if field == 'name':
-                            st.session_state['name'] = new_value
-                            self.exp_date = self._set_exp_date()
-                            self.token = self._token_encode()
-                            self.cookie_manager.set(self.cookie_name, self.token,
-                            expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                    return True
-                else:
-                    raise UpdateError('New and current values are the same')
-            if len(new_value) == 0:
-                raise UpdateError('New value not provided')
+        
+        elif field=='email':
+            new_value = update_user_details_form.text_input('New {}'.format(field))
+            if update_user_details_form.form_submit_button('Update'):
+                if len(new_value) > 0:
+                    if new_value != self.credentials['usernames'][self.username][field]:
+                        self._update_entry(self.username, field, new_value)
+                        return True
+                    else:
+                        raise UpdateError('New and current values are the same')
+                elif len(new_value) == 0:
+                    raise UpdateError('New Email not provided')
