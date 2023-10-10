@@ -931,6 +931,7 @@ elif st.session_state["authentication_status"] is None:
     st.warning('Please enter your username and password')
 elif st.session_state["authentication_status"]:
     operator='Ensign'
+	
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
