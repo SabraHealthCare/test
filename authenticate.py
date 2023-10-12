@@ -533,7 +533,7 @@ class Authenticate:
             new_value = st.text_input('New {}'.format(field))
             #if update_user_details_form.form_submit_button('Update'):
             #if st.form_submit_button('Update'):
-            if st.button('Update')
+            if st.button('Update'):
                 if len(new_value) > 0:
                     if field=="username":
                         if new_value not in self.credentials['usernames'] :
