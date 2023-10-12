@@ -510,6 +510,7 @@ class Authenticate:
             The location of the update user details form i.e. main or sidebar.
         Returns
         -------
+        
         str
             The status of updating user details.
         """
