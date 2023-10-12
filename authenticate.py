@@ -515,10 +515,11 @@ class Authenticate:
             The status of updating user details.
         """
         
-        update_user_details_form = st.form("Update user details")
-        update_user_details_form.subheader(form_name)
+        #update_user_details_form = st.form("Update user details")
+        #update_user_details_form.subheader(form_name)
         self.username = username.lower()
-        field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+        #field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+        field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
         if field=='password':
             # Creating a password reset widget
             try:
@@ -528,8 +529,10 @@ class Authenticate:
                 st.error(e)
         
         else:
-            new_value = update_user_details_form.text_input('New {}'.format(field))
-            if update_user_details_form.form_submit_button('Update'):
+            #new_value = update_user_details_form.text_input('New {}'.format(field))
+            new_value = st.text_input('New {}'.format(field))
+            #if update_user_details_form.form_submit_button('Update'):
+            if st.form_submit_button('Update'):
                 if len(new_value) > 0:
                     if field=="username":
                         if new_value not in self.credentials['usernames'] :
