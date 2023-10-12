@@ -514,6 +514,7 @@ class Authenticate:
             The status of updating user details.
         """
         
+        update_user_details_form = st.form("Update user details")
         update_user_details_form.subheader(form_name)
         self.username = username.lower()
         field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
@@ -526,7 +527,6 @@ class Authenticate:
                 st.error(e)
         
         else:
-            update_user_details_form = st.form("Update user details")
             new_value = update_user_details_form.text_input('New {}'.format(field))
             if update_user_details_form.form_submit_button('Update'):
                 if len(new_value) > 0:
