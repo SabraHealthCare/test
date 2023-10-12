@@ -899,7 +899,7 @@ def Upload_Section(uploaded_file):
 
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
-
+st.write(config)
 # Creating the authenticator object
 
 authenticator = Authenticate(
