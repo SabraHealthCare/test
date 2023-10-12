@@ -939,6 +939,7 @@ elif st.session_state["authentication_status"]:
 			# clear cache for every upload
                         st.cache_data.clear()
                         st.cache_resource.clear()
+			    
                         st.write("{} uploaded.".format(uploaded_file.name))
 	     
                         if uploaded_file:
