@@ -529,9 +529,9 @@ class Authenticate:
             except Exception as e:
                 st.error(e)
         
-        elif field==Username:
+        elif field=="username":
             new_value = update_user_details_form.text_input('New {}'.format(field))
-
+            df1['ONE'] = df1.pop("A")
         
         elif field=='email':
             new_value = update_user_details_form.text_input('New {}'.format(field))
