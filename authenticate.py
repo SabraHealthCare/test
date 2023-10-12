@@ -511,12 +511,6 @@ class Authenticate:
         str
             The status of updating user details.
         """
-        if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if location == 'main':
-            update_user_details_form = st.form("Update user details")
-        elif location == 'sidebar':
-            update_user_details_form = st.sidebar.form("Update user details")
         
         update_user_details_form.subheader(form_name)
         self.username = username.lower()
@@ -529,18 +523,31 @@ class Authenticate:
             except Exception as e:
                 st.error(e)
         
-        elif field=="username":
-            new_value = update_user_details_form.text_input('New {}'.format(field))
-            df1['ONE'] = df1.pop("A")
-        
-        elif field=='email':
+        else:
+            update_user_details_form = st.form("Update user details")
             new_value = update_user_details_form.text_input('New {}'.format(field))
             if update_user_details_form.form_submit_button('Update'):
                 if len(new_value) > 0:
-                    if new_value != self.credentials['usernames'][self.username][field]:
-                        self._update_entry(self.username, field, new_value)
-                        return True
-                    else:
-                        raise UpdateError('New and current values are the same')
+                    if field=="username"
+                        if new_value not in self.credentials['usernames'] :
+                            if self.validator.validate_username(username):
+                                self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
+                                return True
+                            else:
+                                raise RegisterError('Username is not valid')
+                        else:
+                            raise RegisterError('Username already be taken')
+                    
+                    elif field=='email':
+                        if new_value != self.credentials['usernames'][self.username][field]:
+                            if self.validator.validate_email(email):
+                                self._update_entry(self.username, field, new_value)
+                                return True
+                            else:
+                                raise RegisterError('New email is not valid')
+                        else:
+                            raise UpdateError('New and current email are the same')
                 elif len(new_value) == 0:
-                    raise UpdateError('New Email not provided')
+                    raise UpdateError('New {} not provided'.format(field))
+
+
