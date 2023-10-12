@@ -150,7 +150,7 @@ class Authenticate:
                     else:
                         return False
             except Exception as e:
-                print(e)
+                st.write(e)
         else:
             if inplace:
                 st.session_state['authentication_status'] = False
@@ -532,6 +532,11 @@ class Authenticate:
                         if new_value not in self.credentials['usernames'] :
                             if self.validator.validate_username(username):
                                 self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
+                                st.session_state['usernames'] = new_value
+                                self.exp_date = self._set_exp_date()
+                                self.token = self._token_encode()
+                                self.cookie_manager.set(self.cookie_name, self.token,
+                                                        expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                 return True
                             else:
                                 raise RegisterError('Username is not valid')
