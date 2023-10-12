@@ -528,7 +528,7 @@ class Authenticate:
             new_value = update_user_details_form.text_input('New {}'.format(field))
             if update_user_details_form.form_submit_button('Update'):
                 if len(new_value) > 0:
-                    if field=="username"
+                    if field=="username":
                         if new_value not in self.credentials['usernames'] :
                             if self.validator.validate_username(username):
                                 self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
