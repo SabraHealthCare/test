@@ -526,7 +526,7 @@ class Authenticate:
         if field=='password':
             # Creating a password reset widget
             try:
-                reset_password_form = st.sidebar.form('Reset password')
+                reset_password_form = st.form('Reset password')
                 #reset_password_form.subheader('Reset password')    
                 self.password = reset_password_form.text_input('Current password', type='password')
                 new_password = reset_password_form.text_input('New password', type='password')
