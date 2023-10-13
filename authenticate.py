@@ -142,7 +142,7 @@ class Authenticate:
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
                         self.cookie_manager.set(self.cookie_name, self.token,
-                            expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                                   expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                         st.session_state['authentication_status'] = True
                     else:
                         return True
@@ -194,7 +194,10 @@ class Authenticate:
                 st.session_state['username'] = self.username
                 self.password = login_form.text_input('Password', type='password')
                 if login_form.form_submit_button('Login'):
-                    self._check_credentials()
+                    if len(self.password)>0 and len(self.username)>0:
+                        self._check_credentials()
+                    else:
+                        st.warning('Please enter your username and password')
 
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
 
@@ -522,7 +525,7 @@ class Authenticate:
         if field=='password':
             # Creating a password reset widget
             try:
-                if authenticator.reset_password(st.session_state["username"], 'Reset password'):
+                if reset_password(st.session_state["username"], 'Reset password'):
                     st.success('Password modified successfully')
             except Exception as e:
                 st.write(1)
