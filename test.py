@@ -977,7 +977,6 @@ elif st.session_state["authentication_status"]:
 	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
-                st.success('Updated successfully')
                 s33 = boto3.resource("s3").Bucket(bucket_PL)
                 json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                 json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
