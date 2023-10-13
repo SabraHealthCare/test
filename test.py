@@ -899,9 +899,7 @@ def Upload_Section(uploaded_file):
 
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
-st.write(config)
 # Creating the authenticator object
-
 authenticator = Authenticate(
         config['credentials'],
         config['cookie']['name'], 
@@ -914,8 +912,7 @@ authenticator = Authenticate(
 authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-elif st.session_state["authentication_status"] is None:
-    st.warning('Please enter your username and password')
+
 elif st.session_state["authentication_status"]:
     operator='Ensign'
 	
