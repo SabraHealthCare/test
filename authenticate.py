@@ -567,6 +567,7 @@ class Authenticate:
                                 self.token = self._token_encode()
                                 self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                                st.success('Username updated successfully')
                                 return True
                             else:
                                 raise RegisterError('Username is not valid')
@@ -577,6 +578,7 @@ class Authenticate:
                         if new_value != self.credentials['usernames'][self.username][field]:
                             if self.validator.validate_email(email):
                                 self._update_entry(self.username, field, new_value)
+                                st.success('Email updated successfully')
                                 return True
                             else:
                                 raise RegisterError('New email is not valid')
