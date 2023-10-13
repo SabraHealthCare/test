@@ -522,7 +522,7 @@ class Authenticate:
         #update_user_details_form.subheader(form_name)
         self.username = username.lower()
         st.write(self.credentials['usernames'][username]["email"] )
-        st.write(self.credentials['usernames'][username]["username"] )
+        st.write(self.credentials['usernames'][username] )
         st.write(self.credentials['usernames'][username]["operator"] )
 
 
