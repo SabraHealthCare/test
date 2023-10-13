@@ -521,6 +521,12 @@ class Authenticate:
         #update_user_details_form = st.form("Update user details")
         #update_user_details_form.subheader(form_name)
         self.username = username.lower()
+        st.write(self.credentials['usernames'][username]["email"] )
+        st.write(self.credentials['usernames'][username]["username"] )
+        st.write(self.credentials['usernames'][username]["operator"] )
+
+
+        
         #field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
         field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
         if field=='password':
