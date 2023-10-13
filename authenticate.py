@@ -521,9 +521,10 @@ class Authenticate:
         #update_user_details_form = st.form("Update user details")
         #update_user_details_form.subheader(form_name)
         self.username = username.lower()
-        st.write(self.credentials['usernames'][username]["email"] )
-        st.write(self.credentials['usernames'][username] )
-        st.write(self.credentials['usernames'][username]["operator"] )
+        st.title("Your Profile")
+        st.write("Username",self.username)
+        st.write("Email:",self.credentials['usernames'][username]["email"] )
+        st.write("Operator:",self.credentials['usernames'][username]["operator"] )
 
 
         
