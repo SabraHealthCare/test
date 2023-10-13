@@ -256,6 +256,7 @@ class Authenticate:
             The location of the password reset form i.e. main or sidebar.
         Returns
         -------
+        
         str
             The status of resetting the password.
         """
