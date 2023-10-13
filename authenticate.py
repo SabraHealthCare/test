@@ -526,6 +526,7 @@ class Authenticate:
                 if authenticator.reset_password(st.session_state["username"], 'Reset password'):
                     st.success('Password modified successfully')
             except Exception as e:
+                st.write(1)
                 st.error(e)
         
         else:
