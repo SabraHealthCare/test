@@ -576,7 +576,7 @@ class Authenticate:
                     
                     elif field=='email':
                         if new_value != self.credentials['usernames'][self.username][field]:
-                            if self.validator.validate_email(email):
+                            if self.validator.validate_email(new_value):
                                 self._update_entry(self.username, field, new_value)
                                 st.success('Email updated successfully')
                                 return True
