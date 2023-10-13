@@ -193,7 +193,6 @@ class Authenticate:
                 self.username = login_form.text_input('Username').lower()
                 st.session_state['username'] = self.username
                 self.password = login_form.text_input('Password', type='password')
-
                 if login_form.form_submit_button('Login'):
                     self._check_credentials()
 
