@@ -913,10 +913,9 @@ authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
-elif st.session_state["authentication_status"]:
-    st.write(st.session_state)
-    operator='Ensign'
-	
+elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
+    operator=st.session_state["operator"]
+
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
@@ -986,4 +985,4 @@ elif st.session_state["authentication_status"]:
 
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-    time.sleep(5000) 
+   
