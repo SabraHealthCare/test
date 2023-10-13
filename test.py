@@ -914,6 +914,7 @@ if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
 elif st.session_state["authentication_status"]:
+    st.write(st.session_state)
     operator='Ensign'
 	
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
