@@ -522,76 +522,77 @@ class Authenticate:
         #update_user_details_form.subheader(form_name)
         self.username = username.lower()
         st.subheader("Your Profile")
-        st.write("Username",self.username)
+        st.write("Username:",self.username)
         st.write("Email:",self.credentials['usernames'][username]["email"] )
         st.write("From:",self.credentials['usernames'][username]["operator"] )
 
-
+        st.write("")
         st.subheader("Edit Your Profile")
-        #field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
-        field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
-        if field=='password':
-            # Creating a password reset widget
-            try:
-                reset_password_form = st.form('Reset password')
-                #reset_password_form.subheader('Reset password')    
-                self.password = reset_password_form.text_input('Current password', type='password')
-                new_password = reset_password_form.text_input('New password', type='password')
-                new_password_repeat = reset_password_form.text_input('Repeat password', type='password')
+        col1,col2=st.columns(2)
+        with col1:
+            #field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+            field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
+            if field=='password':
+                # Creating a password reset widget
+                try:
+                    reset_password_form = st.form('Reset password')
+                    reset_password_form.subheader('Reset password')    
+                    self.password = reset_password_form.text_input('Current password', type='password')
+                    new_password = reset_password_form.text_input('New password', type='password')
+                    new_password_repeat = reset_password_form.text_input('Repeat password', type='password')
 
-                if reset_password_form.form_submit_button('Reset'):
-                    if self._check_credentials(inplace=False):
-                        if len(new_password) > 0:
-                            if new_password == new_password_repeat:
-                                if self.password != new_password: 
-                                    self._update_password(self.username, new_password)
-                                    st.success('Password updated successfully')
+                    if reset_password_form.form_submit_button('Reset'):
+                        if self._check_credentials(inplace=False):
+                            if len(new_password) > 0:
+                                if new_password == new_password_repeat:
+                                    if self.password != new_password: 
+                                        self._update_password(self.username, new_password)
+                                        st.success('Password updated successfully')
+                                        return True
+                                    else:
+                                        raise ResetError('New and current passwords are the same')
+                                else:
+                                    raise ResetError('Passwords do not match')
+                            else:
+                                raise ResetError('No new password provided')
+                        else:
+                            raise CredentialsError('password')
+                except Exception as e:
+                    st.error(e)
+        
+            else:
+                #new_value = update_user_details_form.text_input('New {}'.format(field))
+                new_value = st.text_input('New {}'.format(field))
+
+                if st.button('Update'):
+                    if len(new_value) > 0:
+                        if field=="username":
+                            if new_value not in self.credentials['usernames'] :
+                                if self.validator.validate_username(username):
+                                    self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
+                                    st.session_state['usernames'] = new_value
+                                    self.exp_date = self._set_exp_date()
+                                    self.token = self._token_encode()
+                                    self.cookie_manager.set(self.cookie_name, self.token,
+                                                        expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                                    st.success('Username updated successfully')
                                     return True
                                 else:
-                                    raise ResetError('New and current passwords are the same')
+                                    raise RegisterError('Username is not valid')
                             else:
-                                raise ResetError('Passwords do not match')
-                        else:
-                            raise ResetError('No new password provided')
-                    else:
-                        raise CredentialsError('password')
-            except Exception as e:
-                st.error(e)
-        
-        else:
-            #new_value = update_user_details_form.text_input('New {}'.format(field))
-            new_value = st.text_input('New {}'.format(field))
-            #if update_user_details_form.form_submit_button('Update'):
-            #if st.form_submit_button('Update'):
-            if st.button('Update'):
-                if len(new_value) > 0:
-                    if field=="username":
-                        if new_value not in self.credentials['usernames'] :
-                            if self.validator.validate_username(username):
-                                self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
-                                st.session_state['usernames'] = new_value
-                                self.exp_date = self._set_exp_date()
-                                self.token = self._token_encode()
-                                self.cookie_manager.set(self.cookie_name, self.token,
-                                                        expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                st.success('Username updated successfully')
-                                return True
-                            else:
-                                raise RegisterError('Username is not valid')
-                        else:
-                            raise RegisterError('Username already be taken')
+                                raise RegisterError('Username already be taken')
                     
-                    elif field=='email':
-                        if new_value != self.credentials['usernames'][self.username][field]:
-                            if self.validator.validate_email(new_value):
-                                self._update_entry(self.username, field, new_value)
-                                st.success('Email updated successfully')
-                                return True
+                        elif field=='email':
+                            if new_value != self.credentials['usernames'][self.username][field]:
+                                if self.validator.validate_email(new_value):
+                                    self._update_entry(self.username, field, new_value)
+                                    st.success('Email updated successfully')
+                                    return True
+                                else:
+                                    raise RegisterError('New email is not valid')
                             else:
-                                raise RegisterError('New email is not valid')
-                        else:
-                            raise UpdateError('New and current email are the same')
-                elif len(new_value) == 0:
-                    raise UpdateError('New {} not provided'.format(field))
+                                raise UpdateError('New and current email are the same')
+                    elif len(new_value) == 0:
+                        raise UpdateError('New {} not provided'.format(field))
 
 
