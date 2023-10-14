@@ -915,7 +915,7 @@ if st.session_state["authentication_status"] is False:
 
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
     operator=st.session_state["operator"]
-
+    st.write("operator",operator)
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
@@ -987,8 +987,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         authenticator.logout('Logout', 'main')
 	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
-
-    menu=["Riew operator upload","Review New Mapping","Edit Account","Logout"]
+    st.write("operator",operator)
+    menu=["Review operator upload","Review New Mapping","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
     if choice=="Edit Account":
