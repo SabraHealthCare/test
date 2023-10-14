@@ -114,9 +114,7 @@ class Authenticate:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
                         if 'operator' and 'username' in self.token:
-                            st.write(self.token['operator'])
-                            st.write(st.session_state['operator'])
-                            #st.session_state['operator'] = self.token['operator']
+                            st.session_state['operator'] = self.token['operator']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
     
