@@ -988,7 +988,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
 
-    menu=["Riew operator upload","Review New Mapping",,"Edit Account","Logout"]
+    menu=["Riew operator upload","Review New Mapping","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
     if choice=="Edit Account":
