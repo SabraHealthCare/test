@@ -911,10 +911,10 @@ authenticator = Authenticate(
 authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-
-elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
+elif st.session_state["operator"]!="sabra":
+    st.write("yes")
+elif st.session_state["authentication_status"] :
     operator=st.session_state["operator"]
-    st.write("operator",operator)
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
