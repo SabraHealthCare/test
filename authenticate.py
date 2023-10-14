@@ -561,7 +561,6 @@ class Authenticate:
                     st.error(e)
         
             else:
-                #new_value = update_user_details_form.text_input('New {}'.format(field))
                 new_value = st.text_input('New {}'.format(field))
 
                 if st.button('Update'):
@@ -570,7 +569,9 @@ class Authenticate:
                             if new_value not in self.credentials['usernames'] :
                                 if self.validator.validate_username(username):
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
+                                    st.write("credentials",self.credentials)
                                     st.session_state['usernames'] = new_value
+                                    st.write("session_state",st.session_state)
                                     self.exp_date = self._set_exp_date()
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
