@@ -61,7 +61,6 @@ def Initial_Paramaters(operator):
         st.stop()
     return PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic
 
-
 @st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
