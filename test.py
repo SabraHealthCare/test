@@ -985,4 +985,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
+	    
+elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
+
+    menu=["Riew operator upload","Review New Mapping",,"Edit Account","Logout"]
+    choice=st.sidebar.selectbox("Menu", menu)
+
+    if choice=="Edit Account":
+	# update user details widget
+        try:
+            if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
+                s33 = boto3.resource("s3").Bucket(bucket_PL)
+                json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+                json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+        except Exception as e:
+            st.error(e)
+
+    elif choice=="Logout":
+        authenticator.logout('Logout', 'main')
    
