@@ -988,7 +988,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         authenticator.logout('Logout', 'main')
 	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
-    st.write("operator",operator)
+    
     menu=["Review operator upload","Review New Mapping","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
