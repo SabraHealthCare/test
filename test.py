@@ -912,6 +912,7 @@ authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 elif st.session_state["operator"]!="sabra":
+    st.write(st.session_state["operator"],"sabra")
     st.write("yes")
 elif st.session_state["authentication_status"] :
     operator=st.session_state["operator"]
