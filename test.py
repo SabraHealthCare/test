@@ -893,6 +893,7 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL=diff_BPC_PL.merge(entity_mapping, on="ENTITY",how="left")
                 diff_BPC_PL['Type comments below']=""
                 diff_BPC_PL['Operator']=operator
+		    
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 #----------------------------------website widges------------------------------------
 
