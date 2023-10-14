@@ -992,6 +992,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     menu=["Review operator upload","Review New Mapping","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
+	
     if choice=="Edit Account":
 	# update user details widget
         try:
