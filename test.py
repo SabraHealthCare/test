@@ -909,7 +909,9 @@ authenticator = Authenticate(
     )
 
 # login widget
-authenticator.login('Login', 'main')
+col1,col2=st.columns(2)
+with col1:
+    authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
@@ -974,7 +976,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
                     Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
     
-    elif choice=="Edit Account":
+    elif choice=="Edit Account": 
 	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
