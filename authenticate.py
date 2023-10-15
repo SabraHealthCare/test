@@ -190,10 +190,12 @@ class Authenticate:
                 elif location == 'sidebar':
                     login_form = st.sidebar.form('Login')
 
-                login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
-                st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
+                col1,col2=st.columns(2)
+                with col1:
+                    login_form.subheader(form_name)
+                    self.username = login_form.text_input('Username').lower()
+                    st.session_state['username'] = self.username
+                    self.password = login_form.text_input('Password', type='password')
                 if login_form.form_submit_button('Login'):
                     if len(self.password)>0 and len(self.username)>0:
                         self._check_credentials()
