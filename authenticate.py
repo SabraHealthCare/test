@@ -336,6 +336,7 @@ class Authenticate:
             The preauthorization requirement, True: user must be preauthorized to register, 
             False: any user can register.
         Returns
+        
         -------
         bool
             The status of registering the new user, True: user registered successfully.
