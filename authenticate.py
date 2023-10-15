@@ -163,7 +163,7 @@ class Authenticate:
     def login(self, form_name: str, location: str='main') -> tuple:
         """
         Creates a login widget.
-
+ 
         Parameters
         ----------
         form_name: str
