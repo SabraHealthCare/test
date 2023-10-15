@@ -190,6 +190,7 @@ class Authenticate:
                 elif location == 'sidebar':
                     login_form = st.sidebar.form('Login')
 
+                
                 col1,col2=st.columns(2)
                 with col1:
                     login_form.subheader(form_name)
