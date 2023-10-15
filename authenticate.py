@@ -576,7 +576,7 @@ class Authenticate:
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
                                     self.operator=self.credentials['usernames'][new_value]["operator"]
-                                    st.session_state['usernames'] = new_value
+                                    st.session_state['username'] = new_value
                                     st.session_state['operator']= self.operator
                                     st.write("st.session_state['operator']",st.session_state['operator'])
                                     self.exp_date = self._set_exp_date()
@@ -586,7 +586,7 @@ class Authenticate:
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                     st.write(3)
-                                    st.sleep(100)
+                                    
                                     st.success('Username updated successfully')
                                     return True
                                 else:
