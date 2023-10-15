@@ -570,13 +570,11 @@ class Authenticate:
                                 if self.validator.validate_username(username):
                     
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
-                                    st.write(self.credentials['usernames'][new_value])
+                                    self.username=new_value
                                     st.session_state['usernames'] = new_value
                                     st.write("st.session_state['usernames']",st.session_state['usernames'])
-                                    st.session_state['operator']= self.credentials['usernames'][username]["operator"]
+                                    st.session_state['operator']= self.credentials['usernames'][new_value]["operator"]
                                     st.write("st.session_state['operator']",st.session_state['operator'])
-                                    
-                                    st.write("credentials",self.credentials)
                                     self.exp_date = self._set_exp_date()
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
