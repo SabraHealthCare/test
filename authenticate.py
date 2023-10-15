@@ -548,7 +548,7 @@ class Authenticate:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
-                                        st.success('Password updated successfully')
+                                      
                                         return True
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -573,13 +573,11 @@ class Authenticate:
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
                                     st.session_state['username'] = self.username
-                                    #st.session_state['operator']= self.operator
-                                    #st.write("st.session_state['operator']",st.session_state['operator'])
                                     self.exp_date = self._set_exp_date()
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                    st.success('Username updated successfully')
+                                    
                                     return True
                                 else:
                                     raise RegisterError('Username is not valid')
@@ -590,7 +588,7 @@ class Authenticate:
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
-                                    st.success('Email updated successfully')
+                                    
                                     return True
                                 else:
                                     raise RegisterError('New email is not valid')
