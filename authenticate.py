@@ -60,11 +60,8 @@ class Authenticate:
         Returns
         -------
         str
-            The JWT cookie for passwordless reauthentication.
+            The JWT cookie for passwordless authentication.
         """
-        st.write(jwt.encode({'operator':st.session_state['operator'],
-            'username':st.session_state['username'],
-            'exp_date':self.exp_date}, self.key, algorithm='HS256'))
         
         return jwt.encode({'operator':st.session_state['operator'],
             'username':st.session_state['username'],
