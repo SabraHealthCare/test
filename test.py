@@ -1000,6 +1000,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 s33 = boto3.resource("s3").Bucket(bucket_PL)
                 json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                 json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+		st.success('Updated successfully')
         except Exception as e:
             st.error(e)
 
