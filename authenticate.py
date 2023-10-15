@@ -569,8 +569,9 @@ class Authenticate:
                             if new_value not in self.credentials['usernames'] :
                                 if self.validator.validate_username(username):
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
-                                    st.write("credentials",self.credentials)
+                                    #st.write("credentials",self.credentials)
                                     st.session_state['usernames'] = new_value
+                                    st.session_state['operator']= self.credentials['usernames'][username]["operator"]
                                     st.write("session_state",st.session_state)
                                     self.exp_date = self._set_exp_date()
                                     self.token = self._token_encode()
