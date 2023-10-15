@@ -184,15 +184,15 @@ class Authenticate:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
             self._check_cookie()
-            if not st.session_state['authentication_status']:
-                if location == 'main':
-                    login_form = st.form('Login')
-                elif location == 'sidebar':
-                    login_form = st.sidebar.form('Login')
 
-                
+            if not st.session_state['authentication_status']:
                 col1,col2=st.columns(2)
                 with col1:
+                    if location == 'main':
+                        login_form = st.form('Login')
+                    elif location == 'sidebar':
+                        login_form = st.sidebar.form('Login')
+
                     login_form.subheader(form_name)
                     self.username = login_form.text_input('Username').lower()
                     st.session_state['username'] = self.username
