@@ -586,7 +586,7 @@ class Authenticate:
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                     st.write(3)
-                                    st.stop()
+                                    st.sleep(100)
                                     st.success('Username updated successfully')
                                     return True
                                 else:
