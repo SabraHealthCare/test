@@ -1006,6 +1006,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         except Exception as e:
             st.error(e)
 
+	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 
