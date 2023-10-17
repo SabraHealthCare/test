@@ -1009,7 +1009,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 
-col1,col2=st.colmuns(2)
+col1,col2=st.columns(2)
 with col1:
     forgot_password=st.button("Forgot password")
 # Creating a forgot password widget
