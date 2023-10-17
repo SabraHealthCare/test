@@ -1011,7 +1011,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 col1,col2=st.colmuns(2)
 with col1:
-    forgot_password=st.button("Forgot password"):
+    forgot_password=st.button("Forgot password")
 # Creating a forgot password widget
 if forgot_username:
     try:
