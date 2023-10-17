@@ -1025,7 +1025,7 @@ if forgot_username:
     except Exception as e:
         st.error(e)
 with col2:
-    forgot_username=st.button("Forgot username"):
+    forgot_username=st.button("Forgot username")
     # Creating a forgot username widget
 if forgot_username:
     try:
