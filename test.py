@@ -1012,10 +1012,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 col1,col2=st.columns(2)
 with col1:
-    
     st.write("<a href='#' id='Forgot password'>Forgot password</a>", unsafe_allow_html=True)
     if st.button("Forgot password",key='password'):
-
 # Creating a forgot password widget
         try:
             username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
@@ -1028,8 +1026,8 @@ with col1:
         except Exception as e:
             st.error(e)
 with col2:
-    st.write("<a href='#' id='Forgot password'>Forgot password</a>", unsafe_allow_html=True)
-if st.button("Forgot password",key='password'):
+    st.write("<a href='#' id='Forgot username'>Forgot username</a>", unsafe_allow_html=True)
+if st.button("Forgot username",key='username'):
     # Creating a forgot username widget
     try:
         username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
