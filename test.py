@@ -1013,7 +1013,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 col1,col2=st.columns([1,4])
 with col1:
     # Creating a forgot password widget 
-    #if st.button("Forgot_password",key='password'):
+    if st.button("Forgot_password",key='password'):
         try:
             username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
             if username_forgot_pw:
@@ -1025,7 +1025,7 @@ with col1:
         except Exception as e:
             st.error(e)
 
-primaryColor = st.get_option("theme.primaryColor")
+
 
 with col2:
     Forgot_username=st.button("Forgot_username",key='username')
