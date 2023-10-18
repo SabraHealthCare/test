@@ -917,7 +917,7 @@ with col1:
 # Creating a forgot password widget 
                 
     try:
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')              
+        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password',"main")              
         if username_forgot_pw:
             st.success('New password sent securely')
             st.write(username_forgot_pw,email_forgot_password,random_password)
