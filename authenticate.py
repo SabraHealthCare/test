@@ -353,7 +353,7 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(self, form_name: str, location: str='main') -> tuple:
+    def _forgot_password(self, form_name: str, location: str='main') -> tuple:
         """
         Creates a forgot password widget.
 
@@ -507,7 +507,7 @@ class Authenticate:
                 if st.button("Forgot_password",key='password'):
                     try:
                         st.write(1)
-                        username_forgot_pw, email_forgot_password, random_password = self.forgot_password(self,'Forgot password')
+                        username_forgot_pw, email_forgot_password, random_password = self._forgot_password('Forgot password')
                         st.write(2)
                         if username_forgot_pw:
                             st.success('New password sent securely')
