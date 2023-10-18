@@ -520,7 +520,7 @@ def login(self, form_name: str, location: str='main') -> tuple:
 
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
     
-    def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
+def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
         """
         Creates a update user details widget.
 
