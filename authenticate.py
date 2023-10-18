@@ -521,9 +521,7 @@ class Authenticate:
         str
             The status of updating user details.
         """
-        
-        #update_user_details_form = st.form("Update user details")
-        #update_user_details_form.subheader(form_name)
+    
         self.username = username.lower()
         st.subheader("Your Profile")
         st.write("Username:",self.username)
