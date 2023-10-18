@@ -366,6 +366,7 @@ class Authenticate:
         Returns
         -------
         str
+        
             Username associated with forgotten password.
         str
             Email associated with forgotten password.
