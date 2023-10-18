@@ -1010,7 +1010,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 
-col1,col2=st.columns([1,4])
+col1,col2=st.columns([1,2])
 with col1:
     # Creating a forgot password widget 
     if st.button("Forgot_password",key='password'):
@@ -1027,18 +1027,4 @@ with col1:
 
 
 
-with col2:
-   #Forgot_username=st.button("Forgot_username",key='username')
-    
-    if st.button("Forgot_username",key='username'):
-    # Creating a forgot username widget
-    #try:
-        username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
-        if username_forgot_username:
-            st.success('Username sent securely')
-            st.write(username_forgot_username, email_forgot_username)
-            # Username to be transferred to user securely
-        else:
-            st.error('Email not found')
-    #except Exception as e:
-        #st.error(e)
+
