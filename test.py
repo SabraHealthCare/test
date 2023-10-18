@@ -1028,9 +1028,9 @@ with col1:
 
 
 with col2:
-    Forgot_username=st.button("Forgot_username",key='username')
+   #Forgot_username=st.button("Forgot_username",key='username')
     
-    if Forgot_username:
+    if st.button("Forgot_username",key='username'):
     # Creating a forgot username widget
     #try:
         username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
