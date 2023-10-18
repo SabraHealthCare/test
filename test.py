@@ -1012,9 +1012,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 col1,col2=st.columns(2)
 with col1:
+    # Creating a forgot password widget
     st.write("<a href='#' id='Forgot password'>Forgot password</a>", unsafe_allow_html=True)
     if st.button("Forgot password",key='password'):
-# Creating a forgot password widget
         try:
             username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
             if username_forgot_pw:
