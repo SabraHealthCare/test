@@ -996,6 +996,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 	
     if choice=="Edit Account":
+	    
 	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
