@@ -507,7 +507,7 @@ class Authenticate:
                 if st.button("Forgot_password",key='password'):
                     try:
                         st.write(1)
-                        username_forgot_pw, email_forgot_password, random_password = forgot_password(self,'Forgot password')
+                        username_forgot_pw, email_forgot_password, random_password = self.forgot_password(self,'Forgot password')
                         st.write(2)
                         if username_forgot_pw:
                             st.success('New password sent securely')
