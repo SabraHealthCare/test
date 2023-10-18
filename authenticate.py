@@ -353,7 +353,7 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def _forgot_password(self, form_name: str, location: str='main') -> tuple:
+    def forgot_password(self, form_name: str, location: str='main') -> tuple:
         """
         Creates a forgot password widget.
 
@@ -501,24 +501,7 @@ class Authenticate:
                     if len(self.password)>0 and len(self.username)>0:
                         self._check_credentials()
                     else:
-                        
                         st.warning('Please enter your username and password')
-
-                # Creating a forgot password widget 
-                if st.button("Forgot_password",key='password'):
-                    try:
-                        st.write(1)
-                        username_forgot_pw, email_forgot_password, random_password = self._forgot_password('Forgot password')
-                        st.write(2)
-                        if username_forgot_pw:
-                            st.success('New password sent securely')
-                            st.write(username_forgot_pw,email_forgot_password,random_password)
-                            # Random password to be transferred to user securely
-                        else:
-                            st.error('Username not found')
-                    except Exception as e:
-                        st.error(e)
-
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
     
     def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
