@@ -501,6 +501,7 @@ class Authenticate:
                     if len(self.password)>0 and len(self.username)>0:
                         self._check_credentials()
                     else:
+                        
                         st.warning('Please enter your username and password')
 
                 # Creating a forgot password widget 
