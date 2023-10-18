@@ -202,6 +202,19 @@ class Authenticate:
                     else:
                         st.warning('Please enter your username and password')
 
+                # Creating a forgot password widget 
+                if st.button("Forgot_password",key='password'):
+                    try:
+                        username_forgot_pw, email_forgot_password, random_password = forgot_password('Forgot password')
+                        if username_forgot_pw:
+                            st.success('New password sent securely')
+                            st.write(username_forgot_pw,email_forgot_password,random_password)
+                            # Random password to be transferred to user securely
+                        else:
+                            st.error('Username not found')
+                    except Exception as e:
+                        st.error(e)
+
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
 
     def logout(self, button_name: str, location: str='main', key: str=None):
