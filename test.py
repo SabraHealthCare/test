@@ -1012,8 +1012,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 col1,col2=st.columns([1,4])
 with col1:
-    # Creating a forgot password widget
-    st.write("<a href='#' id='Forgot_password'>Forgot password</a>", unsafe_allow_html=True)
+    # Creating a forgot password widget 
     if st.button("Forgot_password",key='password'):
         try:
             username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
@@ -1025,9 +1024,13 @@ with col1:
                 st.error('Username not found')
         except Exception as e:
             st.error(e)
+
+primaryColor = st.get_option("theme.primaryColor")
+
 with col2:
-    st.write("<a href='#' id='Forgot_username'>Forgot username</a>", unsafe_allow_html=True)
-if st.button("Forgot_username",key='username'):
+    Forgot_username=st.button("Forgot_username",key='username')
+    
+if Forgot_username:
     # Creating a forgot username widget
     try:
         username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
