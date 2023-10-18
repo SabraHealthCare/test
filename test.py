@@ -1014,7 +1014,7 @@ col1,col2=st.columns(2)
 with col1:
     forgot_password=st.button("Forgot password")
 # Creating a forgot password widget
-    if forgot_username:
+    if forgot_password:
         try:
             username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
             if username_forgot_pw:
@@ -1026,9 +1026,9 @@ with col1:
         except Exception as e:
             st.error(e)
 with col2:
-    #forgot_username=st.button("Forgot username")
+    forgot_username=st.button("Forgot username")
     # Creating a forgot username widget
-    if st.button("Forgot username"):
+    if forgot_username:
         try:
             username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
             if username_forgot_username:
