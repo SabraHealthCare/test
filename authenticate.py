@@ -160,62 +160,7 @@ class Authenticate:
             else:
                 return False
 
-    def login(self, form_name: str, location: str='main') -> tuple:
-        """
-        Creates a login widget.
- 
-        Parameters
-        ----------
-        form_name: str
-            The rendered name of the login form.
-        location: str
-            The location of the login form i.e. main or sidebar.
-        Returns
-        -------
-        str
-            Name of the authenticated user.
-        bool
-            The status of authentication, None: no credentials entered, 
-            False: incorrect credentials, True: correct credentials.
-        str
-            Username of the authenticated user.
-        """
-        if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if not st.session_state['authentication_status']:
-            self._check_cookie()
-
-            if not st.session_state['authentication_status']:
-                
-                if location == 'main':
-                    login_form = st.form('Login')
-                elif location == 'sidebar':
-                    login_form = st.sidebar.form('Login')
-
-                login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
-                st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
-                if login_form.form_submit_button('Login'):
-                    if len(self.password)>0 and len(self.username)>0:
-                        self._check_credentials()
-                    else:
-                        st.warning('Please enter your username and password')
-
-                # Creating a forgot password widget 
-                if st.button("Forgot_password",key='password'):
-                    try:
-                        username_forgot_pw, email_forgot_password, random_password = forgot_password('Forgot password')
-                        if username_forgot_pw:
-                            st.success('New password sent securely')
-                            st.write(username_forgot_pw,email_forgot_password,random_password)
-                            # Random password to be transferred to user securely
-                        else:
-                            st.error('Username not found')
-                    except Exception as e:
-                        st.error(e)
-
-        return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
+    
 
     def logout(self, button_name: str, location: str='main', key: str=None):
         """
@@ -516,6 +461,65 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
+def login(self, form_name: str, location: str='main') -> tuple:
+        """
+        Creates a login widget.
+ 
+        Parameters
+        ----------
+        form_name: str
+            The rendered name of the login form.
+        location: str
+            The location of the login form i.e. main or sidebar.
+        Returns
+        -------
+        str
+            Name of the authenticated user.
+        bool
+            The status of authentication, None: no credentials entered, 
+            False: incorrect credentials, True: correct credentials.
+        str
+            Username of the authenticated user.
+        """
+        if location not in ['main', 'sidebar']:
+            raise ValueError("Location must be one of 'main' or 'sidebar'")
+        if not st.session_state['authentication_status']:
+            self._check_cookie()
+
+            if not st.session_state['authentication_status']:
+                
+                if location == 'main':
+                    login_form = st.form('Login')
+                elif location == 'sidebar':
+                    login_form = st.sidebar.form('Login')
+
+                login_form.subheader(form_name)
+                self.username = login_form.text_input('Username').lower()
+                st.session_state['username'] = self.username
+                self.password = login_form.text_input('Password', type='password')
+                if login_form.form_submit_button('Login'):
+                    if len(self.password)>0 and len(self.username)>0:
+                        self._check_credentials()
+                    else:
+                        st.warning('Please enter your username and password')
+
+                # Creating a forgot password widget 
+                if st.button("Forgot_password",key='password'):
+                    try:
+                        st.write(1)
+                        username_forgot_pw, email_forgot_password, random_password = forgot_password('Forgot password')
+                        st.write(2)
+                        if username_forgot_pw:
+                            st.success('New password sent securely')
+                            st.write(username_forgot_pw,email_forgot_password,random_password)
+                            # Random password to be transferred to user securely
+                        else:
+                            st.error('Username not found')
+                    except Exception as e:
+                        st.error(e)
+
+        return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
+    
     def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
         """
         Creates a update user details widget.
