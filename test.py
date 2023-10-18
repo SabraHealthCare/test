@@ -1028,11 +1028,11 @@ with col1:
 primaryColor = st.get_option("theme.primaryColor")
 
 with col2:
-    #Forgot_username=st.button("Forgot_username",key='username')
+    Forgot_username=st.button("Forgot_username",key='username')
     
-#if Forgot_username:
+    if Forgot_username:
     # Creating a forgot username widget
-    try:
+    #try:
         username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
         if username_forgot_username:
             st.success('Username sent securely')
@@ -1040,5 +1040,5 @@ with col2:
             # Username to be transferred to user securely
         else:
             st.error('Email not found')
-    except Exception as e:
-        st.error(e)
+    #except Exception as e:
+        #st.error(e)
