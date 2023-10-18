@@ -1026,9 +1026,9 @@ with col1:
         except Exception as e:
             st.error(e)
 with col2:
-    forgot_username=st.button("Forgot username")
+    #forgot_username=st.button("Forgot username")
     # Creating a forgot username widget
-    if forgot_username:
+    if st.button("Forgot username"):
         try:
             username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
             if username_forgot_username:
