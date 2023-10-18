@@ -353,7 +353,7 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(self, form_name: str, location: str='main') -> tuple:
+    def forgot_password(form_name: str, location: str='main') -> tuple:
         """
         Creates a forgot password widget.
 
