@@ -353,7 +353,7 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(form_name: str, location: str='main') -> tuple:
+    def forgot_password(form_name: str) -> tuple:
         """
         Creates a forgot password widget.
 
@@ -373,6 +373,7 @@ class Authenticate:
         str
             New plain text password that should be transferred to user securely.
         """
+        location='main'
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
