@@ -1,5 +1,4 @@
 import pandas as pd
-
 import numpy as np
 from datetime import datetime, timedelta,date
 from openpyxl import load_workbook
@@ -912,6 +911,21 @@ authenticator = Authenticate(
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login', 'main')
+    try:
+        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+        if username_forgot_pw:
+            st.success('New password sent securely')
+            s33 = boto3.resource("s3").Bucket(bucket_PL)
+            json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+            json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
+            st.write(username_forgot_pw,email_forgot_password,random_password)
+            
+        else:
+            st.error('Username not found')
+    except Exception as e:
+        st.error(e)
+
+
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
@@ -1010,19 +1024,4 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-try:
-    st.write(config['credentials'])
-    username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
-    if username_forgot_pw:
-        st.success('New password sent securely')
-        s33 = boto3.resource("s3").Bucket(bucket_PL)
-        json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-        json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-        st.write(username_forgot_pw,email_forgot_password,random_password)
-        st.write(config['credentials'])
-        st.stop()
-            # Random password to be transferred to user securely
-    else:
-        st.error('Username not found')
-except Exception as e:
-    st.error(e)
+
