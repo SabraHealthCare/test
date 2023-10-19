@@ -210,7 +210,6 @@ class Authenticate:
                 def clicked_forgot_password(button):
                     st.session_state.clicked_forgot_password[button] = True
 
-                # Button with callback function
                 st.button('Forgot password', on_click=clicked_forgot_password, args=[1])
 
                 # Conditional based on value in session state, not the output
@@ -223,8 +222,7 @@ class Authenticate:
                             json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
                             st.write(username_forgot_pw,email_forgot_password,random_password)
-                        else:
-                            st.error('Username not found')
+           
                     except Exception as e:
                         st.error(e)
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
@@ -546,9 +544,7 @@ class Authenticate:
         str
             The status of updating user details.
         """
-        
-        #update_user_details_form = st.form("Update user details")
-        #update_user_details_form.subheader(form_name)
+
         self.username = username.lower()
         st.subheader("Your Profile")
         st.write("Username:",self.username)
@@ -575,6 +571,7 @@ class Authenticate:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
+                                        
                                         return True
                                     else:
                                         raise ResetError('New and current passwords are the same')
