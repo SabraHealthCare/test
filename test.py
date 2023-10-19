@@ -20,7 +20,6 @@ s3 = boto3.client('s3')
 
 #---------------------------define parameters--------------------------
 st.set_page_config(
-    #page_title="Sabra HealthCare monthly reporting App",
     initial_sidebar_state="expanded",
     layout="wide")
 placeholder = st.empty()
@@ -895,6 +894,8 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL['Operator']=operator
 		    
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
+
+
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
@@ -908,7 +909,6 @@ authenticator = Authenticate(
     )
 
 # login widget
-
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login', bucket_PL,config,'main')
