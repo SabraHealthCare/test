@@ -203,7 +203,7 @@ class Authenticate:
                         st.warning('Please enter your username and password')
                 if st.button("forgot_password"):
                     try:
-                        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+                        username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
                             st.success('New password sent securely')
                             s33 = boto3.resource("s3").Bucket(bucket_PL)
