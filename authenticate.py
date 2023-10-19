@@ -209,7 +209,7 @@ class Authenticate:
                 # Function to update the value in session state
                 def clicked(button_name):
                     st.session_state.clicked[button_name] = True
-                col1,col2=st.columns[1,4]
+                col1,col2=st.columns([1,4])
                 with col1:
                     st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
                 with col2:
