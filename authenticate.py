@@ -201,7 +201,20 @@ class Authenticate:
                         self._check_credentials()
                     else:
                         st.warning('Please enter your username and password')
-                if st.button("forgot_password"):
+
+
+                if 'clicked_forgot_password' not in st.session_state:
+                    st.session_state.clicked_forgot_password = {1:False,2:False}
+
+                # Function to update the value in session state
+                def clicked_forgot_password(button):
+                    st.session_state.clicked_forgot_password[button] = True
+
+                # Button with callback function
+                st.button('Forgot password', on_click=clicked_forgot_password, args=[1])
+
+                # Conditional based on value in session state, not the output
+                if st.session_state.clicked_forgot_password[1]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
@@ -210,13 +223,10 @@ class Authenticate:
                             json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
                             st.write(username_forgot_pw,email_forgot_password,random_password)
-                            st.stop()
-            
                         else:
                             st.error('Username not found')
                     except Exception as e:
                         st.error(e)
-
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
 
     def logout(self, button_name: str, location: str='main', key: str=None):
