@@ -912,7 +912,6 @@ authenticator = Authenticate(
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login', 'main')
-    st.write(333)
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
@@ -1012,17 +1011,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 
-col1,col2=st.columns([1,2])
-with col1:
-    # Creating a forgot password widget 
-    if st.button("Forgot_password",key='password'):
-        try:
-            username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
-            if username_forgot_pw:
-                st.success('New password sent securely')
-                st.write(username_forgot_pw,email_forgot_password,random_password)
-                # Random password to be transferred to user securely
-            else:
-                st.error('Username not found')
-        except Exception as e:
-            st.error(e)
+
+try:
+        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+        if username_forgot_pw:
+            st.success('New password sent securely')
+            st.write(username_forgot_pw,email_forgot_password,random_password)
+            # Random password to be transferred to user securely
+        else:
+            st.error('Username not found')
+except Exception as e:
+        st.error(e)
