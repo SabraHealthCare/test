@@ -919,7 +919,7 @@ with col1:
     try:
         st.write(1)
         username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password',"main") 
-	st.write(2)
+        st.write(2)
         if username_forgot_pw:
             st.success('New password sent securely')
             st.write(username_forgot_pw,email_forgot_password,random_password)
