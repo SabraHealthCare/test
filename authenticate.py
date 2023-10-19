@@ -160,7 +160,49 @@ class Authenticate:
             else:
                 return False
 
-    
+    def login(self, form_name: str, location: str='main') -> tuple:
+        """
+        Creates a login widget.
+ 
+        Parameters
+        ----------
+        form_name: str
+            The rendered name of the login form.
+        location: str
+            The location of the login form i.e. main or sidebar.
+        Returns
+        -------
+        str
+            Name of the authenticated user.
+        bool
+            The status of authentication, None: no credentials entered, 
+            False: incorrect credentials, True: correct credentials.
+        str
+            Username of the authenticated user.
+        """
+        if location not in ['main', 'sidebar']:
+            raise ValueError("Location must be one of 'main' or 'sidebar'")
+        if not st.session_state['authentication_status']:
+            self._check_cookie()
+
+            if not st.session_state['authentication_status']:
+                
+                if location == 'main':
+                    login_form = st.form('Login')
+                elif location == 'sidebar':
+                    login_form = st.sidebar.form('Login')
+
+                login_form.subheader(form_name)
+                self.username = login_form.text_input('Username').lower()
+                st.session_state['username'] = self.username
+                self.password = login_form.text_input('Password', type='password')
+                if login_form.form_submit_button('Login'):
+                    if len(self.password)>0 and len(self.username)>0:
+                        self._check_credentials()
+                    else:
+                        st.warning('Please enter your username and password')
+
+        return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
 
     def logout(self, button_name: str, location: str='main', key: str=None):
         """
@@ -353,7 +395,7 @@ class Authenticate:
         self.credentials['usernames'][username]['password'] = Hasher([self.random_password]).generate()[0]
         return self.random_password
 
-    def forgot_password(form_name: str) -> tuple:
+    def forgot_password(self, form_name: str, location: str='main') -> tuple:
         """
         Creates a forgot password widget.
 
@@ -366,14 +408,12 @@ class Authenticate:
         Returns
         -------
         str
-        
             Username associated with forgotten password.
         str
             Email associated with forgotten password.
         str
             New plain text password that should be transferred to user securely.
         """
-        location='main'
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if location == 'main':
@@ -463,49 +503,6 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
-    def login(self, form_name: str, location: str='main') -> tuple:
-        """
-        Creates a login widget.
- 
-        Parameters
-        ----------
-        form_name: str
-            The rendered name of the login form.
-        location: str
-            The location of the login form i.e. main or sidebar.
-        Returns
-        -------
-        str
-            Name of the authenticated user.
-        bool
-            The status of authentication, None: no credentials entered, 
-            False: incorrect credentials, True: correct credentials.
-        str
-            Username of the authenticated user.
-        """
-        if location not in ['main', 'sidebar']:
-            raise ValueError("Location must be one of 'main' or 'sidebar'")
-        if not st.session_state['authentication_status']:
-            self._check_cookie()
-
-            if not st.session_state['authentication_status']:
-                
-                if location == 'main':
-                    login_form = st.form('Login')
-                elif location == 'sidebar':
-                    login_form = st.sidebar.form('Login')
-
-                login_form.subheader(form_name)
-                self.username = login_form.text_input('Username').lower()
-                st.session_state['username'] = self.username
-                self.password = login_form.text_input('Password', type='password')
-                if login_form.form_submit_button('Login'):
-                    if len(self.password)>0 and len(self.username)>0:
-                        self._check_credentials()
-                    else:
-                        st.warning('Please enter your username and password')
-        return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
-    
     def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
         """
         Creates a update user details widget.
@@ -524,7 +521,9 @@ class Authenticate:
         str
             The status of updating user details.
         """
-    
+        
+        #update_user_details_form = st.form("Update user details")
+        #update_user_details_form.subheader(form_name)
         self.username = username.lower()
         st.subheader("Your Profile")
         st.write("Username:",self.username)
@@ -600,5 +599,3 @@ class Authenticate:
                                 raise UpdateError('New and current email are the same')
                     elif len(new_value) == 0:
                         raise UpdateError('New {} not provided'.format(field))
-
-
