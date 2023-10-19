@@ -237,8 +237,7 @@ class Authenticate:
                             st.success('Username sent securely')
                             st.write(username_forgot_username, email_forgot_username)
                            
-                        else:
-                            st.error('Email not found')
+                        
                     except Exception as e:
                         st.error(e)
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
