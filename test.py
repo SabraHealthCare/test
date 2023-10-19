@@ -1012,15 +1012,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 
 try:
-	st.write(config['credentials'])
-	st.write(11111111)
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
-        if username_forgot_pw:
-            st.success('New password sent securely')
-            st.write(username_forgot_pw,email_forgot_password,random_password)
-            st.write(config['credentials'])
+    st.write(config['credentials'])
+    st.write(11111111)
+    username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+    if username_forgot_pw:
+        st.success('New password sent securely')
+        st.write(username_forgot_pw,email_forgot_password,random_password)
+        st.write(config['credentials'])
             # Random password to be transferred to user securely
-        else:
-            st.error('Username not found')
+    else:
+        st.error('Username not found')
 except Exception as e:
-        st.error(e)
+    st.error(e)
