@@ -213,7 +213,7 @@ class Authenticate:
                 st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
 
                 # Conditional based on value in session state, not the output
-                if st.session_state.clicked["forgot_password_buton"]:
+                if st.session_state.clicked["forgot_password_button"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
