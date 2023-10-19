@@ -1019,8 +1019,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         operator_list=get_operator_list(bucket_mapping)
         col1,col2=st.columns(2)
         with col1:
-            operator= st.selectbox('Operator Name',(operator_list))
-            operator=st.select_box()
+            operator= st.selectbox('Select Operator',(operator_list))
+            
         try:
             if authenticator.register_user('Register user',operator, preauthorization=False):
                 st.success('Registered successfully')
