@@ -181,6 +181,7 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
+        st.title("Sabra HealthCare Monthly Reporting App")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
