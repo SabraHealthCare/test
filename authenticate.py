@@ -3,7 +3,7 @@ import bcrypt
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
-
+import boto3
 from hasher import Hasher
 from validator import Validator
 from utils import generate_random_pw
