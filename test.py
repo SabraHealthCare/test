@@ -979,18 +979,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     elif choice=="Edit Account": 
         st.write(1111100111111111111111)
 	# update user details widget
-        try:
-            st.write(222)
-		
-            if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
-                s33 = boto3.resource("s3").Bucket(bucket_PL)
-                json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-        except Exception as e:
-            st.error(e)
-
-    elif choice=="Logout":
-        authenticator.logout('Logout', 'main')
+        
 	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
     
