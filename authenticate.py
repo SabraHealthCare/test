@@ -213,7 +213,7 @@ class Authenticate:
                 st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
 
                 # Conditional based on value in session state, not the output
-                if st.session_state.clicked["button_forgot_password"]:
+                if st.session_state.clicked["forgot_password_buton"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
@@ -230,14 +230,12 @@ class Authenticate:
                 st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
 
                 # Conditional based on value in session state, not the output
-                if st.session_state.clicked["button_forgot_username"]:
+                if st.session_state.clicked["forgot_username_button"]:
                     try:
                         username_forgot_username, email_forgot_username = self.forgot_username('Forgot username')
                         if username_forgot_username:
                             st.success('Username sent securely')
                             st.write(username_forgot_username, email_forgot_username)
-                       
-             
                         
                     except Exception as e:
                         st.error(e)
