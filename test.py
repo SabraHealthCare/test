@@ -990,10 +990,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-	    
-elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
-    
-    menu=["Review operator upload","Review New Mapping","Edit Account","Logout"]
+
+
+
+# ----------------for Sabra account--------------------	    
+elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":	
+    menu=["Review operator upload","Review New Mapping","Edit Account","Create operator account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
 	
@@ -1008,6 +1010,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         except Exception as e:
             st.error(e)
 
+    elif choice="Create operator account":
+	@st.cache_data
+        def get_operator_list(bucket_mapping):
+            operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
+            operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
+        return operator_list
+        operator_list=get_operator_list(bucket_mapping)
+        col1,col2=st.columns(2)
+        with col1:
+            operator= st.selectbox('Operator Name',(operator_list))
+            operator=st.select_box()
+        try:
+            if authenticator.register_user('Register user',operator, preauthorization=False):
+                st.success('Registered successfully')
+        except Exception as e:
+            st.error(e)
 	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
