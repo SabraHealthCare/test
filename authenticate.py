@@ -329,7 +329,7 @@ class Authenticate:
             else:
                 raise CredentialsError('password')
     
-    def _register_credentials(self, username: str, name: str, password: str, email: str, preauthorization: bool):
+    def _register_credentials(self, username: str, operator: str, password: str, email: str, preauthorization: bool):
         """
         Adds to credentials dictionary the new user's information.
 
@@ -349,8 +349,8 @@ class Authenticate:
         """
         if not self.validator.validate_username(username):
             raise RegisterError('Username is not valid')
-        if not self.validator.validate_name(name):
-            raise RegisterError('Name is not valid')
+        if not self.validator.validate_operator(operator):
+            raise RegisterError('operator is not valid')
         if not self.validator.validate_email(email):
             raise RegisterError('Email is not valid')
 
