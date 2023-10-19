@@ -11,6 +11,7 @@ from utils import generate_random_pw
 import json
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
+
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -116,11 +117,9 @@ class Authenticate:
                 if not st.session_state['logout']:
                     if self.token['exp_date'] > datetime.utcnow().timestamp():
                         if 'operator' and 'username' in self.token:
-                            
                             st.session_state['operator'] = self.token['operator']
                             st.session_state['username'] = self.token['username']
                             st.session_state['authentication_status'] = True
-                            st.write(st.session_state['operator'])
     
     def _check_credentials(self, inplace: bool=True) -> bool:
         """
