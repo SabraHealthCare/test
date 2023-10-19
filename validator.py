@@ -21,7 +21,7 @@ class Validator:
         pattern = r"^[a-zA-Z0-9_-]{1,20}$"
         return bool(re.match(pattern, username))
 
-    def validate_name(self, name: str) -> bool:
+    def alidate_operator(self, operator: str) -> bool:
         """
         Checks the validity of the entered name.
         
