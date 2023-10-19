@@ -918,11 +918,8 @@ if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
-    authenticator.logout('Logout', 'main')
-    st.write(st.session_state['operator'],"st.session_state['operator']3")
-    st.write("yes11")
     operator=st.session_state["operator"]
-    st.write("Hello {}".format(operator))
+    st.subheader("Hello {}".format(operator))
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
