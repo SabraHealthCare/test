@@ -917,9 +917,10 @@ if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
-    st.write(st.session_state["operator"],"sabra")
-    st.write("yes")
+    
+    st.write("yes11")
     operator=st.session_state["operator"]
+    st.write("Hello {}".format(operator))
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
@@ -998,7 +999,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     menu=["Review operator upload","Review New Mapping","Edit Account","Create operator account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
-	
     if choice=="Edit Account":
 	# update user details widget
         try:
