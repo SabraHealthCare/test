@@ -919,6 +919,7 @@ if st.session_state["authentication_status"] is False:
 
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
     authenticator.logout('Logout', 'main')
+    st.write(st.session_state['operator'],"st.session_state['operator']3")
     st.write("yes11")
     operator=st.session_state["operator"]
     st.write("Hello {}".format(operator))
