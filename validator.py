@@ -34,7 +34,7 @@ class Validator:
         bool
             Validity of entered name.
         """
-        return 1 < len(name) < 100
+        return 1 < len(operator) < 100
 
     def validate_email(self, email: str) -> bool:
         """
