@@ -203,17 +203,17 @@ class Authenticate:
                         st.warning('Please enter your username and password')
 
 
-                if 'clicked_forgot_password' not in st.session_state:
-                    st.session_state.clicked_forgot_password = {1:False,2:False}
+                if 'clicked' not in st.session_state:
+                    st.session_state.clicked = {"button_forgot_password":False,"button_forgot_username":False}
 
                 # Function to update the value in session state
-                def clicked_forgot_password(button):
-                    st.session_state.clicked_forgot_password[button] = True
+                def clicked(button):
+                    st.session_state.clicked[button] = True
 
-                st.button('Forgot password', on_click=clicked_forgot_password, args=[1])
+                st.button('Forgot password', on_click=clicked, args=["button_forgot_password"])
 
                 # Conditional based on value in session state, not the output
-                if st.session_state.clicked_forgot_password[1]:
+                if st.session_state.clicked["button_forgot_password"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
@@ -223,6 +223,22 @@ class Authenticate:
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
                             st.write(username_forgot_pw,email_forgot_password,random_password)
            
+                    except Exception as e:
+                        st.error(e)
+                        
+                # Creating a forgot username widget
+                st.button('Forgot username', on_click=clicked, args=["button_forgot_username"])
+
+                # Conditional based on value in session state, not the output
+                if st.session_state.clicked["button_forgot_username"]:
+                    try:
+                        username_forgot_username, email_forgot_username = forgot_username('Forgot username')
+                        if username_forgot_username:
+                            st.success('Username sent securely')
+                            st.write(username_forgot_username, email_forgot_username)
+                           
+                        else:
+                            st.error('Email not found')
                     except Exception as e:
                         st.error(e)
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
