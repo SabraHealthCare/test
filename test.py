@@ -1013,6 +1013,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 try:
 	st.write(config['credentials'])
+	st.write(1)
         username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
         if username_forgot_pw:
             st.success('New password sent securely')
