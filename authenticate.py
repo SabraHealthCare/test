@@ -209,10 +209,13 @@ class Authenticate:
                 # Function to update the value in session state
                 def clicked(button_name):
                     st.session_state.clicked[button_name] = True
+                col1,col2=st.columns[1,4]
+                with col1:
+                    st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
+                with col2:
+                    st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
 
-                st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
-
-                # Conditional based on value in session state, not the output
+                
                 if st.session_state.clicked["forgot_password_button"]:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
@@ -227,9 +230,6 @@ class Authenticate:
                         st.error(e)
                         
                 # Creating a forgot username widget
-                st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
-
-                # Conditional based on value in session state, not the output
                 if st.session_state.clicked["forgot_username_button"]:
                     try:
                         username_forgot_username, email_forgot_username = self.forgot_username('Forgot username')
