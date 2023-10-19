@@ -236,7 +236,8 @@ class Authenticate:
                         if username_forgot_username:
                             st.success('Username sent securely')
                             st.write(username_forgot_username, email_forgot_username)
-                           
+                       
+             
                         
                     except Exception as e:
                         st.error(e)
@@ -490,6 +491,7 @@ class Authenticate:
         for username, entries in self.credentials['usernames'].items():
             if entries[key] == value:
                 return username
+        st.error('Email not found')
         return False
 
     def forgot_username(self, form_name: str, location: str='main') -> tuple:
