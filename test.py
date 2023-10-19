@@ -921,7 +921,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     st.markdown("""
 <style>
 .big-font {
-    font-size:300px !important;
+    font-size:100px !important;
 }
 </style>
 """, unsafe_allow_html=True)
