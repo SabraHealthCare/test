@@ -620,7 +620,8 @@ class Authenticate:
                                     raise RegisterError('Username is not valid')
                             else:
                                 raise RegisterError('Username already be taken')
-                    
+
+                        
                         elif field=='email':
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
