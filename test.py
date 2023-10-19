@@ -19,11 +19,11 @@ s3 = boto3.client('s3')
 
 
 #---------------------------define parameters--------------------------
-#st.set_page_config(
-   # initial_sidebar_state="expanded",
-    #layout="wide")
+st.set_page_config(
+   initial_sidebar_state="expanded",
+    layout="wide")
 placeholder = st.empty()
-
+st.title("Sabra HealthCare Monthly Reporting App")
 sheet_name_account_mapping="Account_Mapping"
 sheet_name_entity_mapping="Property_Mapping"
 sheet_name_BPC_pull="BPC_pull"
@@ -913,14 +913,9 @@ with col1:
     
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-
-
-
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
     operator=st.session_state["operator"]
-    st.title("Sabra HealthCare Monthly Reporting App111")
-    st.subheader(operator)
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
@@ -928,7 +923,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     choice=st.sidebar.selectbox("Menu", menu)
 	
     if choice=="Upload P&L":
-        st.subheader("Upload P&L:")
+        st.subheader("Upload {} P&L:".format(operator))
         col1,col2=st.columns(2) 
         with col1:
             with st.form("my-form", clear_on_submit=True):
