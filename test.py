@@ -896,7 +896,6 @@ def Upload_Section(uploaded_file):
 		    
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 #----------------------------------website widges------------------------------------
-
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
 # Creating the authenticator object
@@ -1013,10 +1012,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
 
 try:
+	st.write(config['credentials'])
         username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
         if username_forgot_pw:
             st.success('New password sent securely')
             st.write(username_forgot_pw,email_forgot_password,random_password)
+            st.write(config['credentials'])
             # Random password to be transferred to user securely
         else:
             st.error('Username not found')
