@@ -140,7 +140,6 @@ class Authenticate:
                 if self._check_pw():
                     if inplace:
                         st.session_state['operator'] = self.credentials['usernames'][self.username]['operator']
-                        st.write(st.session_state['operator'],"st.session_state['operator']2")
                         self.exp_date = self._set_exp_date()
                         self.token = self._token_encode()
                         self.cookie_manager.set(self.cookie_name, self.token,
@@ -200,7 +199,6 @@ class Authenticate:
                 if login_form.form_submit_button('Login'):
                     if len(self.password)>0 and len(self.username)>0:
                         self._check_credentials()
-                        st.write(st.session_state['operator'],"st.session_state['operator']1")
                     else:
                         st.warning('Please enter your username and password')
 
