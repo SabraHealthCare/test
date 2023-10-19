@@ -534,7 +534,6 @@ class Authenticate:
         st.subheader("Edit Your Profile")
         col1,col2=st.columns(2)
         with col1:
-            #field = update_user_details_form.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
             field = st.selectbox('Select field need to be updated', ['Username', 'Email','Password']).lower()
             if field=='password':
                 # Creating a password reset widget
@@ -551,7 +550,6 @@ class Authenticate:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
-                                      
                                         return True
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -563,7 +561,6 @@ class Authenticate:
                             raise CredentialsError('password')
                 except Exception as e:
                     st.error(e)
-        
             else:
                 new_value = st.text_input('New {}'.format(field))
 
@@ -572,7 +569,6 @@ class Authenticate:
                         if field=="username":
                             if new_value not in self.credentials['usernames'] :
                                 if self.validator.validate_username(username):
-                    
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
                                     st.session_state['username'] = self.username
