@@ -232,7 +232,7 @@ class Authenticate:
                 # Conditional based on value in session state, not the output
                 if st.session_state.clicked["button_forgot_username"]:
                     try:
-                        username_forgot_username, email_forgot_username = forgot_username('Forgot username')
+                        username_forgot_username, email_forgot_username = self.forgot_username('Forgot username')
                         if username_forgot_username:
                             st.success('Username sent securely')
                             st.write(username_forgot_username, email_forgot_username)
