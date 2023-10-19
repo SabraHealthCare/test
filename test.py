@@ -1015,7 +1015,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         def get_operator_list(bucket_mapping):
             operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
             operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
-        return operator_list
+            return operator_list
         operator_list=get_operator_list(bucket_mapping)
         col1,col2=st.columns(2)
         with col1:
