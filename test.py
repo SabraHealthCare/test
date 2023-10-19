@@ -1010,14 +1010,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
-
-
 try:
     st.write(config['credentials'])
     username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
     if username_forgot_pw:
         st.success('New password sent securely')
-	s33 = boto3.resource("s3").Bucket(bucket_PL)
+        s33 = boto3.resource("s3").Bucket(bucket_PL)
         json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
         json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
         st.write(username_forgot_pw,email_forgot_password,random_password)
