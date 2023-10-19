@@ -17,7 +17,6 @@ import json
 import yaml
 s3 = boto3.client('s3')
 
-
 #---------------------------define parameters--------------------------
 st.set_page_config(
     page_title="Sabra HealthCare monthly reporting App",
@@ -912,23 +911,7 @@ authenticator = Authenticate(
 # login widget
 col1,col2=st.columns(2)
 with col1:
-    authenticator.login('Login','main')
-
-# Creating a forgot password widget 
-    if True:            
-    #try:
-        st.write(1)
-        username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot_password') 
-        st.write(2)
-        if username_forgot_pw:
-            st.success('New password sent securely')
-            st.write(username_forgot_pw,email_forgot_password,random_password)
-                            # Random password to be transferred to user securely
-        else:
-            st.error('Username not found')
-    #except Exception as e:
-        #st.error(e)
-
+    authenticator.login('Login', 'main')
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
@@ -1003,7 +986,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         except Exception as e:
             st.error(e)
 
-	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 	    
@@ -1029,7 +1011,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 
-
-
-
-
+col1,col2=st.columns([1,2])
+with col1:
+    # Creating a forgot password widget 
+    if st.button("Forgot_password",key='password'):
+        try:
+            username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+            if username_forgot_pw:
+                st.success('New password sent securely')
+                st.write(username_forgot_pw,email_forgot_password,random_password)
+                # Random password to be transferred to user securely
+            else:
+                st.error('Username not found')
+        except Exception as e:
+            st.error(e)
