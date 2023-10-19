@@ -1020,7 +1020,7 @@ try:
         st.success('New password sent securely')
         st.write(username_forgot_pw,email_forgot_password,random_password)
         st.write(config['credentials'])
-	st.stop()
+        st.stop()
             # Random password to be transferred to user securely
     else:
         st.error('Username not found')
