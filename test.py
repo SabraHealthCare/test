@@ -918,7 +918,7 @@ if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
-    
+    authenticator.logout('Logout', 'main')
     st.write("yes11")
     operator=st.session_state["operator"]
     st.write("Hello {}".format(operator))
@@ -980,7 +980,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
     
     elif choice=="Edit Account": 
-       
 	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
