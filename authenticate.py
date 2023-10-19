@@ -359,7 +359,7 @@ class Authenticate:
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
-    def register_user(self, form_name: str, location: str='main', preauthorization=True) -> bool:
+    def register_user(self, form_name: str, operator:str, location: str='main', preauthorization=True) -> bool:
         """
         Creates a register new user widget.
 
@@ -391,7 +391,7 @@ class Authenticate:
         register_user_form.subheader(form_name)
         new_email = register_user_form.text_input('Email')
         new_username = register_user_form.text_input('Username').lower()
-        new_operator = register_user_form.text_input('operator')
+        new_operator = operator
         new_password = register_user_form.text_input('Password', type='password')
         new_password_repeat = register_user_form.text_input('Repeat password', type='password')
 
