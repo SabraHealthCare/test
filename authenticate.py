@@ -160,7 +160,7 @@ class Authenticate:
             else:
                 return False
 
-    def login(self, form_name: str, location: str='main',bucket_PL) -> tuple:
+    def login(self, form_name: str, bucket_PL:str, location: str='main') -> tuple:
         """
         Creates a login widget.
  
