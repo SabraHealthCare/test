@@ -1,5 +1,6 @@
 import jwt
 import bcrypt
+
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
@@ -181,7 +182,7 @@ class Authenticate:
         str
             Username of the authenticated user.
         """
-        st.title("Sabra HealthCare Monthly Reporting App")
+        #st.title("Sabra HealthCare Monthly Reporting App")
         if location not in ['main', 'sidebar']:
             raise ValueError("Location must be one of 'main' or 'sidebar'")
         if not st.session_state['authentication_status']:
