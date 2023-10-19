@@ -204,13 +204,13 @@ class Authenticate:
 
 
                 if 'clicked' not in st.session_state:
-                    st.session_state.clicked = {"button_forgot_password":False,"button_forgot_username":False}
+                    st.session_state.clicked = {"forgot_password_button":False,"forgot_username_button":False}
 
                 # Function to update the value in session state
-                def clicked(button):
-                    st.session_state.clicked[button] = True
+                def clicked(button_name):
+                    st.session_state.clicked[button_name] = True
 
-                st.button('Forgot password', on_click=clicked, args=["button_forgot_password"])
+                st.button('Forgot password', on_click=clicked, args=["forgot_password_button"])
 
                 # Conditional based on value in session state, not the output
                 if st.session_state.clicked["button_forgot_password"]:
@@ -227,7 +227,7 @@ class Authenticate:
                         st.error(e)
                         
                 # Creating a forgot username widget
-                st.button('Forgot username', on_click=clicked, args=["button_forgot_username"])
+                st.button('Forgot username', on_click=clicked, args=["forgot_username_button"])
 
                 # Conditional based on value in session state, not the output
                 if st.session_state.clicked["button_forgot_username"]:
@@ -468,6 +468,7 @@ class Authenticate:
                 if username in self.credentials['usernames']:
                     return username, self.credentials['usernames'][username]['email'], self._set_random_password(username)
                 else:
+                    st.error("Username not found")
                     return False, None, None
             else:
                 raise ForgotError('Username not provided')
