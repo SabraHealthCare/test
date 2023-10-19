@@ -7,7 +7,7 @@ import boto3
 from hasher import Hasher
 from validator import Validator
 from utils import generate_random_pw
-
+import json
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 
 class Authenticate:
