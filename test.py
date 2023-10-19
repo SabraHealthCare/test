@@ -21,7 +21,6 @@ s3 = boto3.client('s3')
 #---------------------------define parameters--------------------------
 st.set_page_config(
     page_title="Sabra HealthCare monthly reporting App",
-    page_icon="🧊",
     initial_sidebar_state="expanded",
     layout="wide")
 placeholder = st.empty()
@@ -916,10 +915,10 @@ with col1:
     
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
-
+#---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
     operator=st.session_state["operator"]
-    st.title(operator)
+    st.markdown('<p class="big-font">{} !!</p>'.format(operator), unsafe_allow_html=True)
     PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
