@@ -264,8 +264,9 @@ class Authenticate:
                     try:
                         username_forgot_username, email_forgot_username = self.forgot_username('Forgot username')
                         if username_forgot_username:
-                            st.success('Your username is :{}'.format(username_forgot_username))
+                            st.success("Your username is :{}".format(username_forgot_username))
                             st.write(username_forgot_username, email_forgot_username)
+                            st.write("Your username is :{}".format(username_forgot_username))
                         
                     except Exception as e:
                         st.error(e)
