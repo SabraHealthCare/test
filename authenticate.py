@@ -389,7 +389,7 @@ class Authenticate:
         if preauthorization:
             self.preauthorized['emails'].remove(email)
 
-    def register_user(self, form_name: str, operator:str, location: str='main', preauthorization=True) -> bool:
+    def register_user(self, form_name: str, operator:str, config:dict, location: str='main', preauthorization=True) -> bool:
         """
         Creates a register new user widget.
 
@@ -572,7 +572,7 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
-    def update_user_details(self, username: str, form_name: str, location: str='main') -> bool:
+    def update_user_details(self, username: str, form_name: str, config:dict,location: str='main') -> bool:
         """
         Creates a update user details widget.
 
