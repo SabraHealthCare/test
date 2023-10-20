@@ -1,6 +1,5 @@
 import jwt
 import bcrypt
-
 import streamlit as st
 from datetime import datetime, timedelta
 import extra_streamlit_components as stx
@@ -12,6 +11,7 @@ import json
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
 import smtplib
 from email.mime.text import MIMEText
+bucket_PL="operatorpl"
 
 class Authenticate:
     """
