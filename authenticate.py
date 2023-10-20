@@ -186,7 +186,7 @@ class Authenticate:
             server.login(email_sender, "gdwipqjqbtaeixfx")
             server.sendmail(email_sender, email_receiver, msg.as_string())
             server.quit()
-            st.success('A temperate password was send to your email {}.'.format(email))
+            st.success('A temperate password was send to your email: {}.'.format(email))
         except Exception as e:
             st.error("Fail to send email:{}".format(e))
 
