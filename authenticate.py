@@ -162,9 +162,9 @@ class Authenticate:
             else:
                 return False
 
-    def send_email(self,username: str,random_password):
+    def send_email(self,username: str,email:str,random_password:str):
         email_sender="shaperi@gmail.com"
-        email_receiver = self.credentials['usernames'][username]['email']
+        email_receiver = email
         
         body = """
         Hi {},
@@ -251,7 +251,7 @@ class Authenticate:
                             s33 = boto3.resource("s3").Bucket(bucket_PL)
                             json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
-                            send_email(self,username: str,random_password)
+                            self.send_email(username_forgot_pw,email_forgot_password,random_password)
            
                     except Exception as e:
                         st.error(e)
