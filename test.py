@@ -1029,5 +1029,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
+        st.write(0)
         
 
