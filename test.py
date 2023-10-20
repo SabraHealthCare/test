@@ -977,9 +977,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	# update user details widget
         try:
             if authenticator.update_user_details(st.session_state["username"], 'Update user details'):
-                s33 = boto3.resource("s3").Bucket(bucket_PL)
-                json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+                #s33 = boto3.resource("s3").Bucket(bucket_PL)
+                #json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+                #json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
         except Exception as e:
             st.error(e)
 
@@ -1003,7 +1003,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success('Updated successfully')
         except Exception as e:
             st.error(e)
-
+    
     elif choice=="Create operator account":
         @st.cache_data
         def get_operator_list(bucket_mapping):
@@ -1026,4 +1026,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
+	    
+    elif choice=="Review New Mapping":
+        
 
