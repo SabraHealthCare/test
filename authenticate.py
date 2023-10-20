@@ -184,8 +184,8 @@ class Authenticate:
             server.sendmail(email_sender, email_receiver, msg.as_string())
             server.quit()
             st.success('A temperate password was send to your email {}.'.format(email_forgot_password))
-    except Exception as e:
-        st.error(f"Erreur lors de l’envoi de l’e-mail : {e}")
+        except Exception as e:
+            st.error("Fail to send email": {e}")
 
 
     def login(self, form_name: str, bucket_PL:str, config, location: str='main') -> tuple:
