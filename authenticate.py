@@ -55,7 +55,7 @@ class Authenticate:
             st.session_state['username'] = None
         if 'logout' not in st.session_state:
             st.session_state['logout'] = None
-
+    
     def _token_encode(self) -> str:
         """
         Encodes the contents of the reauthentication cookie.
@@ -190,7 +190,11 @@ class Authenticate:
         except Exception as e:
             st.error("Fail to send email:{}".format(e))
 
-
+    def save_credentials_to_yaml(self,bucket:str,config:dict):
+        s33 = boto3.resource("s3").Bucket(bucket)
+        json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
+        json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+        
     def login(self, form_name: str, bucket_PL:str, config, location: str='main') -> tuple:
         """
         Creates a login widget.
@@ -251,9 +255,7 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
-                            s33 = boto3.resource("s3").Bucket(bucket_PL)
-                            json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                            json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
+                            self.save_credentials_to_yaml(bucket_PL,config)
                             self.send_email(username_forgot_pw,email_forgot_password,random_password)
            
                     except Exception as e:
@@ -264,8 +266,7 @@ class Authenticate:
                     try:
                         username_forgot_username, email_forgot_username = self.forgot_username('Forgot username')
                         if username_forgot_username:
-                            st.success("Your username is : "+username_forgot_username)
-                          
+                            st.success("Your username is : "+username_forgot_username)    
                     except Exception as e:
                         st.error(e)
         return st.session_state['operator'], st.session_state['authentication_status'], st.session_state['username']
@@ -593,8 +594,8 @@ class Authenticate:
         self.username = username.lower()
         st.subheader("Your Profile")
         st.write("Username:",self.username)
-        st.write("Email:",self.credentials['usernames'][username]["email"] )
-        st.write("From:",self.credentials['usernames'][username]["operator"] )
+        st.write("Email:   ",self.credentials['usernames'][username]["email"] )
+        st.write("From:    ",self.credentials['usernames'][username]["operator"] )
 
         st.write("")
         st.subheader("Edit Your Profile")
@@ -616,7 +617,7 @@ class Authenticate:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
-                                        
+                                        self.save_credentials_to_yaml(bucket_PL,config)
                                         return True
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -643,7 +644,7 @@ class Authenticate:
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                                    
+                                    self.save_credentials_to_yaml(bucket_PL,config)
                                     return True
                                 else:
                                     raise RegisterError('Username is not valid')
@@ -655,7 +656,7 @@ class Authenticate:
                             if new_value != self.credentials['usernames'][self.username][field]:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
-                                    
+                                    self.save_credentials_to_yaml(bucket_PL,config)
                                     return True
                                 else:
                                     raise RegisterError('New email is not valid')
