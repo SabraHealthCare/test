@@ -177,17 +177,12 @@ class Authenticate:
             msg['From'] = email_sender
             msg['To'] = email_receiver
             msg['Subject'] = "Temperate password for Sabra App"
-            st.write(1)
             server = smtplib.SMTP('smtp.gmail.com', 587)
-            st.write(2)
             server.starttls()
-            st.write(3)
             server.login(email_sender, "gdwipqjqbtaeixfx")
-            st.write(4)
             server.sendmail(email_sender, email_receiver, msg.as_string())
-            st.write(5)
             server.quit()
-            st.success('A temperate password was send to your email {}.'.format(email_forgot_password))
+            st.success('A temperate password was send to your email {}.'.format(random_password))
         except Exception as e:
             st.error("Fail to send email:{}".format(e))
 
