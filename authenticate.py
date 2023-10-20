@@ -163,7 +163,7 @@ class Authenticate:
                 return False
 
     def send_email(self,username: str,email:str,random_password:str):
-        email_sender="shaperi@gmail.com"
+        email_sender="sli@sabrahealth.com" #"shaperi@gmail.com"
         email_receiver = email
         
         body = """
