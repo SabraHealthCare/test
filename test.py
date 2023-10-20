@@ -927,7 +927,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
         col1,col2=st.columns(2) 
         with col1:
             with st.form("my-form", clear_on_submit=True):
-                uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx", "xlsm","xls"},accept_multiple_files=False)
+                uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
                 col3,col4=st.columns([1,3]) 
                 with col3:
                     submitted = st.form_submit_button("Upload")
