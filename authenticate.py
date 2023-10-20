@@ -251,7 +251,7 @@ class Authenticate:
                             s33 = boto3.resource("s3").Bucket(bucket_PL)
                             json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
-                            st.write(username_forgot_pw,email_forgot_password,random_password)
+                            send_email(self,username: str,random_password)
            
                     except Exception as e:
                         st.error(e)
