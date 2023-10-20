@@ -168,10 +168,14 @@ class Authenticate:
         
         body = """
         Hi {},
-        Your temperate password is: {}
-        Please reset your password after login.
+        
+        Your temperate password for Sabra Monthly reporting APP is: {}
+        Please reset password after login.
+        Feel free to contact sli@sabrahealth.com if you have any questions.
+
+        Regards,
+        Sabra
         """.format(username,random_password)
- 
         try:
             msg = MIMEText(body)
             msg['From'] = email_sender
@@ -182,7 +186,7 @@ class Authenticate:
             server.login(email_sender, "gdwipqjqbtaeixfx")
             server.sendmail(email_sender, email_receiver, msg.as_string())
             server.quit()
-            st.success('A temperate password was send to your email {}.'.format(random_password))
+            st.success('A temperate password was send to your email {}.'.format(email))
         except Exception as e:
             st.error("Fail to send email:{}".format(e))
 
