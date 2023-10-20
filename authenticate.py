@@ -178,7 +178,7 @@ class Authenticate:
             msg['To'] = email_receiver
             msg['Subject'] = "Temperate password for Sabra App"
             st.write(1)
-            server = smtplib.SMTP('smtp.gmail.com', 465)
+            server = smtplib.SMTP('smtp.gmail.com', 587)
             st.write(2)
             server.starttls()
             st.write(3)
