@@ -10,7 +10,8 @@ from validator import Validator
 from utils import generate_random_pw
 import json
 from exceptions import CredentialsError, ForgotError, RegisterError, ResetError, UpdateError
-
+import smtplib
+from email.mime.text import MIMEText
 
 class Authenticate:
     """
@@ -161,6 +162,32 @@ class Authenticate:
             else:
                 return False
 
+    def send_email(self,username: str,random_password):
+        email_sender="shaperi@gmail.com"
+        email_receiver = self.credentials['usernames'][username]['email']
+        
+        body = """
+        Hi {},
+        Your temperate password is: {}
+        Please reset your password after login.
+        """.format(username,random_password)
+ 
+        try:
+            msg = MIMEText(body)
+            msg['From'] = email_sender
+            msg['To'] = email_receiver
+            msg['Subject'] = "Temperate password for Sabra App"
+
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(email_sender, cccvuofff1)
+            server.sendmail(email_sender, email_receiver, msg.as_string())
+            server.quit()
+            st.success('A temperate password was send to your email {}.'.format(email_forgot_password))
+    except Exception as e:
+        st.error(f"Erreur lors de l’envoi de l’e-mail : {e}")
+
+
     def login(self, form_name: str, bucket_PL:str, config, location: str='main') -> tuple:
         """
         Creates a login widget.
@@ -221,7 +248,6 @@ class Authenticate:
                     try:
                         username_forgot_pw, email_forgot_password, random_password = self.forgot_password('Forgot password')
                         if username_forgot_pw:
-                            st.success('New password sent securely')
                             s33 = boto3.resource("s3").Bucket(bucket_PL)
                             json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
                             json.dump_s3(config, "config.yaml")   # saves json to s3://bucket/key
