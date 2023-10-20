@@ -180,7 +180,7 @@ class Authenticate:
 
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
-            server.login(email_sender, cccvuofff1)
+            server.login(email_sender, "cccvuofff1")
             server.sendmail(email_sender, email_receiver, msg.as_string())
             server.quit()
             st.success('A temperate password was send to your email {}.'.format(email_forgot_password))
