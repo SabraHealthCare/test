@@ -432,11 +432,13 @@ class Authenticate:
                         if preauthorization:
                             if new_email in self.preauthorized['emails']:
                                 self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
+                                self.save_credentials_to_yaml(bucket_PL,config)
                                 return True
                             else:
                                 raise RegisterError('User not preauthorized to register')
                         else:
                             self._register_credentials(new_username, new_operator, new_password, new_email, preauthorization)
+                            self.save_credentials_to_yaml(bucket_PL,config)
                             return True
                     else:
                         raise RegisterError('Passwords do not match')
@@ -572,7 +574,7 @@ class Authenticate:
         """
         self.credentials['usernames'][username][key] = value
 
-    def update_user_details(self, username: str, form_name: str, config:dict,location: str='main') -> bool:
+    def update_user_details(self, username: str, form_name: str, config: dict, location: str='main') -> bool:
         """
         Creates a update user details widget.
 
