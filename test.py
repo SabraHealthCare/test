@@ -1024,10 +1024,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
         new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
         st.write(new_account)
-        selected_option = st.multiselect("Select one or more options:",['A', 'B', 'C', 'All'])
+        
+        
+        agree = st.checkbox(new_account.iloc[0,:])
 
-        if "All" in selected_option:
-            selected_option = ['A', 'B', 'C']
-
-        selected_option
+        if agree:
+            st.write('Great!')
+        
 
