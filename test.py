@@ -839,7 +839,7 @@ def Upload_Section(uploaded_file):
         else:
             PL_sheet_list=[]
         
-	Total_PL=pd.DataFrame()
+        Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         for entity_i in range(len(entity_mapping["ENTITY"])):
             if entity_mapping.loc[entity_i,"P&L_in_separate_sheets"]=="Y":
