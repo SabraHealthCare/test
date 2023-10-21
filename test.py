@@ -1022,7 +1022,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
         account_mapping = pd.read_csv(BytesIO(account_mapping_obj['Body'].read()),header=0)
 	    
-        new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Sabra_Account","Sabra_Second_Account","Tenant_Account"]]
+        new_account=account_mapping[(account_mapping["Conversion"]=="N") && (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Sabra_Account","Sabra_Second_Account","Tenant_Account"]]
         st.write(new_account)
         
 
