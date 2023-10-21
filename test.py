@@ -37,7 +37,7 @@ def Initial_Paramaters(operator):
     if operator!='select operator':
         PL_path=operator+"/"+operator+"_P&L.xlsx"
         BPCpull =s3.get_object(Bucket=bucket_mapping, Key=BPC_pull_filename)
-        BPC_pull=pd.read_csv(BPCpull['Body'].read(),header=0)
+        BPC_pull=pd.read_csv(BytesIO(BPCpull['Body'].read()),header=0)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
@@ -56,13 +56,13 @@ def Initial_Paramaters(operator):
 def Initial_Mapping(operator):
     # read account mapping
     account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=account_mapping_filename)
-    account_mapping = pd.read_csv(account_mapping_obj['Body'].read(),header=0)   
+    account_mapping = pd.read_csv(BytesIO(account_mapping_obj['Body'].read()),header=0)   
     account_mapping = account_mapping[account_mapping["Operator"]==operator]
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
     account_mapping=account_mapping[["Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=entity_mapping_filename)
-    entity_mapping=pd.read_csv(entity_mapping_obj['Body'].read(),header=0)
+    entity_mapping=pd.read_csv(BytesIO(entity_mapping_obj['Body'].read()),header=0)
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     return entity_mapping,account_mapping
 
