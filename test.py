@@ -24,29 +24,23 @@ st.set_page_config(
     layout="wide")
 placeholder = st.empty()
 st.title("Sabra HealthCare Monthly Reporting App")
-sheet_name_account_mapping="Account_Mapping"
-sheet_name_entity_mapping="Property_Mapping"
-sheet_name_BPC_pull="BPC_pull"
-sheet_name_format='Format'
 sheet_name_discrepancy="Discrepancy_Review"
 bucket_mapping="sabramapping"
 bucket_PL="operatorpl"
-
+account_mapping_filename="Account_Mapping.csv"
+BPC_pull_filename="BPC_Pull.csv"
+entity_mapping_filename ="Entity_Mapping.csv"
+Discrepancy_path="Total_Diecrepancy_Review.xlsx"
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!='select operator':
-        mapping_path="Mapping/"+operator+"/"+operator+"_Mapping.xlsx"
         PL_path=operator+"/"+operator+"_P&L.xlsx"
-        Discrepancy_path="Total_Diecrepancy_Review.xlsx"
-        BPCpull =s3.get_object(Bucket=bucket_mapping, Key=mapping_path)
-        BPC_pull=pd.read_excel(BPCpull['Body'].read(),sheet_name=sheet_name_BPC_pull,header=0)
+        BPCpull =s3.get_object(Bucket=bucket_mapping, Key=BPC_pull_filename)
+        BPC_pull=pd.read_csv(BPCpull['Body'].read(),header=0)
+	BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
-        BPC_pull.columns=list(map(lambda x :str(x),BPC_pull.columns))
-        
-        # read format table
-        mapping_format =s3.get_object(Bucket=bucket_mapping, Key=mapping_path)
-        format_table=pd.read_excel(mapping_format['Body'].read(), sheet_name=sheet_name_format,header=0)
+        BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
         
         month_dic={10:["october","oct","10/","-10","/10","10"],11:["november","nov","11/","-11","/11","11"],12:["december","dec","12/","-12","/12","12"],1:["january","jan","01/","1/","-1","-01","/1","/01"],\
                    2:["february","feb","02/","2/","-2","-02","/2","/02"],3:["march","mar","03/","3/","-3","-03","/3","/03"],4:["april","apr","04/","4/","-4","-04","/4","/04"],\
@@ -56,18 +50,20 @@ def Initial_Paramaters(operator):
 
     else:
         st.stop()
-    return PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic
+    return PL_path,BPC_pull,month_dic,year_dic
 
 @st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
-    account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=mapping_path)
-    account_mapping = pd.read_excel(account_mapping_obj['Body'].read(), sheet_name=sheet_name_account_mapping,header=0)   
+    account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=account_mapping_filename)
+    account_mapping = pd.read_csv(account_mapping_obj['Body'].read(),header=0)   
+    account_mapping = account_mapping[account_mapping["Operator"]==operator]
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
     account_mapping=account_mapping[["Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
-    entity_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=mapping_path)
-    entity_mapping=pd.read_excel(entity_mapping_obj['Body'].read(),sheet_name=sheet_name_entity_mapping,header=0)
+    entity_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=entity_mapping_filename)
+    entity_mapping=pd.read_csv(entity_mapping_obj['Body'].read(),header=0)
+    entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     return entity_mapping,account_mapping
 
 
@@ -843,10 +839,11 @@ def Upload_Section(uploaded_file):
         else:
             PL_sheet_list=[]
         
-        if format_table["P&L_in_separate_sheets"][0]=="Y":
-            Total_PL=pd.DataFrame()
-            Total_PL_detail=pd.DataFrame()
-            for entity_i in range(len(entity_mapping["ENTITY"])):
+	Total_PL=pd.DataFrame()
+        Total_PL_detail=pd.DataFrame()
+        for entity_i in range(len(entity_mapping["ENTITY"])):
+            if entity_mapping.loc[entity_i,"P&L_in_separate_sheets"]=="Y":
+                
                 sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
@@ -916,7 +913,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
     operator=st.session_state["operator"]
-    PL_path,Discrepancy_path,mapping_path,BPC_pull,format_table,month_dic,year_dic=Initial_Paramaters(operator)
+    PL_path,BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
@@ -941,7 +938,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	     
                         if uploaded_file:
 		        # initial parameter
-                            TENANT_ID=format_table["Tenant_ID"][0]
                             global latest_month
                             latest_month="2023"
                             Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
@@ -997,12 +993,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     if choice=="Edit Account":
 	# update user details widget
         try:
-            authenticator.update_user_details(st.session_state["username"], 'Update user details',config)
-            #if authenticator.update_user_details(st.session_state["username"], 'Update user details',config):
-                #s33 = boto3.resource("s3").Bucket(bucket_PL)
-                #json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                #json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
-                #st.success('Updated successfully')
+            if authenticator.update_user_details(st.session_state["username"], 'Update user details',config):
+                st.success('Updated successfully')
         except Exception as e:
             st.error(e)
     
@@ -1018,10 +1010,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             operator= st.selectbox('Select Operator',(operator_list))
             
         try:
-            if authenticator.register_user('Register user',operator, config, preauthorization=False):
-                s33 = boto3.resource("s3").Bucket(bucket_PL)
-                json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
-                json.dump_s3(config, "config.yaml") # saves json to s3://bucket/key
+            if authenticator.register_user('Register for '+operator, operator, config, preauthorization=False):
                 st.success('Registered successfully')
         except Exception as e:
             st.error(e)
@@ -1030,6 +1019,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
-        st.write(0)
+        account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
+        account_mapping = pd.read_csv(account_mapping_obj['Body'].read(),header=0)
+	new_account=account_mapping[account_mapping["Conversion"]=="N"]["Sabra_Account","Sabra_Second_Account","Tenant_Account"]
         
 
