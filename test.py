@@ -1020,7 +1020,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
-        account_mapping = pd.read_csv(io.BytesIO(account_mapping_obj['Body'].read(),header=0)
+        account_mapping = pd.read_csv(io.BytesIO(account_mapping_obj['Body'].read(),header=0))
 	    
         new_account=account_mapping[account_mapping["Conversion"]=="N"]["Sabra_Account","Sabra_Second_Account","Tenant_Account"]
         st.write(new_account)
