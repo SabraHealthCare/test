@@ -1026,7 +1026,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         st.write(new_account)
         
         
-        agree = st.checkbox(new_account.iloc[0,0])
+        agree = st.checkbox("   {}    {}    {}".format(new_account.iloc[0,0],new_account.iloc[0,1],new_account.iloc[0,2]))
 
         if agree:
             st.write('Great!')
