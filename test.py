@@ -38,7 +38,7 @@ def Initial_Paramaters(operator):
         PL_path=operator+"/"+operator+"_P&L.xlsx"
         BPCpull =s3.get_object(Bucket=bucket_mapping, Key=BPC_pull_filename)
         BPC_pull=pd.read_csv(BPCpull['Body'].read(),header=0)
-	BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
+        BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
         
