@@ -1025,10 +1025,29 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
         st.write(new_account)
         
-        
-        agree = st.checkbox("   {} ——{}    {}".format(new_account.iloc[0,0],new_account.iloc[0,1],new_account.iloc[0,2]))
+        from st_aggrid import AgGrid, GridUpdateMode
+        from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-        if agree:
-            st.write('Great!')
+
+        data = {
+    'country': ['Japan', 'China', 'Thailand', 'France', 'Belgium', 'South Korea'],
+    'capital': ['Tokyo', 'Beijing', 'Bangkok', 'Paris', 'Brussels', 'Seoul']
+}
+
+        df = pd.DataFrame(data)
+        gd = GridOptionsBuilder.from_dataframe(df)
+        gd.configure_selection(selection_mode='multiple', use_checkbox=True)
+        gridoptions = gd.build()
+
+        grid_table = AgGrid(df, height=250, gridOptions=gridoptions,
+                    update_mode=GridUpdateMode.SELECTION_CHANGED)
+
+        st.write('## Selected')
+        selected_row = grid_table["selected_rows"]
+        st.dataframe(selected_row)
+        #agree = st.checkbox("   {} ——{}    {}".format(new_account.iloc[0,0],new_account.iloc[0,1],new_account.iloc[0,2]))
+
+        #if agree:
+            #st.write('Great!')
         
 
