@@ -702,7 +702,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     return diff_BPC_PL,diff_BPC_PL_detail
 
 @st.cache_data(experimental_allow_widgets=True)
-def View_Summary():
+def View_Summary(latest_month):
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
@@ -998,9 +998,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	        # 1 Summary
                 with st.expander("Summary of P&L" ,expanded=True):
                     ChangeWidgetFontSize('Summary of P&L', '25px')
-                    View_Summary()
+                    View_Summary(latest_month)
 	        
-	                    # 2 Discrepancy of Historic Data
+	        # 2 Discrepancy of Historic Data
                 with st.expander("Discrepancy for Historic Data",expanded=True):
                     ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
                     View_Discrepancy(percent_discrepancy_accounts)
