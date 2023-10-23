@@ -702,7 +702,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     return diff_BPC_PL,diff_BPC_PL_detail
 
 @st.cache_data(experimental_allow_widgets=True)
-def View_Summary(latest_month):
+def View_Summary():
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
@@ -738,7 +738,7 @@ def View_Summary(latest_month):
     st.write("")
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
-        st.writie(3,latest_month)
+        st.write(3,latest_month)
         latest_month_data["Operator"]=operator
         Update_file_inS3(bucket_PL,"test1.csv",operator,latest_month_data,how="replace") 
         st.write("Success")
@@ -861,7 +861,7 @@ def PL_Process_Main(entity_i,sheet_type):
             
             max_month_cols=str(max(list(PL.columns)))
 	    # check the latest reporting month
-            if latest_month=="2023":	    
+            if not latest_month:	    
                 latest_month=max_month_cols
                 st.write(1,latest_month)
                 
@@ -944,7 +944,7 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL['Type comments below']=""
                 diff_BPC_PL['Operator']=operator
 		    
-    return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
+    return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
 
 #----------------------------------website widges------------------------------------
@@ -992,13 +992,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if uploaded_file:
 		# initial parameter
                 global latest_month
-                latest_month="2023"
-                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
 	
 	        # 1 Summary
                 with st.expander("Summary of P&L" ,expanded=True):
                     ChangeWidgetFontSize('Summary of P&L', '25px')
-                    View_Summary(latest_month)
+                    View_Summary()
 	        
 	        # 2 Discrepancy of Historic Data
                 with st.expander("Discrepancy for Historic Data",expanded=True):
