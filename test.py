@@ -978,30 +978,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 col3,col4=st.columns([1,3]) 
                 with col3:
                     submitted = st.form_submit_button("Upload")
-                with col4:
-                    if submitted:
-			# clear cache for every upload
-                        st.cache_data.clear()
-                        st.cache_resource.clear()
-			    
-                        st.write("{} uploaded.".format(uploaded_file.name))
-	     
-                        if uploaded_file:
+        with col4:
+            if submitted:
+		# clear cache for every upload
+                st.cache_data.clear()
+                st.cache_resource.clear()
+                st.write("{} uploaded.".format(uploaded_file.name))
+	    else:
+                st.stop()
+            if uploaded_file:
 		        # initial parameter
-                            global latest_month
-                            latest_month="2023"
-                            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
+                global latest_month
+                latest_month="2023"
+                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
 	
-	                    # 1 Summary
-                            with st.expander("Summary of P&L" ,expanded=True):
-                                ChangeWidgetFontSize('Summary of P&L', '25px')
-                                View_Summary()
+	        # 1 Summary
+                with st.expander("Summary of P&L" ,expanded=True):
+                    ChangeWidgetFontSize('Summary of P&L', '25px')
+                    View_Summary()
 	        
 	                    # 2 Discrepancy of Historic Data
-                            with st.expander("Discrepancy for Historic Data",expanded=True):
-                                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                                View_Discrepancy(percent_discrepancy_accounts)
-                                View_Discrepancy_Detail()
+                with st.expander("Discrepancy for Historic Data",expanded=True):
+                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                    View_Discrepancy(percent_discrepancy_accounts)
+                    View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
