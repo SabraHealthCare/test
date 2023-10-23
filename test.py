@@ -983,8 +983,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.cache_data.clear()
                 st.cache_resource.clear()
                 st.write("{} uploaded.".format(uploaded_file.name))
-            else:
-                st.stop()
+            
             if uploaded_file:
 		# initial parameter
                 global latest_month
