@@ -405,7 +405,7 @@ def Save_File_toS3(uploaded_file, bucket, key):
         st.error("File can't be uploaded.")
         return False   
     
-def Update_Sheet_inS3(bucket,key,sheet_name,df,how="replace"):  
+def Update_Sheet_inS3(bucket,key,sheet_name,df,how="replace"):  # how = replace, append,
     if how=="append":
         discrepancy_file =s3.get_object(Bucket=bucket, Key=key)
         original_df=pd.read_excel(discrepancy_file['Body'].read(), sheet_name=sheet_name,header=0)
@@ -419,11 +419,50 @@ def Update_Sheet_inS3(bucket,key,sheet_name,df,how="replace"):
     new_worksheet = workbook.create_sheet(sheet_name)
     for r in dataframe_to_rows(df, index=False, header=True):
         new_worksheet.append(r)
+
+
+    if how=="replace":
+        st.write("not done yet")
+
+
 	    
     with NamedTemporaryFile() as tmp:
          workbook.save(tmp.name)
          data = BytesIO(tmp.read())
     s3.upload_fileobj(data,bucket,key)
+
+
+# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
+def Update_file_inS3(bucket,key,operator,new_data,how="replace"):  # how = replace, append....
+    if how=="replace":
+        original_file =s3.get_object(Bucket=bucket, Key=key)
+        original_data=pd.read_csv(original_file['Body'].read(),header=0)
+        
+	# remove original data for that operator
+        original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+	    
+	# append new data to file
+        updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
+
+    #load_file =s3.get_object(Bucket=bucket, Key=key)
+    #workbook = load_workbook(BytesIO(load_file['Body'].read()))
+
+
+    csv_buffer = StringIO()
+    updated_data.to_csv(csv_buffer)
+    s3_resource = boto3.resource('s3')
+    s3_resource.Object(bucket, 'test.csv').put(Body=csv_buffer.getvalue())
+	
+    #for r in dataframe_to_rows(updated_data, index=False, header=True):
+        #workbook.append(r)
+
+    
+	    
+    #with NamedTemporaryFile() as tmp:
+         #workbook.save(tmp.name)
+         #data = BytesIO(tmp.read())
+    #s3.upload_fileobj(data,bucket,key)
+
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Property_Mapping(operator):
@@ -693,6 +732,13 @@ def View_Summary():
    
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).applymap(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
+    submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
+    if submit_latest_month:
+	submit_latest_month["Operator"]=operator
+        Update_file_inS3(bucket_PL,"test1.csv",operator,submit_latest_month,how="replace") 
+	st.write("Success")
+    else:
+        st.stop()	
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
 
 # can't use cache
@@ -1024,7 +1070,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review New Mapping":
         account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
         account_mapping = pd.read_csv(BytesIO(account_mapping_obj['Body'].read()),header=0)
-	    
+        
         new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
         gd = GridOptionsBuilder.from_dataframe(new_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
@@ -1036,6 +1082,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             selected_row = grid_table["selected_rows"]
 	else:
             selected_row = grid_table["selected_rows"]
+
+    #elif choice=="Upload data":
+        
+        
             
 
 
