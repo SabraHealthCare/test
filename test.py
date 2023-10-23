@@ -703,7 +703,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
 
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
-    global Total_PL
+    global Total_PL,latest_month
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
@@ -735,6 +735,7 @@ def View_Summary():
    
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
+    st.write("")
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
         latest_month_data["Operator"]=operator
@@ -861,10 +862,12 @@ def PL_Process_Main(entity_i,sheet_type):
 	    # check the latest reporting month
             if latest_month=="2023":	    
                 latest_month=max_month_cols
+                st.write(1,latest_month)
                 
                 col4,col5,col6=st.columns([4,1,6])
                 with col4:
                     st.write("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+                    st.write(2,latest_month)
                 with col5:		
                     yes=st.button("Yes")          
                 with col6:
@@ -875,6 +878,7 @@ def PL_Process_Main(entity_i,sheet_type):
                     st.stop()
                 elif not yes:
                     st.stop()
+			
             elif latest_month!=max_month_cols:
                 st.error("The latest month in sheet '{}' is not {}. Please fix it and re-upload.".format(sheet_name,latest_month))
                 st.stop()
