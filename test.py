@@ -984,10 +984,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.cache_data.clear()
                 st.cache_resource.clear()
                 st.write("{} uploaded.".format(uploaded_file.name))
-	    else:
+            else:
                 st.stop()
             if uploaded_file:
-		        # initial parameter
+		# initial parameter
                 global latest_month
                 latest_month="2023"
                 Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Upload_Section(uploaded_file)
