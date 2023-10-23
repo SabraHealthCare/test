@@ -612,7 +612,7 @@ def Sheet_Process(entity_i,sheet_type,sheet_name):
     PL.drop(nan_index, inplace=True)
     #set index as str ,strip
     PL.index=map(lambda x:str(x).strip(),PL.index)
-    PL=PL.applymap(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
+    PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
     # remove columns with all nan/0
     PL=PL.loc[:,(PL!= 0).any(axis=0)]
     # remove rows with all nan/0 value
@@ -732,7 +732,7 @@ def View_Summary():
     
     latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
    
-    st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).applymap(left_align)
+    st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
@@ -820,7 +820,7 @@ def View_Discrepancy_Detail():
         </style>
             """,
         unsafe_allow_html=True )
-        st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).applymap(left_align)
+        st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
 	
         download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy")
