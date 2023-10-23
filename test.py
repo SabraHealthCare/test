@@ -1033,9 +1033,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     'country': ['Japan', 'China', 'Thailand', 'France', 'Belgium', 'South Korea'],
     'capital': ['Tokyo', 'Beijing', 'Bangkok', 'Paris', 'Brussels', 'Seoul']}
 
-        df = pd.DataFrame(data)
-        st.write(df)
-        gd = GridOptionsBuilder.from_dataframe(df)
+        #df = pd.DataFrame(data)
+        #st.write(df)
+        gd = GridOptionsBuilder.from_dataframe(account_mapping)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gridoptions = gd.build()
         grid_table = AgGrid(new_account, height=250, gridOptions=gridoptions,
