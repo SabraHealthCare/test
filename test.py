@@ -603,7 +603,8 @@ def Sheet_Process(entity_i,sheet_type,sheet_name):
 
     #set tenant_account as index of PL
     PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
-   
+
+	
     #remove row above date row and remove column without date col name
     PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
     
