@@ -861,7 +861,7 @@ def PL_Process_Main(entity_i,sheet_type):
             
             max_month_cols=str(max(list(PL.columns)))
 	    # check the latest reporting month
-            if not latest_month:	    
+            if latest_month=="2023":	    
                 latest_month=max_month_cols
                 st.write(1,latest_month)
                 
@@ -992,6 +992,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             if uploaded_file:
 		# initial parameter
                 global latest_month
+                latest_month='2023'
                 Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
 	
 	        # 1 Summary
