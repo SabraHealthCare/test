@@ -1038,9 +1038,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         gd = GridOptionsBuilder.from_dataframe(df)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gridoptions = gd.build()
-        grid_table = AgGrid(df, height=250, gridOptions=gridoptions,
+        grid_table = AgGrid(new_account, height=250, gridOptions=gridoptions,
                     update_mode=GridUpdateMode.SELECTION_CHANGED)
-        st.write(grid_table)
+       
         st.write('## Selected')
         selected_row = grid_table["selected_rows"]
         st.dataframe(selected_row)
