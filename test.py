@@ -1081,7 +1081,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         
         if st.button("Confirm"):
             selected_row = grid_table["selected_rows"]
-	else:
+        else:
             selected_row = grid_table["selected_rows"]
 
     #elif choice=="Upload data":
