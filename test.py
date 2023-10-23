@@ -1031,8 +1031,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         gridoptions = gd.build()
         grid_table = AgGrid(account_mapping, height=1000, gridOptions=gridoptions,
                     update_mode=GridUpdateMode.SELECTION_CHANGED)
-        selected_row = grid_table["selected_rows"]
+        
         if st.button("Confirm"):
+            selected_row = grid_table["selected_rows"]
+	else:
+            selected_row = grid_table["selected_rows"]
             
 
 
