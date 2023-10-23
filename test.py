@@ -735,8 +735,8 @@ def View_Summary():
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
-	submit_latest_month["Operator"]=operator
-        Update_file_inS3(bucket_PL,"test1.csv",operator,submit_latest_month,how="replace") 
+	latest_month_data["Operator"]=operator
+        Update_file_inS3(bucket_PL,"test1.csv",operator,latest_month_data,how="replace") 
 	st.write("Success")
     else:
         st.stop()	
