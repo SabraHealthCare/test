@@ -703,7 +703,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
 
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary():
-    global Total_PL,latest_month
+    global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
@@ -736,13 +736,7 @@ def View_Summary():
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
-    submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
-    if submit_latest_month:
-        latest_month_data["Operator"]=operator
-        Update_file_inS3(bucket_PL,"test1.csv",operator,latest_month_data,how="replace") 
-        st.write("Success")
-    else:
-        st.stop()	
+	
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
 
 # can't use cache
