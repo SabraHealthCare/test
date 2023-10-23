@@ -102,7 +102,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
     BPCAccount = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
-    BPC_Account= pd.read_excel(BPCAccount['Body'].read(), sheet_name="BPC_Account_Info")
+    BPC_Account= pd.read_excel(BytesIO(BPCAccount['Body'].read()), sheet_name="BPC_Account_Info")
  
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
