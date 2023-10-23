@@ -438,7 +438,7 @@ def Update_Sheet_inS3(bucket,key,sheet_name,df,how="replace"):  # how = replace,
 def Update_file_inS3(bucket,key,operator,new_data,how="replace"):  # how = replace, append....
     if how=="replace":
         original_file =s3.get_object(Bucket=bucket, Key=key)
-        original_data=pd.read_csv(original_file['Body'].read(),header=0)
+        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         
 	# remove original data for that operator
         original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
@@ -738,7 +738,6 @@ def View_Summary():
     st.write("")
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
-        st.write(3,latest_month)
         latest_month_data["Operator"]=operator
         Update_file_inS3(bucket_PL,"test1.csv",operator,latest_month_data,how="replace") 
         st.write("Success")
@@ -863,12 +862,10 @@ def PL_Process_Main(entity_i,sheet_type):
 	    # check the latest reporting month
             if latest_month=="2023":	    
                 latest_month=max_month_cols
-                st.write(1,latest_month)
                 
                 col4,col5,col6=st.columns([4,1,6])
                 with col4:
                     st.write("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-                    st.write(2,latest_month)
                 with col5:		
                     yes=st.button("Yes")          
                 with col6:
