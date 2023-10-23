@@ -861,12 +861,12 @@ def PL_Process_Main(entity_i,sheet_type):
             if latest_month=="2023":	    
                 latest_month=max_month_cols
                 
-                col1,col2,col3=st.columns([4,1,6])
-                with col1:
+                col4,col5,col6=st.columns([4,1,6])
+                with col4:
                     st.write("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-                with col2:		
+                with col5:		
                     yes=st.button("Yes")          
-                with col3:
+                with col6:
                     no=st.button("No")   
 
                 if no:
