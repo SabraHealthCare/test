@@ -444,28 +444,13 @@ def Update_file_inS3(bucket,key,operator,new_data,how="replace"):  # how = repla
 	# remove original data for that operator
         original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 	    
-	# append new data to file
+	# append new data to original data
         updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-
-    #load_file =s3.get_object(Bucket=bucket, Key=key)
-    #workbook = load_workbook(BytesIO(load_file['Body'].read()))
-
 
     csv_buffer = StringIO()
     updated_data.to_csv(csv_buffer)
     s3_resource = boto3.resource('s3')
-    s3_resource.Object(bucket, 'test.csv').put(Body=csv_buffer.getvalue())
-	
-    #for r in dataframe_to_rows(updated_data, index=False, header=True):
-        #workbook.append(r)
-
-    
-	    
-    #with NamedTemporaryFile() as tmp:
-         #workbook.save(tmp.name)
-         #data = BytesIO(tmp.read())
-    #s3.upload_fileobj(data,bucket,key)
-
+    s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Property_Mapping(operator):
@@ -740,12 +725,12 @@ def View_Summary():
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
         latest_month_data["Operator"]=operator
-        Update_file_inS3(bucket_PL,"test1.csv",operator,latest_month_data,how="replace") 
+        Update_file_inS3(bucket_PL,"Data_upload.csv",operator,latest_month_data,how="replace") 
         st.write("Success")
     else:
         st.stop()
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-
+"Data_upload.csv"
 # can't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
