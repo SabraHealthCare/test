@@ -708,11 +708,11 @@ def View_Summary():
 	
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
-        upload_latest_month=Total_PL[latest_month]
+        upload_latest_month=Total_PL.loc[:,latest_month]
         upload_latest_month["Operator"]=operator
         upload_latest_month["TIME"]=latest_month
         st.write(upload_latest_month,upload_latest_month.columns)
-        #upload_latest_month.rename(columns={latest_month:"Amount"})
+        upload_latest_month.rename(columns={latest_month:"Amount"})
 	    
         if Update_File_inS3(bucket_PL,Monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
