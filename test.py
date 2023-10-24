@@ -424,8 +424,8 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
     
     # append new data to original data
-    original_data=original_data[list(filter(lambda x:len(x)>0,original_data.columns))]
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
+    updated_data=updated_data[list(filter(lambda x:"Unnamed:" not in x,updated_data.columns))]
     try:
         csv_buffer = StringIO()
         updated_data.to_csv(csv_buffer)
