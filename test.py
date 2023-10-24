@@ -705,9 +705,12 @@ def View_Summary():
     st.write("")
 
     # upload latest month data to AWS
+	
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
-        if Update_File_inS3(bucket_PL,Monthly_reporting_path,Total_PL[latest_month],operator,latest_month): 
+        upload_latest_month=Total_PL[latest_month]
+	upload_latest_month["Operator"]=operator
+        if Update_File_inS3(bucket_PL,Monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
