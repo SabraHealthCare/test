@@ -414,6 +414,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
     original_file =s3.get_object(Bucket=bucket, Key=key)
 
     if int(original_file["ContentLength"])>2:  # not empty file
+        st.write(original_file)
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
     else:  # empty file
         original_data=pd.DataFrame()
