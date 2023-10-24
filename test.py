@@ -711,7 +711,6 @@ def View_Summary():
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
         upload_latest_month["Operator"]=operator
         upload_latest_month["TIME"]=latest_month
-        st.write(upload_latest_month)
         upload_latest_month.rename(columns={latest_month:"Amount"})
 	    
         if Update_File_inS3(bucket_PL,Monthly_reporting_path,upload_latest_month,operator,latest_month): 
@@ -964,22 +963,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                 st.cache_resource.clear()
                 st.write("{} uploaded.".format(uploaded_file.name))
             
-            if uploaded_file:
-		# initial parameter
-                global latest_month
-                latest_month='2023'
-                Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
+        if uploaded_file:
+	    # initial parameter
+        global latest_month
+            latest_month='2023'
+            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
 	
-	        # 1 Summary
-                with st.expander("Summary of P&L" ,expanded=True):
-                    ChangeWidgetFontSize('Summary of P&L', '25px')
-                    View_Summary()
+	    # 1 Summary
+            with st.expander("Summary of P&L" ,expanded=True):
+                ChangeWidgetFontSize('Summary of P&L', '25px')
+                View_Summary()
 	        
-	        # 2 Discrepancy of Historic Data
-                with st.expander("Discrepancy for Historic Data",expanded=True):
-                    ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                    View_Discrepancy(percent_discrepancy_accounts)
-                    View_Discrepancy_Detail()
+	    # 2 Discrepancy of Historic Data
+            with st.expander("Discrepancy for Historic Data",expanded=True):
+                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+                View_Discrepancy(percent_discrepancy_accounts)
+                View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
