@@ -33,7 +33,8 @@ bucket_PL="operatorpl"
 account_mapping_filename="Account_Mapping.csv"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
-Discrepancy_path="Total_Diecrepancy_Review.xlsx"
+discrepancy_path="Total_Diecrepancy_Review.csv"
+Monthly_reporting_path="Total monthly reporting for upload.csv"
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
@@ -398,7 +399,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     st.error("Can't identify date row in P&L for sheet: '"+sheet_name+"'")
     st.stop()
 
-
 def Save_File_toS3(uploaded_file, bucket, key):  
     try:
         s3.upload_fileobj(uploaded_file, bucket, key)
@@ -407,50 +407,30 @@ def Save_File_toS3(uploaded_file, bucket, key):
     except FileNotFoundError:
         st.error("File can't be uploaded.")
         return False   
-    
-def Update_Sheet_inS3(bucket,key,sheet_name,df,how="replace"):  # how = replace, append,
-    if how=="append":
-        discrepancy_file =s3.get_object(Bucket=bucket, Key=key)
-        original_df=pd.read_excel(discrepancy_file['Body'].read(), sheet_name=sheet_name,header=0)
-        # remove original discrepancy and comments
-        original_df = original_df.drop(original_df[original_df['Operator'] == operator].index)
-	# update to new discrepancy and comments
-        df = pd.concat([original_df,df]).reset_index(drop=True)
-    load_file =s3.get_object(Bucket=bucket, Key=key)
-    workbook = load_workbook(BytesIO(load_file['Body'].read()))
-    workbook.remove(workbook[sheet_name])
-    new_worksheet = workbook.create_sheet(sheet_name)
-    for r in dataframe_to_rows(df, index=False, header=True):
-        new_worksheet.append(r)
-
-
-    if how=="replace":
-        st.write("not done yet")
-
-
-	    
-    with NamedTemporaryFile() as tmp:
-         workbook.save(tmp.name)
-         data = BytesIO(tmp.read())
-    s3.upload_fileobj(data,bucket,key)
 
 
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_file_inS3(bucket,key,operator,new_data,how="replace"):  # how = replace, append....
-    if how=="replace":
-        original_file =s3.get_object(Bucket=bucket, Key=key)
-        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        
-	# remove original data for that operator
-        original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-	    
+def Update_File_inS3(bucket,key,new_data,operator=operator,month=None,how = "replace"):  # how = replace, append...
+    original_file =s3.get_object(Bucket=bucket, Key=key)
+    original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+    if original_data.shape[0]==0:
+        updated_data=new_data
+    else:
+        if month:
+	    # remove original data for that operator
+            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
+        elif not month:
+            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
 	# append new data to original data
         updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-
-    csv_buffer = StringIO()
-    updated_data.to_csv(csv_buffer)
-    s3_resource = boto3.resource('s3')
-    s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
+    try:
+        csv_buffer = StringIO()
+        updated_data.to_csv(csv_buffer)
+        s3_resource = boto3.resource('s3')
+        s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
+        return True
+    except:
+        return False
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Property_Mapping(operator):
@@ -492,7 +472,7 @@ def Manage_Property_Mapping(operator):
         
         download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"{} properties mapping".format(operator))
         # update account_mapping in S3     
-        Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_entity_mapping,entity_mapping)    
+        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
 
 @st.cache_data(experimental_allow_widgets=True)
@@ -571,9 +551,9 @@ def Sheet_Process(entity_i,sheet_type,sheet_name):
     if count>0:
         # update sheet name in entity_mapping
         entity_mapping.loc[entity_i,sheet_type]=sheet_name  
-        # update account_mapping in S3     
-        Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_entity_mapping,entity_mapping)    
-    
+        # update entity_mapping in S3     
+        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
+
     # Start checking process
     st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
     tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
@@ -722,16 +702,20 @@ def View_Summary():
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
+
+    # upload latest month data to AWS
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
         latest_month_data["Operator"]=operator
-        Update_file_inS3(bucket_PL,"Data_upload.csv",operator,latest_month_data,how="replace") 
-        st.write("Success")
+        if Update_file_inS3(bucket_PL,Monthly_reporting_path,latest_month_data,operator,latest_month): 
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!").format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+	else:
+            st.write("")  #----------record into error report------------------------	
     else:
         st.stop()
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
-"Data_upload.csv"
-# can't use cache
+
+# don't use cache
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
     if diff_BPC_PL.shape[0]>0:
@@ -768,7 +752,8 @@ def View_Discrepancy(percent_discrepancy_accounts):
                     st.markdown("✔️ :green[Comments uploaded]")
                     time.sleep(1)
                     st.write(" ")
-                Update_Sheet_inS3(bucket_PL,Discrepancy_path,sheet_name_discrepancy,edited_diff_BPC_PL,"append") 
+                Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator,latest_month)
+
             with col1:                        
                 download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"]],"Discrepancy review")
     else:
@@ -833,7 +818,7 @@ def PL_Process_Main(entity_i,sheet_type):
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
                     #insert new record to the bottom line of account_mapping
                     account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
-                Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping) 
+                Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
             #if there are duplicated accounts in P&L, ask for confirming
             dup_tenant_account=set([x for x in PL.index if list(PL.index).count(x) > 1])
@@ -1003,7 +988,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account)
 	            #insert new record to the bottom line of account_mapping
                     account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account,new_tenant_account.upper(),"N"]   
-                    Update_Sheet_inS3(bucket_mapping,mapping_path,sheet_name_account_mapping,account_mapping)
+                    Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping)
     
     elif choice=="Edit Account": 
 	# update user details widget
