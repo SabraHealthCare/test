@@ -34,7 +34,7 @@ account_mapping_filename="Account_Mapping.csv"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
 discrepancy_path="Total_Diecrepancy_Review.csv"
-Monthly_reporting_path="Total monthly reporting for upload.csv"
+Monthly_reporting_path="Total monthly reporting.csv"
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
