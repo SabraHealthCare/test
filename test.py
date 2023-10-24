@@ -413,17 +413,15 @@ def Save_File_toS3(uploaded_file, bucket, key):
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
     original_file =s3.get_object(Bucket=bucket, Key=key)
 
-    if int(original_file["ContentLength"])>2:  # not empty file
-        st.write(original_file)
-        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-    else:  # empty file
+    if int(original_file["ContentLength"])<=2:  # empty file
         original_data=pd.DataFrame()
-    
-    if month:
-	# remove original data by operator and month 
-        original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
-    elif not month:
-        original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+    else:
+        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+        if month:
+	    # remove original data by operator and month 
+            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
+        elif not month:
+            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
     
     # append new data to original data
     original_data=original_data[list(filter(lambda x:len(x)>0,original_data.columns))]
