@@ -710,7 +710,7 @@ def View_Summary():
     if submit_latest_month:
         upload_latest_month=Total_PL[latest_month]
         upload_latest_month["Operator"]=operator
-	upload_latest_month["TIME"]=latest_month
+        upload_latest_month["TIME"]=latest_month
 	upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
 	    
         if Update_File_inS3(bucket_PL,Monthly_reporting_path,upload_latest_month,operator,latest_month): 
