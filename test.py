@@ -707,7 +707,7 @@ def View_Summary():
     submit_latest_month=st.button("Confirm {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
         if Update_file_inS3(bucket_PL,Monthly_reporting_path,Total_PL[latest_month],operator,latest_month): 
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!").format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
 	else:
             st.write("")  #----------record into error report------------------------	
     else:
