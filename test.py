@@ -413,7 +413,7 @@ def Save_File_toS3(uploaded_file, bucket, key):
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
     original_file =s3.get_object(Bucket=bucket, Key=key)
     if original_file: 
-        st.write("Not none",original_data)
+        st.write("Not none",original_file)
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
         
     else:
