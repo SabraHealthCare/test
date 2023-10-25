@@ -1073,7 +1073,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review operator upload":
         download_data_button=st.button("Download reporting data")
         if download_data_button:
-            data_file =s3.get_object(Bucket=bucket, Key=key)
+            data_file =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
             if int(data_file["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
 		
