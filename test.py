@@ -1070,11 +1070,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         selected_row = grid_table["selected_rows"]
         if st.button("Confirm new accounts"):
             if selected_row:
-                #df = pd.DataFrame(selected_row)
                 un_conmirmed_account=un_conmirmed_account.set_index([["Tenant_Account","Sabra_Account","Sabra_Second_Account"]])
                 for row in selected_row:
                     un_conmirmed_account.loc[rwo]["Conversion"]=""
-                st.write(un_conmirmed_account)
+                st.write("un_conmirmed_account",un_conmirmed_account)
             else:
                 st.error("Please select accounts which you want to confirm")
         
@@ -1082,7 +1081,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
-		
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unname" not in x,data.columns))]
@@ -1099,7 +1097,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 for r in range(2,row_size+2):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
-                    data.loc[r-2,"EPM_Formula"]=formula  
+                    data.loc[r-2,"EPM_Formula"]=formula
                 download_report(data,"Operator reporting data")
 		    
                 
