@@ -103,7 +103,7 @@ def colnum_letter(col_number):
     letter = ""
     col_number+=1
     while col_number >= 0:
-        col_number, remainder = divmod(n - 1, 26)
+        col_number, remainder = divmod(col_number - 1, 26)
         letter = chr(65 + remainder) + letter
     return letter 
 
