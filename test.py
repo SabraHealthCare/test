@@ -1073,7 +1073,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
     elif choice=="Review operator upload":
         download_data_button=st.button("Download reporting data")
         if download_data_button:
-            data_file =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
+            data_file =s3.get_object(Bucket=bucket_PL, Key="Monthly_reporting_path.csv")
             if int(data_file["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
 		
@@ -1084,6 +1084,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
                 st.write(col_name_list)
+                time_col_letter=colnum_letter(col_name_list.index("TIME"))
+                entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
+                account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+                data_col_letter=colnum_letter(col_name_list.index("Amount"))
+                data["EPM_Formula"]=None
+                for r in range(2,row_size):
+                    formula="""@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
+                    data.loc[r-2,"EPM_Formula"]=formula  
+                download_report(data,"Operator reporting data")
+		    
                 
      
   
