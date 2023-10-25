@@ -1075,7 +1075,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 for row in selected_row:
                     un_conmirmed_account.loc[rwo]["Conversion"]=""
                 st.write(un_conmirmed_account)
-	    else:
+            else:
                 st.error("Please select accounts which you want to confirm')
         
     elif choice=="Review Monthly reporting":
