@@ -1056,7 +1056,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
         un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
         gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
-        gd.configure_selection(selection_mode='multiple', use_checkbox=True)
+        #gd.configure_selection(selection_mode='multiple', use_checkbox=True)
+	gb.configure_column("Tenant_Account", headerCheckboxSelection = True,selection_mode='multiple', use_checkbox=True)
         gridoptions = gd.build()
         grid_table = AgGrid(un_conmirmed_account, gridOptions=gridoptions,fit_columns_on_grid_load=True,height=500,
                     update_mode=GridUpdateMode.SELECTION_CHANGED)
