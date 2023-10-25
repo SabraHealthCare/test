@@ -1064,8 +1064,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         
         if st.button("Confirm new accounts"):
             selected_row = grid_table["selected_rows"]
-        else:
-            selected_row = grid_table["selected_rows"]
+            st.write(selected_row)
+        
 
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
