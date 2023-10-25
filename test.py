@@ -1076,7 +1076,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     un_conmirmed_account.loc[rwo]["Conversion"]=""
                 st.write(un_conmirmed_account)
             else:
-                st.error("Please select accounts which you want to confirm')
+                st.error("Please select accounts which you want to confirm")
         
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
