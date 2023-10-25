@@ -98,6 +98,14 @@ css='''
 '''
 st.markdown(css, unsafe_allow_html=True)
 
+# convert column number into letter for CVS file 0-A, 1-B,2-c
+def colnum_letter(n):
+    letter = ""
+    n=n+1
+    while n >= 0:
+        n, remainder = divmod(n - 1, 26)
+        letter = chr(65 + remainder) + letter
+    return letter 
 
 @st.cache_data
 def Create_Tree_Hierarchy(bucket_mapping):
@@ -1064,7 +1072,34 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         else:
             selected_row = grid_table["selected_rows"]
 
-    #elif choice=="Upload data":
+    elif choice=="Review operator upload":
+        download_data_button=st.button("Download reporting data")
+        if download_data_button:
+            data_file =s3.get_object(Bucket=bucket, Key=key)
+            if int(data_file["ContentLength"])<=2:  # empty file
+                st.success("there is no un-uploaded data")
+		
+	else:
+            upload_data=pd.read_csv(BytesIO(data_file['Body'].read()),header=0)
+            # EPM save data formula
+            col_size=data.shape[1]
+            row_size=data.shape[0]
+            col_list=upload_data.columns
+            for i in range(len(col_list)):
+                if col_list[i]=="Amount":
+                    Amount_col=colnum_letter(i)
+            for r in range(2,row_size+2):
+                r_num=str(r)
+                formula="=@EPMSaveData("+col_letter+r_str+","+'"finance"'+",A"+r_str+",B"+r_str+",C"+r_str+",D"+r_str+",E"+r_str+",F"+\
+            r_str+",G"+r_str+",H"+r_str+",I"+r_str+",J"+r_str+",K"+r_str+","+col_letter+"1"+")"        
+                upload_data.loc[row_num+r+2,column_name]=formula  
+		    
+     
+    
+            
+        
+       
+
         
         
             
