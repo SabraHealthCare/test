@@ -175,7 +175,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
 
 def download_report(df,button_display):
     download_file=df.to_csv(index=False).encode('utf-8')
-    st.download_button(label="Download "+button_display,data=download_file,file_name=operator+" "+button_display+".csv",mime="text/csv")
+    st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
     
 def Get_Year(single_string):
     if single_string!=single_string or single_string==None or type(single_string)==float:
@@ -481,7 +481,7 @@ def Manage_Property_Mapping(operator):
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
                 entity_mapping.loc[i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
         
-        download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"{} properties mapping".format(operator))
+        download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update account_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
@@ -771,7 +771,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                 Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator,latest_month)
 
             with col1:                        
-                download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"]],"Discrepancy review")
+                download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"]],"Discrepancy review_{}".format(operator))
     else:
         st.success("All previous data in P&L ties with Sabra data")
 
@@ -812,8 +812,8 @@ def View_Discrepancy_Detail():
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
 	
-        download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy")
-        download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping")
+        download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
+        download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
 
 @st.cache_data(experimental_allow_widgets=True)        
@@ -1045,14 +1045,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         col1,col2=st.columns(2)
         with col1:
             operator= st.selectbox('Select Operator',(operator_list))
-            
         try:
             if authenticator.register_user('Register for '+operator, operator, config, preauthorization=False):
                 st.success('Registered successfully')
         except Exception as e:
             st.error(e)
-
-	
+		
     elif choice=="Logout":
         authenticator.logout('Logout', 'main')
 	    
@@ -1079,24 +1077,25 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             if int(data_file["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
 		
-	else:
-            upload_data=pd.read_csv(BytesIO(data_file['Body'].read()),header=0)
-            # EPM save data formula
-            col_size=data.shape[1]
-            row_size=data.shape[0]
-            col_list=upload_data.columns
-            for i in range(len(col_list)):
-                if col_list[i]=="Amount":
-                    Amount_col=colnum_letter(i)
-            for r in range(2,row_size+2):
-                r_num=str(r)
-                formula="=@EPMSaveData("+col_letter+r_str+","+'"finance"'+",A"+r_str+",B"+r_str+",C"+r_str+",D"+r_str+",E"+r_str+",F"+\
-            r_str+",G"+r_str+",H"+r_str+",I"+r_str+",J"+r_str+",K"+r_str+","+col_letter+"1"+")"        
-                upload_data.loc[row_num+r+2,column_name]=formula  
+            else:
+                data=pd.read_csv(BytesIO(data_file['Body'].read()),header=0)
+                # EPM save data formula
+                col_size=data.shape[1]
+                row_size=data.shape[0]
+                colname_list=data.columns
+                time_col_letter=colnum_letter(colname_list.index("TIME"))
+		entity_col_letter=colnum_letter(colname_list.index("ENTITY"))
+                account_col_letter=colnum_letter(colname_list.index("Sabra_Account"))
+	        data_col_letter=colnum_letter(colname_list.index("Amount"))
+                data["EPM_Formula"]=None
+                for r in range(2,row_size):
+                    formula="""@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
+                    data.loc[r-2,"EPM_Formula"]=formula  
+                download_report(data,"Operator reporting data")
 		    
      
-    
-            
+  
         
        
 
