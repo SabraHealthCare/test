@@ -1074,7 +1074,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         download_data_button=st.button("Download reporting data")
         if download_data_button:
             data_obj =s3.get_object(Bucket=bucket_PL, Key=Monthly_reporting_path)
-            if int(data_file["ContentLength"])<=2:  # empty file
+            if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
 		
             else:
