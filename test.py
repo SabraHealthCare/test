@@ -1085,8 +1085,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 col_name_list=list(data.columns)
                 st.write(col_name_list)
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
-                entity_col_letter=(col_name_list.index("ENTITY"))
-                account_col_letter=(col_name_list.index("Sabra_Account"))
+                entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
+                account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 st.write(data_col_letter,time_col_letter,entity_col_letter,account_col_letter)
                 data["EPM_Formula"]=None
