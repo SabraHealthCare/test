@@ -1082,16 +1082,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
-                st.write(col_name_list)
-                st.write(col_name_list.index("TIME"),col_name_list.index("ENTITY"),col_name_list.index("Sabra_Account"),col_name_list.index("Amount"))
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
-                st.write(data_col_letter,time_col_letter,entity_col_letter,account_col_letter)
                 data["EPM_Formula"]=None
                 
-                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(x[0:4],month_abbr[3]))
+                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x[4:6]))]))
                 for r in range(2,row_size):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
