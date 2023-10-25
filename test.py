@@ -1054,19 +1054,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
-        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
+        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")]
         gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gd.configure_column("Tenant_Account", headerCheckboxSelection = True)
         gridoptions = gd.build()
-        grid_table = AgGrid(un_conmirmed_account, gridOptions=gridoptions,fit_columns_on_grid_load=True,height=500,
-                    update_mode=GridUpdateMode.SELECTION_CHANGED)
+        grid_table = AgGrid(un_conmirmed_account[["Tenant_Account","Sabra_Account","Sabra_Second_Account"]],
+			    gridOptions=gridoptions,
+			    fit_columns_on_grid_load=True,
+			    height=500,
+			    width = '100%',
+        		    theme = "streamlit"
+                            update_mode=GridUpdateMode.SELECTION_CHANGED)
         
+        selected_row = grid_table["selected_rows"]
         if st.button("Confirm new accounts"):
-            selected_row = grid_table["selected_rows"]
-            st.write(selected_row)
+            if selected_row:
+                #df = pd.DataFrame(selected_row)
+                un_conmirmed_account=un_conmirmed_account.set_index([["Tenant_Account","Sabra_Account","Sabra_Second_Account"]])
+		for row in selected_row:
+		    un_conmirmed_account.loc[rwo]["Conversion"]=""
+		st.write(un_conmirmed_account)
+	    else:
+                st.error("Please select accounts which you want to confirm')
         
-
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
