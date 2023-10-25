@@ -1091,7 +1091,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.write(data_col_letter,time_col_letter,entity_col_letter,account_col_letter)
                 data["EPM_Formula"]=None
                 st.write(data.loc[1,"TIME"][4:6])
-                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(x[0:4],month_abbr[int(x[4:6])]))
+                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(x[0:4],month_abbr[3]))
                 for r in range(2,row_size):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
