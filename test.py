@@ -1064,7 +1064,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			    fit_columns_on_grid_load=True,
 			    height=500,
 			    width = '100%',
-        		    theme = "streamlit"
+        		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
         selected_row = grid_table["selected_rows"]
