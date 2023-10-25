@@ -1084,17 +1084,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
                 st.write(col_name_list)
-                time_col_letter=colnum_letter(col_name_list.index("TIME"))
-                entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
-                account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
-                data_col_letter=colnum_letter(col_name_list.index("Amount"))
-                data["EPM_Formula"]=None
-                for r in range(2,row_size):
-                    formula="""@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
-                    data.loc[r-2,"EPM_Formula"]=formula  
-                download_report(data,"Operator reporting data")
-		    
+                
      
   
         
