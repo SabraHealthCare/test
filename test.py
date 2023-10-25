@@ -34,14 +34,22 @@ account_mapping_filename="Account_Mapping.csv"
 BPC_pull_filename="BPC_Pull.csv"
 entity_mapping_filename ="Entity_Mapping.csv"
 discrepancy_path="Total_Diecrepancy_Review.csv"
-Monthly_reporting_path="Total monthly reporting.csv"
+monthly_reporting_path="Total monthly reporting.csv"
+operator_list_path="Operator_list.csv"
+BPC_account_path="Sabra_account_list.csv"
+@st.cache_data
+def read_csv_fromS3(bucket,key):
+    file_obj = s3.get_object(Bucket=bucket, Key=key)
+    df = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
+    return df
+
+
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!='select operator':
         PL_path=operator+"/"+operator+"_P&L.xlsx"
-        BPCpull =s3.get_object(Bucket=bucket_mapping, Key=BPC_pull_filename)
-        BPC_pull=pd.read_csv(BytesIO(BPCpull['Body'].read()),header=0)
+        BPC_pull=read_csv_fromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
@@ -60,14 +68,12 @@ def Initial_Paramaters(operator):
 @st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
-    account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=account_mapping_filename)
-    account_mapping = pd.read_csv(BytesIO(account_mapping_obj['Body'].read()),header=0)   
+    account_mapping = read_csv_fromS3(bucket_mapping,account_mapping_filename)  
     account_mapping = account_mapping[account_mapping["Operator"]==operator]
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
     account_mapping=account_mapping[["Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
-    entity_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key=entity_mapping_filename)
-    entity_mapping=pd.read_csv(BytesIO(entity_mapping_obj['Body'].read()),header=0)
+    entity_mapping =read_csv_fromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     return entity_mapping,account_mapping
 
@@ -111,8 +117,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPCAccount = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
-    BPC_Account= pd.read_excel(BytesIO(BPCAccount['Body'].read()), sheet_name="BPC_Account_Info")
+    BPC_Account = read_csv_fromS3(bucket_mapping, BPC_account_path)
  
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
@@ -419,7 +424,6 @@ def Save_File_toS3(uploaded_file, bucket, key):
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
     original_file =s3.get_object(Bucket=bucket, Key=key)
-
     if int(original_file["ContentLength"])<=2:  # empty file
         original_data=pd.DataFrame()
     else:
@@ -722,7 +726,7 @@ def View_Summary():
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
 	    
-        if Update_File_inS3(bucket_PL,Monthly_reporting_path,upload_latest_month,operator,latest_month): 
+        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
@@ -1023,7 +1027,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":	
-    menu=["Review operator upload","Review New Mapping","Edit Account","Create operator account","Logout"]
+    menu=["Review operator upload","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
     if choice=="Edit Account":
@@ -1034,16 +1038,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         except Exception as e:
             st.error(e)
     
-    elif choice=="Create operator account":
-        @st.cache_data
-        def get_operator_list(bucket_mapping):
-            operatorlist = s3.get_object(Bucket=bucket_mapping, Key="Initial_info.xlsx")
-            operator_list = pd.read_excel(operatorlist['Body'].read(), sheet_name='Operator_List')
-            return operator_list
-        operator_list=get_operator_list(bucket_mapping)
+    elif choice=="Register":
+        operator_list=read_csv_fromS3(bucket_mapping,operator_list_path)
         col1,col2=st.columns(2)
         with col1:
-            operator= st.selectbox('Select Operator',(operator_list))
+            operator= st.selectbox('Select Operator',(operator_list["Operator"]))
         try:
             if authenticator.register_user('Register for '+operator, operator, config, preauthorization=False):
                 st.success('Registered successfully')
@@ -1054,9 +1053,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
-        account_mapping_obj =s3.get_object(Bucket=bucket_mapping, Key="Account_Mapping.csv")
-        account_mapping = pd.read_csv(BytesIO(account_mapping_obj['Body'].read()),header=0)
-        
+        account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
         new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
         gd = GridOptionsBuilder.from_dataframe(new_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
@@ -1070,8 +1067,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             selected_row = grid_table["selected_rows"]
 
     elif choice=="Review operator upload":
-        
-            data_obj =s3.get_object(Bucket=bucket_PL, Key=Monthly_reporting_path)
+            data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
 		
