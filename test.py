@@ -1058,10 +1058,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gridoptions = gd.build()
-        grid_table = AgGrid(gd, height=1000, gridOptions=gridoptions,
+        grid_table = AgGrid(gridoptions, height=1000, gridOptions=gridoptions,
                     update_mode=GridUpdateMode.SELECTION_CHANGED)
         
-        if st.button("Confirm"):
+        if st.button("Confirm new accounts"):
             selected_row = grid_table["selected_rows"]
         else:
             selected_row = grid_table["selected_rows"]
