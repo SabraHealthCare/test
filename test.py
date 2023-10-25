@@ -12,7 +12,7 @@ import time
 import  streamlit_tree_select
 import copy
 import streamlit.components.v1 as components
-from calendar import monthrange
+from calendar import monthrange,month_abbr
 from  authenticate import Authenticate
 import json
 import yaml
@@ -1090,6 +1090,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 st.write(data_col_letter,time_col_letter,entity_col_letter,account_col_letter)
                 data["EPM_Formula"]=None
+                data["TIMIE"]=data["TIMIE"].apply(lambda x: "{}.{}".format(x[0:4],month_abbr[int(x[4:6])]))
                 for r in range(2,row_size):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
