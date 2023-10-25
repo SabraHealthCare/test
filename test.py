@@ -102,11 +102,10 @@ st.markdown(css, unsafe_allow_html=True)
 def colnum_letter(col_number):
     letter = ""
     col_number+=1
-    while col_number >= 0:
+    while col_number > 0:
         col_number, remainder = divmod(col_number - 1, 26)
         letter = chr(65 + remainder) + letter
     return letter 
-
 @st.cache_data
 def Create_Tree_Hierarchy(bucket_mapping):
     #Create Tree select hierarchy
@@ -1084,6 +1083,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
                 st.write(col_name_list)
+                st.write(col_name_list.index("TIME"),col_name_list.index("ENTITY"),col_name_list.index("Sabra_Account"),col_name_list.index("Amount"))
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
