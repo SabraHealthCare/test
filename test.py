@@ -1083,6 +1083,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
+                st.write(col_name_list)
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
