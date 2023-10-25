@@ -1074,7 +1074,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 un_conmirmed_account=un_conmirmed_account.set_index([["Tenant_Account","Sabra_Account","Sabra_Second_Account"]])
                 for row in selected_row:
                     un_conmirmed_account.loc[rwo]["Conversion"]=""
-		st.write(un_conmirmed_account)
+                st.write(un_conmirmed_account)
 	    else:
                 st.error("Please select accounts which you want to confirm')
         
@@ -1095,7 +1095,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 data["EPM_Formula"]=None
-                
                 data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 for r in range(2,row_size+2):
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
