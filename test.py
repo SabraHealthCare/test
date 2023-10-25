@@ -1027,7 +1027,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":	
-    menu=["Review operator upload","Review New Mapping","Edit Account","Register","Logout"]
+    menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
     if choice=="Edit Account":
@@ -1054,11 +1054,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
-        new_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
-        gd = GridOptionsBuilder.from_dataframe(new_account)
+        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
+        gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gridoptions = gd.build()
-        grid_table = AgGrid(account_mapping, height=1000, gridOptions=gridoptions,
+        grid_table = AgGrid(gd, height=1000, gridOptions=gridoptions,
                     update_mode=GridUpdateMode.SELECTION_CHANGED)
         
         if st.button("Confirm"):
@@ -1066,7 +1066,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         else:
             selected_row = grid_table["selected_rows"]
 
-    elif choice=="Review operator upload":
+    elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
