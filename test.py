@@ -1084,9 +1084,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 row_size=data.shape[0]
                 colname_list=data.columns
                 time_col_letter=colnum_letter(colname_list.index("TIME"))
-		entity_col_letter=colnum_letter(colname_list.index("ENTITY"))
+                entity_col_letter=colnum_letter(colname_list.index("ENTITY"))
                 account_col_letter=colnum_letter(colname_list.index("Sabra_Account"))
-	        data_col_letter=colnum_letter(colname_list.index("Amount"))
+                data_col_letter=colnum_letter(colname_list.index("Amount"))
                 data["EPM_Formula"]=None
                 for r in range(2,row_size):
                     formula="""@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
