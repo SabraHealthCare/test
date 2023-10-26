@@ -1077,6 +1077,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             elif selected_row:	#select part
                 for i in range(len(selected_row)):
                     tenant_account=un_confirmed_account.loc[selected_row[i]["Index"]]["Tenant_Account"]
+                    st.write(un_confirmed_account)
                     account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Confirm"]==None
                 st.write(account_mapping)
             else:
