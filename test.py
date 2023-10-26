@@ -1095,17 +1095,17 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     st.error("Please select mapping to confirm")
         st.subheader("Review operator Mapping")
         select_operator=operator_list["Operator"]
-	select_operator.loc[select_operator["Operator"]=="Sabra","Operator"]="Total"
+        select_operator.loc[select_operator["Operator"]=="Sabra","Operator"]="Total"
         with col1:
             operator= st.selectbox('Select Operator',select_operator)
         if operator:
             if operator!="Total":
                 operator_mapping=account_mapping[account_mapping["Operator"]==operator]
                 st.markdown(operator_mapping)
-		download_report(operator_mapping,"{} mapping".format(operator))
+                download_report(operator_mapping,"{} mapping".format(operator))
             else:
                 st.markdown(account_mapping)
-                download_report(account_mapping,"Operator total mapping")
+                download_report(account_mapping,"Total tenant mapping")
         
 		    
     elif choice=="Review Monthly reporting":
