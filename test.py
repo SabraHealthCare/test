@@ -1059,6 +1059,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         with st.expander("Review new mapping" ,expanded=True):
+            ChangeWidgetFontSize('Review new mapping', '25px')
             account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
@@ -1094,6 +1095,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     else:
                         st.error("Please select mapping to confirm")
         with st.expander("Review tenant mapping" ,expanded=True):
+            ChangeWidgetFontSize('Review tenant mapping', '25px')
             col1,col2=st.columns(2)
             select_operator=list(operator_list["Operator"])
             select_operator[0]="Total"
@@ -1106,7 +1108,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     download_report(operator_mapping,"{} mapping".format(selected_operator))
                 else:
                     st.write(account_mapping)
-                    download_report(account_mapping[list(filter(lambda x:"Unnamed" not in x,account_mapping.columns))],"Total tenant mapping")
+                    download_report(account_mapping,"Total tenant mapping")
         
 		    
     elif choice=="Review Monthly reporting":
