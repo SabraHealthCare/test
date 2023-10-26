@@ -1054,7 +1054,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
-        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")]
+        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]].reset_index(drop=True)
+        un_conmirmed_account.index.name='Index'
         gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gd.configure_column("Tenant_Account", headerCheckboxSelection = True)
@@ -1069,12 +1070,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         
         selected_row = grid_table["selected_rows"]
         if st.button("Confirm new accounts"):
-            if selected_row:
-                un_conmirmed_account=un_conmirmed_account.set_index(["Tenant_Account","Sabra_Account","Sabra_Second_Account"])
+            if selected_row and len(selected_row)==un_conmirmed_account.shape[0]:
+       
+                account_mapping["Conversion"]=None
+                st.write(account_mapping)
+            elif selected_row:	
                 selected_row=pd.DataFrame(selected_row)
-                for i in selected_row.shape[0]:
-                    un_conmirmed_account[list(selected_row.loc[i])]["Conversion"]=""
-                st.write("un_conmirmed_account",un_conmirmed_account)
+                
+                st.write("selected_row",selected_row)
             else:
                 st.error("Please select accounts which you want to confirm")
         
