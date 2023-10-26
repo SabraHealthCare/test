@@ -1099,7 +1099,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         with col1:
             selected_operator= st.selectbox('Select Operator',select_operator)
         if selected_operator:
-            if operator!="Total":
+            if selected_operator!="Total":
                 operator_mapping=account_mapping[account_mapping["Operator"]==selected_operator]
                 st.markdown(operator_mapping)
                 download_report(operator_mapping,"{} mapping".format(selected_operator))
