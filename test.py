@@ -87,7 +87,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
 @st.cache_data
 def Initial_Paramaters(operator):
     # drop down list of operator
-    if operator!='select operator':
+    if operator!="Sabra":
         PL_path=operator+"/"+operator+"_P&L.xlsx"
         BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
@@ -1031,7 +1031,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 
 
 # ----------------for Sabra account--------------------	    
-elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":	
+elif st.session_state["authentication_status"] and st.session_state["operator"]=="sabra":
+    operator_list=Read_CSV_FromS3(bucket_mapping,operator_list_path)
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
 
@@ -1044,7 +1045,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.error(e)
     
     elif choice=="Register":
-        operator_list=Read_CSV_FromS3(bucket_mapping,operator_list_path)
         col1,col2=st.columns(2)
         with col1:
             operator= st.selectbox('Select Operator',(operator_list["Operator"]))
@@ -1058,38 +1058,56 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
+        st.subheader("Review New Mapping")
         account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
         un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
-        un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
-        un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
-        gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
-        gd.configure_selection(selection_mode='multiple', use_checkbox=True)
-        gd.configure_column("Index", headerCheckboxSelection = True)
-        gridoptions = gd.build()
-        grid_table = AgGrid(un_confirmed_account,
+        if un_confirmed_account.shape[0]==0:
+	    st.write("There is no new mapping.")
+	else:
+            un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
+            un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
+            gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
+            gd.configure_selection(selection_mode='multiple', use_checkbox=True)
+            gd.configure_column("Index", headerCheckboxSelection = True)
+            gridoptions = gd.build()
+            grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
 			    #width = '100%',
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
-        selected_row = grid_table["selected_rows"]
-        if st.button("Confirm new accounts"):
-            if selected_row:
-                if len(selected_row)==un_confirmed_account.shape[0]: # select all
-                    account_mapping["Confirm"]=None
-                else:#select part
-                    for i in range(len(selected_row)):
-                        tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
-                        account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
-                # save account_mapping 
-                if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
+            selected_row = grid_table["selected_rows"]
+            if st.button("Confirm new accounts"):
+                if selected_row:
+                    if len(selected_row)==un_confirmed_account.shape[0]: # select all
+                        account_mapping["Confirm"]=None
+                    else:#select part
+                        for i in range(len(selected_row)):
+                            tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
+                            account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
+                    # save account_mapping 
+                    if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
                         st.success("Selected mappings have been archived successfully")
+                    else:
+                        st.error("Can't save the change, please contact Sha Li.")
                 else:
-                    st.error("Can't save the change, please contact Sha Li.")
+                    st.error("Please select mapping to confirm")
+        st.subheader("Review operator Mapping")
+        select_operator=operator_list["Operator"]
+	select_operator.loc[select_operator["Operator"]=="Sabra","Operator"]="Total"
+        with col1:
+            operator= st.selectbox('Select Operator',select_operator)
+        if operator:
+            if operator!="Total":
+                operator_mapping=account_mapping[account_mapping["Operator"]==operator]
+                st.markdown(operator_mapping)
+		download_report(operator_mapping,"{} mapping".format(operator))
             else:
-                st.error("Please select accounts to confirm")
+                st.markdown(account_mapping)
+                download_report(account_mapping,"Operator total mapping")
         
+		    
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
@@ -1112,7 +1130,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
                     data.loc[r-2,"EPM_Formula"]=formula
                 download_report(data,"Operator reporting data")
-		    
+
                 
      
   
