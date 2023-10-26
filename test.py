@@ -869,7 +869,7 @@ def PL_Process_Main(entity_i,sheet_type):
                     no=st.button("No")   
 
                 if no:
-		     with st.form("latest_month", clear_on_submit=True):
+                    with st.form("latest_month", clear_on_submit=True):
                         st.write("Please select reporting month for the uploading data" )  
                         col1,col2,col3=st.columns([1,1,4])
                         with col1:
