@@ -1094,9 +1094,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     else:
                         st.error("Please select mapping to confirm")
         with st.expander("Review tenant mapping" ,expanded=True):
+            col1,col2=st.columns(2)
             select_operator=list(operator_list["Operator"])
             select_operator[0]="Total"
-            selected_operator= st.selectbox('Select Operator',select_operator)
+            with col1:
+                selected_operator= st.selectbox('Select Operator',select_operator)
             if selected_operator:
                 if selected_operator!="Total":
                     operator_mapping=account_mapping.loc[account_mapping["Operator"]==selected_operator,:]
@@ -1104,7 +1106,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     download_report(operator_mapping,"{} mapping".format(selected_operator))
                 else:
                     st.write(account_mapping)
-                    download_report(account_mapping,"Total tenant mapping")
+                    download_report(account_mapping[list(filter(lambda x:"Unnamed" not in x,account_mapping.columns))],"Total tenant mapping")
         
 		    
     elif choice=="Review Monthly reporting":
