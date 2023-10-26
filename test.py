@@ -291,7 +291,7 @@ def Add_year_to_header(month_list):
     available_month=list(filter(lambda x:x!=0,month_list))
     today=date.today()
     current_year= today.year
-    last_year=today.year-1
+    last_year=current_year-1
     if len(available_month)==1:
         
         if datetime.strptime(available_month[0]+"/01/"+current_year,'%m/%d/%Y').date()<today:
@@ -867,22 +867,25 @@ def PL_Process_Main(entity_i,sheet_type):
                     no=st.button("No")   
 
                 if no:
-                    st.error("Please check the month header in sheet '{}' and make sure the latest or biggest month in month header is the new reporting month.".format(sheet_name))  
-                    year = st.selectbox('Year', range(2022, date.today().year))
-                    month = st.selectbox('Month', range(1, 13))
-                    if year and month:
-                        latest_month=str(year)+str(month)
-                        st.write(latest_month)
+                    st.write("Please select reporting month for the uploading data" )  
+                    col1,col2,col3=st.columns([1,1,4])
+                    with col1:
+                        year = st.selectbox('Year', range(2023, date.today().year+1))
+                    with col2:
+                        month = st.selectbox('Month', range(1, 13))
+                    with col3:
+                        confirm_month=st.button("Submit")
+                    if confirm_month:
+                        if month<10:
+                            latest_month=str(year)+"0"+str(month)
+                        else:
+                            latest_month=str(year)+str(month)
+		    else:
                         st.stop()
-                    else:
-                        st.stop()
+                    
                 elif not yes:
                     st.stop()
 			
-            elif latest_month!=max_month_cols:
-                st.error("The latest month in sheet '{}' is not {}. Please fix it and re-upload.".format(sheet_name,latest_month))
-                st.stop()
-	    # check the start reporting month
     return latest_month,PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True)  
