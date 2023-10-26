@@ -1058,54 +1058,53 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
-        st.subheader("Review New Mapping")
-        account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
-        un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
-        if un_confirmed_account.shape[0]==0:
-            st.write("There is no new mapping.")
-        else:
-            un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
-            un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
-            gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
-            gd.configure_selection(selection_mode='multiple', use_checkbox=True)
-            gd.configure_column("Index", headerCheckboxSelection = True)
-            gridoptions = gd.build()
-            grid_table = AgGrid(un_confirmed_account,
+        with st.expander("Review new mapping" ,expanded=True):
+            account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
+            un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
+            if un_confirmed_account.shape[0]==0:
+                st.write("There is no new mapping.")
+            else:
+                un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
+                un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
+                gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
+                gd.configure_selection(selection_mode='multiple', use_checkbox=True)
+                gd.configure_column("Index", headerCheckboxSelection = True)
+                gridoptions = gd.build()
+                grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
 			    #width = '100%',
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
-            selected_row = grid_table["selected_rows"]
-            if st.button("Confirm new accounts"):
-                if selected_row:
-                    if len(selected_row)==un_confirmed_account.shape[0]: # select all
-                        account_mapping["Confirm"]=None
-                    else:#select part
-                        for i in range(len(selected_row)):
-                            tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
-                            account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
-                    # save account_mapping 
-                    if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
-                        st.success("Selected mappings have been archived successfully")
+                selected_row = grid_table["selected_rows"]
+                if st.button("Confirm new mappings"):
+                    if selected_row:
+                        if len(selected_row)==un_confirmed_account.shape[0]: # select all
+                            account_mapping["Confirm"]=None
+                        else:#select part
+                            for i in range(len(selected_row)):
+                                tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
+                                account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
+                        # save account_mapping 
+                        if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
+                            st.success("Selected mappings have been archived successfully")
+                        else:
+                            st.error("Can't save the change, please contact Sha Li.")
                     else:
-                        st.error("Can't save the change, please contact Sha Li.")
-                else:
-                    st.error("Please select mapping to confirm")
-        st.subheader("Review operator Mapping")
-        select_operator=list(operator_list["Operator"])
-        select_operator[0]="Total"
-        with col1:
+                        st.error("Please select mapping to confirm")
+        with st.expander("Review tenant mapping" ,expanded=True):
+            select_operator=list(operator_list["Operator"])
+            select_operator[0]="Total"
             selected_operator= st.selectbox('Select Operator',select_operator)
-        if selected_operator:
-            if selected_operator!="Total":
-                operator_mapping=account_mapping[account_mapping["Operator"]==selected_operator]
-                st.markdown(operator_mapping)
-                download_report(operator_mapping,"{} mapping".format(selected_operator))
-            else:
-                st.markdown(account_mapping)
-                download_report(account_mapping,"Total tenant mapping")
+            if selected_operator:
+                if selected_operator!="Total":
+                    operator_mapping=account_mapping[account_mapping["Operator"]==selected_operator]
+                    st.markdown(operator_mapping)
+                    download_report(operator_mapping,"{} mapping".format(selected_operator))
+                else:
+                    st.markdown(account_mapping)
+                    download_report(account_mapping,"Total tenant mapping")
         
 		    
     elif choice=="Review Monthly reporting":
