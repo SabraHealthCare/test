@@ -877,18 +877,18 @@ def PL_Process_Main(entity_i,sheet_type):
                             month = st.selectbox('Month', range(1, 13))
                         with col3:
                             confirm_month=st.form_submit_button("Submit")
-				  
+                    elif not yes:
+                        st.stop()				  
 		    
                 if confirm_month:
                         if month<10:
                             latest_month=str(year)+"0"+str(month)
                         else:
                             latest_month=str(year)+str(month)
-                    else:
-                        st.stop()
-                    
-                elif not yes:
+                else:
                     st.stop()
+                    
+
 			
     return latest_month,PL,PL_with_detail
 
