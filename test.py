@@ -1070,14 +1070,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
         selected_row = grid_table["selected_rows"]
-        un_confirmed_account=un_confirmed_account.set_index("Index")
         if st.button("Confirm new accounts"):
             if selected_row and len(selected_row)==un_confirmed_account.shape[0]: # select all
                 account_mapping["Confirm"]=None
             elif selected_row:	#select part
                 for i in range(len(selected_row)):
-                    tenant_account=un_confirmed_account.loc[selected_row[i]["Index"]]["Tenant_Account"]
-                    st.write(un_confirmed_account)
+                    tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"]
+                    st.write(tenant_account)
                     account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Confirm"]==None
                 st.write(account_mapping)
             else:
