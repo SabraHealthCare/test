@@ -858,17 +858,18 @@ def PL_Process_Main(entity_i,sheet_type):
             if latest_month=="2023":	    
                 latest_month=max_month_cols
 
-                with st.form("latest_month", clear_on_submit=True):
+               
                  
-                    col4,col5,col6=st.columns([4,1,6])
-                    with col4:
-                        st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-                    with col5:		
-                        yes=st.button("Yes")          
-                    with col6:
-                        no=st.button("No")   
+                col4,col5,col6=st.columns([4,1,6])
+                with col4:
+                    st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+                with col5:		
+                    yes=st.button("Yes")          
+                with col6:
+                    no=st.button("No")   
 
-                    if no:
+                if no:
+		     with st.form("latest_month", clear_on_submit=True):
                         st.write("Please select reporting month for the uploading data" )  
                         col1,col2,col3=st.columns([1,1,4])
                         with col1:
@@ -877,19 +878,14 @@ def PL_Process_Main(entity_i,sheet_type):
                             month = st.selectbox('Month', range(1, 13))
                         with col3:
                             confirm_month=st.form_submit_button("Submit")
-                    elif not yes:
-                        st.stop()				  
-		    
-                if confirm_month:
+		    if confirm_month:
                         if month<10:
                             latest_month=str(year)+"0"+str(month)
                         else:
                             latest_month=str(year)+str(month)
-                else:
-                    st.stop()
-                    
-
-			
+				
+                elif not yes:
+                    st.stop()				  		
     return latest_month,PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True)  
