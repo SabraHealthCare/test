@@ -1077,7 +1077,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 for i in range(len(selected_row)):
                     tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                     st.write(tenant_account)
-                    account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Confirm"]==None
+                    account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Confirm"]=None
                 st.write(account_mapping)
             else:
                     st.error("Please select accounts which you want to confirm")
