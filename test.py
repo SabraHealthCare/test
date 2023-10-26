@@ -1054,8 +1054,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
-        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]].reset_index(drop=True)
-        un_conmirmed_account.index.name='Index'
+        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")][["Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
+        un_conmirmed_account['Index'] = range(1, len(un_conmirmed_account) + 1)
+        un_conmirmed_account=un_conmirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
         gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gd.configure_column("Tenant_Account", headerCheckboxSelection = True)
