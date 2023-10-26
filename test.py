@@ -860,7 +860,7 @@ def PL_Process_Main(entity_i,sheet_type):
                 
                 col4,col5,col6=st.columns([4,1,6])
                 with col4:
-                    st.write("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+                    st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
                 with col5:		
                     yes=st.button("Yes")          
                 with col6:
@@ -868,7 +868,14 @@ def PL_Process_Main(entity_i,sheet_type):
 
                 if no:
                     st.error("Please check the month header in sheet '{}' and make sure the latest or biggest month in month header is the new reporting month.".format(sheet_name))  
-                    st.stop()
+                    year = st.selectbox('Year', range(2022, datetime.date.today().year))
+                    month = st.selectbox('Month', range(1, 13))
+                    if year and month:
+                        latest_month=str(year)+str(month)
+                        st.write(latest_month)
+			st.stop()
+		    else:
+                        st.stop()
                 elif not yes:
                     st.stop()
 			
