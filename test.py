@@ -1076,11 +1076,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             elif selected_row:	#select part
                 for i in range(len(selected_row)):
                     tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
-                    account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=""
-                    st.write(account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Confirm"])
+                    account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]="3"
+                    st.write(account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"])
                 st.write(account_mapping)
             else:
-                    st.error("Please select accounts which you want to confirm")
+                st.error("Please select accounts which you want to confirm")
         
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
