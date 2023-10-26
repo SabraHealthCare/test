@@ -47,6 +47,7 @@ def Read_CSV_FromS3(bucket,key):
 # no cache
 def Save_CSV_ToS3(data,bucket,key):   
     try:
+        data=data[list(filter(lambda x:"Unnamed:" not in x,data.columns))]
         csv_buffer = StringIO()
         data.to_csv(csv_buffer)
         s3_resource = boto3.resource('s3')
@@ -80,7 +81,6 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
     
     # append new data to original data
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-    updated_data=updated_data[list(filter(lambda x:"Unnamed:" not in x,updated_data.columns))]
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
@@ -1064,6 +1064,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
             if un_confirmed_account.shape[0]==0:
                 st.write("There is no new mapping.")
+		st.write(un_confirmed_account)
             else:
                 un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
                 un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
