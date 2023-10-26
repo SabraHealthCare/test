@@ -883,7 +883,7 @@ def PL_Process_Main(entity_i,sheet_type):
                             latest_month=str(year)+"0"+str(month)
                         else:
                             latest_month=str(year)+str(month)
-		    else:
+                    else:
                         st.stop()
                 elif not yes:
                     st.stop()				  		
