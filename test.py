@@ -38,10 +38,39 @@ monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
 @st.cache_data
-def read_csv_fromS3(bucket,key):
+
+def Read_CSV_FromS3(bucket,key):
     file_obj = s3.get_object(Bucket=bucket, Key=key)
-    df = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
-    return df
+    data = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
+    return data
+
+def Save_CSV_ToS3(data,bucket,key):   
+    try:
+        csv_buffer = StringIO()
+        data.to_csv(csv_buffer)
+        s3_resource = boto3.resource('s3')
+        s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
+        return True
+    except:
+        return False
+    
+# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
+def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
+    original_file =s3.get_object(Bucket=bucket, Key=key)
+    if int(original_file["ContentLength"])<=2:  # empty file
+        original_data=pd.DataFrame()
+    else:
+        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+        if month:
+	    # remove original data by operator and month 
+            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
+        elif not month:
+            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
+    
+    # append new data to original data
+    updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
+    updated_data=updated_data[list(filter(lambda x:"Unnamed:" not in x,updated_data.columns))]
+    return Save_CSV_ToS3(updated_data,bucket,key)
 
 
 @st.cache_data
@@ -49,7 +78,7 @@ def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!='select operator':
         PL_path=operator+"/"+operator+"_P&L.xlsx"
-        BPC_pull=read_csv_fromS3(bucket_mapping,BPC_pull_filename)
+        BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
         BPC_pull.columns=list(map(lambda x :str(x), BPC_pull.columns))
@@ -68,12 +97,12 @@ def Initial_Paramaters(operator):
 @st.cache_resource
 def Initial_Mapping(operator):
     # read account mapping
-    account_mapping = read_csv_fromS3(bucket_mapping,account_mapping_filename)  
+    account_mapping = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
     account_mapping = account_mapping[account_mapping["Operator"]==operator]
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
     account_mapping=account_mapping[["Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
-    entity_mapping =read_csv_fromS3(bucket_mapping,entity_mapping_filename)
+    entity_mapping =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
     return entity_mapping,account_mapping
 
@@ -117,7 +146,7 @@ def Create_Tree_Hierarchy(bucket_mapping):
     #Create Tree select hierarchy
     parent_hierarchy_main=[{'label': "No need to map","value":"No need to map"}]
     parent_hierarchy_second=[{'label': "No need to map","value":"No need to map"}]
-    BPC_Account = read_csv_fromS3(bucket_mapping, BPC_account_path)
+    BPC_Account = Read_CSV_FromS3(bucket_mapping, BPC_account_path)
  
     for category in BPC_Account[BPC_Account["Type"]=="Main"]["Category"].unique():
         children_hierarchy=[]
@@ -419,32 +448,6 @@ def Save_File_toS3(uploaded_file, bucket, key):
     except FileNotFoundError:
         st.error("File can't be uploaded.")
         return False   
-
-
-# For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
-    original_file =s3.get_object(Bucket=bucket, Key=key)
-    if int(original_file["ContentLength"])<=2:  # empty file
-        original_data=pd.DataFrame()
-    else:
-        original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
-        if month:
-	    # remove original data by operator and month 
-            original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
-        elif not month:
-            original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
-    
-    # append new data to original data
-    updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
-    updated_data=updated_data[list(filter(lambda x:"Unnamed:" not in x,updated_data.columns))]
-    try:
-        csv_buffer = StringIO()
-        updated_data.to_csv(csv_buffer)
-        s3_resource = boto3.resource('s3')
-        s3_resource.Object(bucket,key).put(Body=csv_buffer.getvalue())
-        return True
-    except:
-        return False
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Property_Mapping(operator):
@@ -1039,7 +1042,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             st.error(e)
     
     elif choice=="Register":
-        operator_list=read_csv_fromS3(bucket_mapping,operator_list_path)
+        operator_list=Read_CSV_FromS3(bucket_mapping,operator_list_path)
         col1,col2=st.columns(2)
         with col1:
             operator= st.selectbox('Select Operator',(operator_list["Operator"]))
@@ -1053,7 +1056,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         authenticator.logout('Logout', 'main')
 	    
     elif choice=="Review New Mapping":
-        account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
+        account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
         un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
         un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
         un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
@@ -1071,16 +1074,21 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         
         selected_row = grid_table["selected_rows"]
         if st.button("Confirm new accounts"):
-            if selected_row and len(selected_row)==un_confirmed_account.shape[0]: # select all
-                account_mapping["Confirm"]=None
-            elif selected_row:	#select part
-                for i in range(len(selected_row)):
-                    tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
-                    account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
-                    st.write(account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"])
-                st.write(account_mapping)
+            if selected_row:
+                if len(selected_row)==un_confirmed_account.shape[0]: # select all
+                    account_mapping["Confirm"]=None
+                else:#select part
+                    for i in range(len(selected_row)):
+                        tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
+                        account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
+                # save account_mapping 
+                if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):
+                    st.success("Selected mappings have been archived")
+	
+		else:
+                    st.error("Can't save the change, please contact Sha Li.")
             else:
-                st.error("Please select accounts which you want to confirm")
+                st.error("Please select accounts to confirm")
         
     elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
