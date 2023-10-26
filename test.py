@@ -1100,7 +1100,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             if selected_operator:
                 if selected_operator!="Total":
                     operator_mapping=account_mapping.loc[account_mapping["Operator"]==selected_operator,:]
-                    st.markdown(operator_mapping.hide(axis="index").to_html(),unsafe_allow_html=True)
+                    st.markdown(operator_mapping)
                     download_report(operator_mapping,"{} mapping".format(selected_operator))
                 else:
                     st.markdown(account_mapping)
