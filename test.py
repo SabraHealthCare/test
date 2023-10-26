@@ -1094,8 +1094,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 else:
                     st.error("Please select mapping to confirm")
         st.subheader("Review operator Mapping")
-        select_operator=operator_list["Operator"]
-        select_operator=select_operator[select_operator["Operator"]!="Sabra"]
+        select_operator=list(operator_list["Operator"])
+        select_operator[0]="Total"
         with col1:
             operator= st.selectbox('Select Operator',select_operator)
         if operator:
