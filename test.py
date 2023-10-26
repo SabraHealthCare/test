@@ -1059,7 +1059,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gd.configure_column("Tenant_Account", headerCheckboxSelection = True)
         gridoptions = gd.build()
-        grid_table = AgGrid(un_conmirmed_account[["Tenant_Account","Sabra_Account","Sabra_Second_Account"]],
+        grid_table = AgGrid(un_conmirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
 			    height=500,
