@@ -1067,8 +1067,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
-			    height=500,
-			    width = '100%',
+			    #width = '100%',
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
@@ -1082,7 +1081,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         tenant_account=un_confirmed_account[un_confirmed_account["Index"]==selected_row[i]["Index"]]["Tenant_Account"].item()
                         account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                 # save account_mapping 
-                if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):
+                if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
+			st.cache_data.clear()
                         st.success("Selected mappings have been archived successfully")
                 else:
                     st.error("Can't save the change, please contact Sha Li.")
