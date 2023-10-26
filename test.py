@@ -1071,8 +1071,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         if st.button("Confirm new accounts"):
             if selected_row:
                 un_conmirmed_account=un_conmirmed_account.set_index(["Tenant_Account","Sabra_Account","Sabra_Second_Account"])
-                for row in selected_row:
-                    un_conmirmed_account.loc[row]["Conversion"]=""
+                selected_row=pd.DataFrame(selected_row)
+                for i in selected_row.shape[0]:
+                    un_conmirmed_account[selected_row.loc[i]]["Conversion"]=""
                 st.write("un_conmirmed_account",un_conmirmed_account)
             else:
                 st.error("Please select accounts which you want to confirm")
