@@ -1062,7 +1062,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         account_mapping =Read_CSV_FromS3(bucket_mapping, account_mapping_filename)
         un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
         if un_confirmed_account.shape[0]==0:
-	    st.write("There is no new mapping.")
+            st.write("There is no new mapping.")
 	else:
             un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
             un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
