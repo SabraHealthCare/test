@@ -37,13 +37,14 @@ discrepancy_path="Total_Diecrepancy_Review.csv"
 monthly_reporting_path="Total monthly reporting.csv"
 operator_list_path="Operator_list.csv"
 BPC_account_path="Sabra_account_list.csv"
-@st.cache_data
 
+# no cache
 def Read_CSV_FromS3(bucket,key):
     file_obj = s3.get_object(Bucket=bucket, Key=key)
     data = pd.read_csv(BytesIO(file_obj['Body'].read()),header=0)
     return data
 
+# no cache
 def Save_CSV_ToS3(data,bucket,key):   
     try:
         csv_buffer = StringIO()
@@ -53,6 +54,16 @@ def Save_CSV_ToS3(data,bucket,key):
         return True
     except:
         return False
+
+# no Cache
+def Upload_File_toS3(uploaded_file, bucket, key):  
+    try:
+        s3.upload_fileobj(uploaded_file, bucket, key)
+        st.success('{} successfully Uploaded'.format(uploaded_file.name))
+        return True
+    except FileNotFoundError:
+        st.error("File can't be uploaded.")
+        return False   
     
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
@@ -439,15 +450,6 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                 return PL_date_header,month_sort_index[month_index_i]
     st.error("Can't identify date row in P&L for sheet: '"+sheet_name+"'")
     st.stop()
-
-def Save_File_toS3(uploaded_file, bucket, key):  
-    try:
-        s3.upload_fileobj(uploaded_file, bucket, key)
-        st.success('{} successfully Uploaded'.format(uploaded_file.name))
-        return True
-    except FileNotFoundError:
-        st.error("File can't be uploaded.")
-        return False   
 
 #@st.cache_data(experimental_allow_widgets=True)
 def Manage_Property_Mapping(operator):
@@ -924,8 +926,8 @@ def Upload_Section(uploaded_file):
 	    # check if census data existed
 		
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
-	    # save uploaded tenant file to S3
-            Save_File_toS3(uploaded_file,bucket_PL,PL_path)
+	    # save tenant P&L to S3
+            Upload_File_toS3(uploaded_file,bucket_PL,PL_path)
             
             if diff_BPC_PL.shape[0]>0:
                 percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
@@ -1082,7 +1084,6 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                 # save account_mapping 
                 if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):           
-			st.cache_data.clear()
                         st.success("Selected mappings have been archived successfully")
                 else:
                     st.error("Can't save the change, please contact Sha Li.")
