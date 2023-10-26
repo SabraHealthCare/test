@@ -1083,9 +1083,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         account_mapping.loc[account_mapping["Tenant_Account"]==tenant_account,"Confirm"]=None
                 # save account_mapping 
                 if Save_CSV_ToS3(account_mapping,bucket_mapping, account_mapping_filename):
-                    st.success("Selected mappings have been archived")
-	
-		else:
+                        st.success("Selected mappings have been archived successfully")
+                else:
                     st.error("Can't save the change, please contact Sha Li.")
             else:
                 st.error("Please select accounts to confirm")
