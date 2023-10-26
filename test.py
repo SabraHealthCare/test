@@ -868,7 +868,7 @@ def PL_Process_Main(entity_i,sheet_type):
 
                 if no:
                     st.error("Please check the month header in sheet '{}' and make sure the latest or biggest month in month header is the new reporting month.".format(sheet_name))  
-                    year = st.selectbox('Year', range(2022, datetime.date.today().year))
+                    year = st.selectbox('Year', range(2022, date.today().year))
                     month = st.selectbox('Month', range(1, 13))
                     if year and month:
                         latest_month=str(year)+str(month)
