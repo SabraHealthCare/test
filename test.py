@@ -1070,7 +1070,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         selected_row = grid_table["selected_rows"]
         if st.button("Confirm new accounts"):
             if selected_row:
-                un_conmirmed_account=un_conmirmed_account.set_index([["Tenant_Account","Sabra_Account","Sabra_Second_Account"]])
+                un_conmirmed_account=un_conmirmed_account.set_index(["Tenant_Account","Sabra_Account","Sabra_Second_Account"])
                 for row in selected_row:
                     un_conmirmed_account.loc[rwo]["Conversion"]=""
                 st.write("un_conmirmed_account",un_conmirmed_account)
