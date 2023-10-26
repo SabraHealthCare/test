@@ -1097,12 +1097,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         select_operator=list(operator_list["Operator"])
         select_operator[0]="Total"
         with col1:
-            operator= st.selectbox('Select Operator',select_operator)
-        if operator:
+            selected_operator= st.selectbox('Select Operator',select_operator)
+        if selected_operator:
             if operator!="Total":
-                operator_mapping=account_mapping[account_mapping["Operator"]==operator]
+                operator_mapping=account_mapping[account_mapping["Operator"]==selected_operator]
                 st.markdown(operator_mapping)
-                download_report(operator_mapping,"{} mapping".format(operator))
+                download_report(operator_mapping,"{} mapping".format(selected_operator))
             else:
                 st.markdown(account_mapping)
                 download_report(account_mapping,"Total tenant mapping")
