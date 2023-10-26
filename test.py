@@ -1054,14 +1054,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 	    
     elif choice=="Review New Mapping":
         account_mapping =read_csv_fromS3(bucket_mapping, account_mapping_filename)
-        un_conmirmed_account=account_mapping[(account_mapping["Conversion"]=="N") & (account_mapping["Sabra_Account"]!="NO NEED TO MAP")]
-        un_conmirmed_account['Index'] = range(1, len(un_conmirmed_account) + 1)
-        un_conmirmed_account=un_conmirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
-        gd = GridOptionsBuilder.from_dataframe(un_conmirmed_account)
+        un_confirmed_account=account_mapping[account_mapping["Confirm"]=="N"]
+        un_confirmed_account['Index'] = range(1, len(un_conmirmed_account) + 1)
+        un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
+        gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
         gd.configure_selection(selection_mode='multiple', use_checkbox=True)
         gd.configure_column("Index", headerCheckboxSelection = True)
         gridoptions = gd.build()
-        grid_table = AgGrid(un_conmirmed_account,
+        grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
 			    height=500,
@@ -1070,13 +1070,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
         
         selected_row = grid_table["selected_rows"]
+	un_confirmed_account=un_confirmed_account.set_index("Index")
         if st.button("Confirm new accounts"):
-            if selected_row and len(selected_row)==un_conmirmed_account.shape[0]: # select all
-                account_mapping["Conversion"]=None
+            if selected_row and len(selected_row)==un_confirmed_account.shape[0]: # select all
+                account_mapping["Confirm"]=None
             elif selected_row:	#select part
-                #selected_row=pd.DataFrame(selected_row)
-                #for i in 
-                st.write("selected_row",selected_row)
+                for i in range(len(selected_row)):
+		    tenant_account=un_conmirmed_account.loc[selected_row[i]["Index"]]["Tenant_Account"]
+		    account_mapping[account_mapping["Tenant_Account"]==tenant_account]["Convirm"]==None
+                st.write(account_mapping)
             else:
                 st.error("Please select accounts which you want to confirm")
         
