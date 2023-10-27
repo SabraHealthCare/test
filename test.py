@@ -201,21 +201,22 @@ def filters_widgets(df, columns=None):
         columns=df.columns.tolist()
     
     widget_dict = {}
-    filter_widgets = st.container()
+    #filter_widgets = st.container()
    
     with filter_widgets.form(key="data_filters"):
-        not_showing = [] 
         for y in columns:
             selected_opts = df[y].unique().tolist()
             widget_dict[y] = st.multiselect(
                     label=str(y),
                     options=selected_opts,
-                    #default=selected_opts,
                     key=str(y),
                 )
             
         submit_button = st.form_submit_button("Apply Filters")
-        st.write(widget_dict)
+        if submit_button:
+            return df.loc[df[widget_dict.keys()].isin(widget_dict.values()).all(axis=1), :]
+	else:
+            return df
    
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
@@ -1164,8 +1165,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 with col1:
                     st.write(upload_summary)
                 with col2:
-                    filters_widgets(upload_summary,["Operator","TIME"])
-
+                    test=filters_widgets(upload_summary,["Operator","TIME"])
+                st.write(test)               
 
 		    
                 # create EPM formula for download data
