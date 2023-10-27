@@ -194,6 +194,58 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
     htmlstr = htmlstr.replace('|wgt_txt|', "'" + wgt_txt + "'")
     components.html(f"{htmlstr}", height=0, width=0)
 
+
+# Parse the df and get filter widgets based for provided columns
+def filters_widgets(df, columns=None, allow_single_value_widgets=False):
+    if not columns: #if columns not provided, use all columns to create widgets
+        columns=df.columns.tolist()
+    if allow_single_value_widgets:
+        threshold=0
+    else:
+        threshold=1
+    widget_dict = {}
+    filter_widgets = st.container()
+    filter_widgets.warning(
+        "After selecting filters press the 'Apply Filters' button at the bottom.")
+    if not allow_single_value_widgets:
+        filter_widgets.markdown("Only showing columns that contain more than 1 unique value.")
+    with filter_widgets.form(key="data_filters"):
+        not_showing = [] 
+        for y in columns:
+            selected_opts = df[y].unique().tolist()
+            if len(df[y].unique().tolist()) > threshold: #checks if above threshold
+                widget_dict[y] = st.multiselect(
+                    label=str(y),
+                    options=selected_opts,
+                    default=selected_opts,
+                    key=str(y),
+                )
+            else:#if doesnt pass threshold
+                not_showing.append(y)
+        if not_showing:#if the list is not empty, show this warning
+            st.warning(
+                f"Not showing filters for {' '.join(not_showing)} since they only contain one unique value."
+            )
+        submit_button = st.form_submit_button("Apply Filters")
+   
+
+def reset_filter_widgets_to_default(df, columns):
+    for y in df[columns]:
+        if str(y) in st.session_state:
+            del st.session_state[y]
+with your example:
+
+data = {
+        'project_title': ['LSE', 'DCP', 'Job-detection', 'Task management & Organizer'],
+        'tech': ['python-RegExp-PyQt5', 'python-RegExp', 'python-RegExp-BeautifulSoup-pandas', 'python-pandas-MS_SQL-CSS/HTML-Javascript'],
+        'Role': ['Junior developer ', 'Python developer', 'Python developer', 'Tech lead']
+    }
+df=pd.DataFrame(data)
+
+filters_widgets(df)
+
+
+
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account
@@ -1137,13 +1189,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
                 # upload summary
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
-
-                st.write(upload_summary)
+                col1,col2=st.columns(2)
+                with col1:
+                    st.write(upload_summary)
+                with col2:
+                    filters_widgets(upload_summary)
 
 
 		    
-		    
-                # create EPM formula
+                # create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
