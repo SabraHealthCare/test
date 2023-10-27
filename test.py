@@ -1135,7 +1135,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=dat[list(filter(lambda x:"Unname" not in x,data.columns))]
+                data=data[list(filter(lambda x:"Unname" not in x,data.columns))]
                 # EPM save data formula
                 col_size=data.shape[1]
                 row_size=data.shape[0]
