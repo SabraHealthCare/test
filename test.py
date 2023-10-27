@@ -729,12 +729,13 @@ def View_Summary():
 	
     # upload latest month data to AWS
     submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
+    upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
+    upload_latest_month["Operator"]=operator
+    upload_latest_month["TIME"]=latest_month
+    upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
+    upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
+    upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+now.strftime("%H:%M")
     if submit_latest_month:
-        upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-        upload_latest_month["Operator"]=operator
-        upload_latest_month["TIME"]=latest_month
-        upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
-        upload_latest_month["EPM_Formula"]=None
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
