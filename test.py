@@ -701,7 +701,7 @@ def View_Summary():
     for month in months:
         m_str += ", " + month
     st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The latest reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
+    st.write("The reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
