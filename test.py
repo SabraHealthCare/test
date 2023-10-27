@@ -201,7 +201,7 @@ def filters_widgets(df, columns=None):
         columns=df.columns.tolist()
     
     widget_dict = {}
-    #filter_widgets = st.container()
+    filter_widgets = st.container()
    
     with filter_widgets.form(key="data_filters"):
         for y in columns:
