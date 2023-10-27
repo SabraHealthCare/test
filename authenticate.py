@@ -238,8 +238,8 @@ class Authenticate:
                         st.warning('Please enter your username and password')
 
 
-                if 'clicked' not in st.session_state:
-                    st.session_state.clicked = {"forgot_password_button":False,"forgot_username_button":False}
+                #if 'clicked' not in st.session_state:
+                    #st.session_state.clicked = {"forgot_password_button":False,"forgot_username_button":False}
 
                 # Function to update the value in session state
                 def clicked(button_name):
