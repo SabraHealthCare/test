@@ -196,35 +196,26 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 
 
 # Parse the df and get filter widgets based for provided columns
-def filters_widgets(df, columns=None, allow_single_value_widgets=False):
+def filters_widgets(df, columns=None):
     if not columns: #if columns not provided, use all columns to create widgets
         columns=df.columns.tolist()
-    if allow_single_value_widgets:
-        threshold=0
-    else:
-        threshold=1
+    
     widget_dict = {}
     filter_widgets = st.container()
-    if not allow_single_value_widgets:
-        filter_widgets.markdown("Only showing columns that contain more than 1 unique value.")
+   
     with filter_widgets.form(key="data_filters"):
         not_showing = [] 
         for y in columns:
             selected_opts = df[y].unique().tolist()
-            if len(df[y].unique().tolist()) > threshold: #checks if above threshold
-                widget_dict[y] = st.multiselect(
+            widget_dict[y] = st.multiselect(
                     label=str(y),
                     options=selected_opts,
-                    default=selected_opts,
+                    #default=selected_opts,
                     key=str(y),
                 )
-            else:#if doesnt pass threshold
-                not_showing.append(y)
-        if not_showing:#if the list is not empty, show this warning
-            st.warning(
-                f"Not showing filters for {' '.join(not_showing)} since they only contain one unique value."
-            )
+            
         submit_button = st.form_submit_button("Apply Filters")
+        st.write(widget_dict)
    
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
