@@ -1136,7 +1136,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
                 # upload summary
-                upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].groupby([["Operator","TIME","Latest_Upload_Time"]])
+                upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
+
                 st.write(upload_summary)
 
 
