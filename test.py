@@ -205,8 +205,6 @@ def filters_widgets(df, columns=None, allow_single_value_widgets=False):
         threshold=1
     widget_dict = {}
     filter_widgets = st.container()
-    filter_widgets.warning(
-        "After selecting filters press the 'Apply Filters' button at the bottom.")
     if not allow_single_value_widgets:
         filter_widgets.markdown("Only showing columns that contain more than 1 unique value.")
     with filter_widgets.form(key="data_filters"):
@@ -1175,7 +1173,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 with col1:
                     st.write(upload_summary)
                 with col2:
-                    filters_widgets(upload_summary)
+                    filters_widgets(upload_summary,["Operator","TIME"],True)
 
 
 		    
