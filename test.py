@@ -868,7 +868,7 @@ def PL_Process_Main(entity_i,sheet_type):
                 with col5:		
                     st.button('Yes', on_click=clicked, args=["yes_button"])         
                 with col6:
-                    st.button("No",, on_click=clicked, args=["no_button"])     )   
+                    st.button("No", on_click=clicked, args=["no_button"])       
 
                 if st.session_state.clicked["no_button"]:
                     with st.form("latest_month", clear_on_submit=True):
