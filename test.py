@@ -1159,16 +1159,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
+		
                 # upload summary
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
+                upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2=st.columns(2)
-                with col1:
-                    st.write(upload_summary)
                 with col2:
-                    test=filters_widgets(upload_summary,["Operator","TIME"])
-                st.write(test)               
+                    upload_summary=filters_widgets(upload_summary,["Operator","TIME"])
+                with col1:
+                    st.write(upload_summary)              
 
-		    
                 # create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
