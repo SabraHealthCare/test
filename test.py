@@ -1134,8 +1134,15 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=data[list(filter(lambda x:"Unname" not in x,data.columns))]
-                # EPM save data formula
+                data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
+                # upload summary
+                upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].groupby("Operator","TIME","Latest_Upload_Time")
+                st.write(upload_summary)
+
+
+		    
+		    
+                # create EPM formula
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
