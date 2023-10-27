@@ -65,7 +65,12 @@ def Upload_File_toS3(uploaded_file, bucket, key):
     except FileNotFoundError:
         st.error("File can't be uploaded.")
         return False   
-    
+
+
+# Function to update the value in session state
+def clicked(button_name):
+    st.session_state.clicked[button_name] = True
+	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
 def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
     original_file =s3.get_object(Bucket=bucket, Key=key)
@@ -857,18 +862,15 @@ def PL_Process_Main(entity_i,sheet_type):
 	    # check the latest reporting month
             if latest_month=="2023":	    
                 latest_month=max_month_cols
-
-               
-                 
                 col4,col5,col6=st.columns([4,1,6])
                 with col4:
                     st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
                 with col5:		
-                    yes=st.button("Yes")          
+                    st.button('Yes', on_click=clicked, args=["yes_button"])         
                 with col6:
-                    no=st.button("No")   
+                    st.button("No",, on_click=clicked, args=["no_button"])     )   
 
-                if no:
+                if st.session_state.clicked["no_button"]:
                     with st.form("latest_month", clear_on_submit=True):
                         st.write("Please select reporting month for the uploading data" )  
                         col1,col2,col3=st.columns([1,1,4])
@@ -885,7 +887,7 @@ def PL_Process_Main(entity_i,sheet_type):
                             latest_month=str(year)+str(month)
                     else:
                         st.stop()
-                elif not yes:
+                elif not st.session_state.clicked["yes_button"]:
                     st.stop()				  		
     return latest_month,PL,PL_with_detail
 
@@ -961,6 +963,9 @@ authenticator = Authenticate(
         config['cookie']['expiry_days'],
         config['preauthorized']
     )
+# set button status
+if 'clicked' not in st.session_state:
+    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
 
 # login widget
 col1,col2=st.columns(2)
