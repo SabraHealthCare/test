@@ -873,7 +873,7 @@ def PL_Process_Main(entity_i,sheet_type):
                 if st.session_state.clicked["no_button"]:
                     with st.form("latest_month", clear_on_submit=True):
                         st.write("Please select reporting month for the uploading data" )  
-                        col1,col2=st.columns([1,4])
+                        col1,col2,col3=st.columns([1,1,2])
                         with col1:
                             year = st.selectbox('Year', range(2023, date.today().year+1))
                         with col2:
