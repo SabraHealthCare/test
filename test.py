@@ -224,7 +224,7 @@ def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
 
 def download_report(df,button_display):
     download_file=df.to_csv(index=False).encode('utf-8')
-    st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
+    return st.download_button(label="Download "+button_display,data=download_file,file_name=button_display+".csv",mime="text/csv")
     
 def Get_Year(single_string):
     if single_string!=single_string or single_string==None or type(single_string)==float:
@@ -726,16 +726,15 @@ def View_Summary():
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
-
-    # upload latest month data to AWS
 	
+    # upload latest month data to AWS
     submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     if submit_latest_month:
         upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
         upload_latest_month["Operator"]=operator
         upload_latest_month["TIME"]=latest_month
         upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
-	    
+        upload_latest_month["EPM_Formula"]=None
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
@@ -1130,12 +1129,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
         
 		    
     elif choice=="Review Monthly reporting":
+
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=data[list(filter(lambda x:"Unname" not in x,data.columns))]
+                data=dat[list(filter(lambda x:"Unname" not in x,data.columns))]
                 # EPM save data formula
                 col_size=data.shape[1]
                 row_size=data.shape[0]
@@ -1144,15 +1144,22 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
-                data["EPM_Formula"]=None
-                data["TIME"]=data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
+                uploud_data=data.copy()
+                uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 for r in range(2,row_size+2):
+                    if uploud_data.loc[r-2,"EPM_Formula"]="uploaded":
+                        continue
                     formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
-                    data.loc[r-2,"EPM_Formula"]=formula
-                download_report(data,"Operator reporting data")
-
-                
+                    uploud_data.loc[r-2,"EPM_Formula"]=formula
+                download_file=uploud_data.to_csv(index=False).encode('utf-8')
+		downloud1=st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+		downloud2=st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
+                    
+                if downloud1:
+                    data["EPM_Formula"]="Uploaded"
+                    Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
+        
      
   
         
