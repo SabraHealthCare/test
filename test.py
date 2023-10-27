@@ -1147,7 +1147,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 for r in range(2,row_size+2):
                     if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
                         continue
-		    else:
+                    else:
 		        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
