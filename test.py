@@ -1164,7 +1164,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 with col1:
                     st.write(upload_summary)
                 with col2:
-                    filters_widgets(upload_summary,["Operator","TIME"],True)
+                    filters_widgets(upload_summary,["Operator","TIME"])
 
 
 		    
