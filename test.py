@@ -228,24 +228,6 @@ def filters_widgets(df, columns=None, allow_single_value_widgets=False):
             )
         submit_button = st.form_submit_button("Apply Filters")
    
-
-def reset_filter_widgets_to_default(df, columns):
-    for y in df[columns]:
-        if str(y) in st.session_state:
-            del st.session_state[y]
-with your example:
-
-data = {
-        'project_title': ['LSE', 'DCP', 'Job-detection', 'Task management & Organizer'],
-        'tech': ['python-RegExp-PyQt5', 'python-RegExp', 'python-RegExp-BeautifulSoup-pandas', 'python-pandas-MS_SQL-CSS/HTML-Javascript'],
-        'Role': ['Junior developer ', 'Python developer', 'Python developer', 'Tech lead']
-    }
-df=pd.DataFrame(data)
-
-filters_widgets(df)
-
-
-
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account
