@@ -1126,10 +1126,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 else:
                     st.write(account_mapping)
                     download_report(account_mapping,"Total tenant mapping")
-        
-		    
-    elif choice=="Review Monthly reporting":
 
+    elif choice=="Review Monthly reporting":
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
@@ -1149,9 +1147,10 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 for r in range(2,row_size+2):
                     if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
                         continue
-                    formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		    else:
+		        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
-                    uploud_data.loc[r-2,"EPM_Formula"]=formula
+                        uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
                 downloud1=st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
                 downloud2=st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
