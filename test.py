@@ -1157,6 +1157,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     
                 if downloud1:
                     data["EPM_Formula"]="Uploaded"
+                    st.write(data)
                     Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
         
      
