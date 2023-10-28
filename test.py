@@ -200,22 +200,20 @@ def filters_widgets(df, columns=None):
     if not columns: #if columns not provided, use all columns to create widgets
         columns=df.columns.tolist()
     
-    widget_dict = {}
+    #widget_dict = {}
     filter_widgets = st.container()
    
-    with filter_widgets.form(key="data_filters"):
-        for y in columns:
-            selected_opts = df[y].unique().tolist()
-            widget_dict[y] = st.multiselect(
-                    label=str(y),
-                    options=selected_opts,
-                    key=str(y),
+    with filter_widgets:
+        for column in columns:
+            user_input = st.multiselect(
+                    label=str(column),
+                    options=df[column].unique().tolist(),
+                    key=str(column),
                 )
-            
-        submit_button = st.form_submit_button("Apply Filters")
-        if submit_button:
-            return df.loc[df[widget_dict.keys()].isin(widget_dict.values()).all(axis=1), :]
-   
+            df = df[df[column].isin(user_input)]            
+        #submit_button = st.form_submit_button("Apply Filters")
+    return df
+	
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account
