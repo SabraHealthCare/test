@@ -1193,13 +1193,13 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
-                def get_data(download_file):
+                def test():
                     st.write("test!!!")
-                    return download_file
+                    return True
 
-                st.download_button("Download Data", get_data(download_file), file_name="test.csv")
+                #st.download_button("Download Data", get_data(download_file), file_name="test.csv")
 			
-               # st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
+               st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
                     
                     #Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
                 #if st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
