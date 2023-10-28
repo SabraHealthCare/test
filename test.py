@@ -1202,7 +1202,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     data["EPM_Formula"]="Uploaded"
                     st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
                 if no_button:
-                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
+                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
                     
 
   
