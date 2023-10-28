@@ -1151,6 +1151,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     download_report(account_mapping,"Total tenant mapping")
 
     elif choice=="Review Monthly reporting":
+            st.subheader("Summary")
             data_obj =s3.get_object(Bucket=bucket_PL, Key=monthly_reporting_path)
             if int(data_obj["ContentLength"])<=2:  # empty file
                 st.success("there is no un-uploaded data")
@@ -1172,7 +1173,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			        "Latest_Upload_Time":"Latest submit"},
 			    hide_index=True)
 
-		    
+		st.subheader("Download reporting data")    
                 # create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
