@@ -1195,7 +1195,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
                 def get_data(download_file):
                     st.write("test!!!")
-                return download_file
+                    return download_file
 
                 st.download_button("Download Data", get_data(download_file), file_name="test.csv")
 			
