@@ -1173,7 +1173,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			        "Latest_Upload_Time":"Latest submit"},
 			    hide_index=True)
 
-		st.subheader("Download reporting data")    
+                st.subheader("Download reporting data")    
                 # create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
