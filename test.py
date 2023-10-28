@@ -1195,9 +1195,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
 
                 st.write("Do you want to label the downloaded data as 'uploaded' to avoid duplicate upload? ")
-			
-                yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"])         
-                no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
+                col1,col2=st.columns(2)
+                with col1:
+                    yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"]) 
+                with col2:
+                    no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
                 if yes_button:
                     data["EPM_Formula"]="Uploaded"
                     st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
