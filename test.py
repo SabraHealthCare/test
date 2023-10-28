@@ -1194,7 +1194,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
                 def test():
-                    st.write("yes")	
+                    st.write("yes")
+                    st.stop()			
                 if st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
                     
                     Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
