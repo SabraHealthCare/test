@@ -209,8 +209,10 @@ def filters_widgets(df, columns=None):
                     label=str(column),
                     options=df[column].unique().tolist(),
                     key=str(column),
+		    
                 )
-            df = df[df[column].isin(user_input)]            
+            if user_input:
+                df = df[df[column].isin(user_input)]            
         #submit_button = st.form_submit_button("Apply Filters")
     return df
 	
