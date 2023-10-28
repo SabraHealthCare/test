@@ -1161,11 +1161,16 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 # upload summary
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
                 upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
-                col1,col2=st.columns(2)
+                col1,col2,col3=st.columns((1,1,2))
                 with col2:
                     upload_summary=filters_widgets(upload_summary,["Operator","TIME"])
                 with col1:
-                    st.write(upload_summary)              
+                    st.dataframe(
+			    upload_summary,
+			    column_config={
+			        "TIME": "Reporting month",
+			        "latest_Upload_Time":"Latest submit")},
+			    hide_index=True)
 
 		    
                 # create EPM formula for download data
