@@ -215,8 +215,6 @@ def filters_widgets(df, columns=None):
         submit_button = st.form_submit_button("Apply Filters")
         if submit_button:
             return df.loc[df[widget_dict.keys()].isin(widget_dict.values()).all(axis=1), :]
-        else:
-            return df
    
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
