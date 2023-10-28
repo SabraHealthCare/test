@@ -1193,7 +1193,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
-                def test:
+                def test():
                     st.write("yes")	
                 if st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
                     
