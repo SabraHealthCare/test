@@ -1199,7 +1199,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 
                 #st.download_button("Download Data", get_data(download_file), file_name="test.csv")
 			
-               st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
+                st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test):
                     
                     #Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
                 #if st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
