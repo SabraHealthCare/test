@@ -1200,11 +1200,9 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
                 if yes_button:
                     data["EPM_Formula"]="Uploaded"
-                    st.download_button(label="Download",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
-                    st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
-                    
+                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
 		if no_button:
-                    st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
+                    st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
                     
 
   
