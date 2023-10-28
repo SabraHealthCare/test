@@ -1159,7 +1159,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
                 data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
 		
-                # upload summary
+                # summary for operator upload
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
                 upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
@@ -1173,7 +1173,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			        "Latest_Upload_Time":"Latest submit"},
 			    hide_index=True)
                 st.write("")
-                st.write("")		
+                st.write("")
                 st.subheader("Download reporting data")    
                 # create EPM formula for download data
                 col_size=data.shape[1]
@@ -1193,17 +1193,19 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
-                def test():
-                    st.write("test!!!")
-                    return True
 
-                #st.download_button("Download Data", download_file, file_name="test.csv")
+                st.write("Do you want to label the downloaded data as 'uploaded' to avoid duplicate upload? ")
 			
-                st.download_button(label="Download and label data as 'uploaded'.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv",on_click=test)
+                yes_button=st.button('Yes, label all the downloaded data as "Uploaded"', on_click=clicked, args=["yes_button"])         
+                no_button=st.button("No,Just download. I won't upload data this time.", on_click=clicked, args=["no_button"])          
+                if yes_button:
+                    data["EPM_Formula"]="Uploaded"
+		    Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
+                    st.download_button(label="Download",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
+                 
+		if no_button:
+                    st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
                     
-                    #Save_CSV_ToS3(data,bucket_PL,monthly_reporting_path)
-                #if st.download_button(label="Just download. I won't upload data this time.",data=download_file,file_name="Operator reporting data.csv",mime="text/csv"):
-                    #st.write(data)
 
   
         
