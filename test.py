@@ -1169,7 +1169,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			    upload_summary,
 			    column_config={
 			        "TIME": "Reporting month",
-			        "latest_Upload_Time":"Latest submit")},
+			        "Latest_Upload_Time":"Latest submit")},
 			    hide_index=True)
 
 		    
