@@ -891,7 +891,6 @@ def PL_Process_Main(entity_i,sheet_type):
                     st.button('Yes', on_click=clicked, args=["yes_button"])         
                 with col6:
                     st.button("No", on_click=clicked, args=["no_button"])       
-                st.write(st.session_state.clicked)
                 if st.session_state.clicked["no_button"]:
                     col1,col2=st.columns(2)
                     with col1:
