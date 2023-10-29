@@ -1019,6 +1019,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 		# clear cache for every upload
                 st.cache_data.clear()
                 st.cache_resource.clear()
+                st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
                 st.write("{} uploaded.".format(uploaded_file.name))
             
         if uploaded_file:
