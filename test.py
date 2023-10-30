@@ -811,7 +811,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
     else:
         st.success("All previous data in P&L ties with Sabra data")
 
-@st.cache_data(experimental_allow_widgets=True)  
+#@st.cache_data(experimental_allow_widgets=True)  
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
