@@ -212,8 +212,8 @@ def filters_widgets(df, columns=None):
 		    
                 )
             if user_input:
-                df = df[df[column].isin(user_input)]            
-        #submit_button = st.form_submit_button("Apply Filters")
+                df = df[df[column].isin(user_input)]     
+    st.write(df)
     return df
 	
 @st.cache_data
