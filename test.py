@@ -998,7 +998,7 @@ with col1:
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
-    authenticator.logout('Logout', 'main')
+
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] :#and st.session_state["operator"]!="sabra":
     authenticator.logout('Logout', 'main')
