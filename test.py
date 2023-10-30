@@ -1114,22 +1114,11 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 gb.configure_column("Index",headerName="Select", width=15)
                 gd.configure_selection(selection_mode='multiple', use_checkbox=True)
                 gd.configure_column("Index", headerCheckboxSelection = True)
-                gridoptions = gd.build()
                 grid_table = AgGrid(un_confirmed_account,
-			    gridOptions=gridoptions,
+			    gridOptions=gd.build(),
 			    fit_columns_on_grid_load=True,
         		    theme = "streamlit",
-                            update_mode=GridUpdateMode.SELECTION_CHANGED)
-
-
-
-grid = AgGrid(df,
-            gridOptions=gb.build(),
-            updateMode=GridUpdateMode.VALUE_CHANGED,
-            allow_unsafe_jscode=True)
-
-
-
+                            update_mode=GridUpdateMode.SELECTION_CHANGED
 
 		    
                 download_report(un_confirmed_account,"new mappings")
