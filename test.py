@@ -196,7 +196,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 
 
 # Parse the df and get filter widgets based for provided columns
-def filters_widgets(df, columns=None,loacation="vertical"):
+def filters_widgets(df, columns=None,location="vertical"):
     if not columns: #if columns not provided, use all columns to create widgets
         columns=df.columns.tolist()
     
