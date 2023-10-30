@@ -207,7 +207,7 @@ def filters_widgets(df, columns=None):
         for column in columns:
             user_input = st.multiselect(
                     label=str(column),
-                    options=df[column].unique().tolist(),
+                    options=data[column].unique().tolist(),
                     key=str(column),
 		    
                 )
