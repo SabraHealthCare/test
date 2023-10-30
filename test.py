@@ -1122,13 +1122,14 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			    fit_columns_on_grid_load=True,
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
+                selected_row = grid_table["selected_rows"]
 
                 col1,col2=st.columns([1,4])
                 with col1:
-                    selected_row = grid_table["selected_rows"]
+                    confirm_button=st.button("Confirm new mappings")
                 with col2:
                     download_report(un_confirmed_account,"new mappings")
-                if st.button("Confirm new mappings"):
+                if confirm_button:
                     if selected_row:
                         if len(selected_row)==un_confirmed_account.shape[0]: # select all
                             account_mapping["Confirm"]=None
