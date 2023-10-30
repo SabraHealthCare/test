@@ -196,24 +196,25 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 
 
 # Parse the df and get filter widgets based for provided columns
-def filters_widgets(df, columns=None,location="vertical"):
-    if not columns: #if columns not provided, use all columns to create widgets
-        columns=df.columns.tolist()
-    
-    #widget_dict = {}
+def filters_widgets(df, columns,location="Vertical"):
     filter_widgets = st.container()
-    if location=='Horizontal':
-        cols = st.columns(len(columns))
-        with filter_widgets:	    
+    with filter_widgets:
+        if location=='Horizontal':
+            cols = st.columns(len(columns))   
             for i, x in enumerate(cols):
                 if location=='Horizontal':
                     user_input = x.multiselect(
                     label=str(columns[i]),
                     options=df[columns[i]].unique().tolist(),
-                    key=str(columns[i])  
-                    )
-                    if user_input:
-                        df = df[df[columns[i]].isin(user_input)]               
+                    key=str(columns[i]))
+        else:  
+            for column in columns:
+                user_input = st.multiselect(
+                    label=str(column),
+                    options=df[column].unique().tolist(),
+                    key=str(column))
+        if user_input:
+            df = df[df[columns[i]].isin(user_input)]   
     return df
 
 
