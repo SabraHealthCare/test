@@ -810,8 +810,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
                 download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"]],"Discrepancy review_{}".format(operator))
     else:
         st.success("All previous data in P&L ties with Sabra data")
-
-#@st.cache_data(experimental_allow_widgets=True)  
+  
 def View_Discrepancy_Detail():
     global diff_BPC_PL,diff_BPC_PL_detail,Total_PL_detail,Total_PL
     # Sabra detail accounts mapping table
@@ -832,10 +831,9 @@ def View_Discrepancy_Detail():
     if diff_BPC_PL.shape[0]>0:      
         diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
-        col1,col2=st.columns(2)
-        with col1:
-            diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
-            diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
+        
+        diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
+        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
