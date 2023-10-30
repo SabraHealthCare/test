@@ -213,11 +213,11 @@ def filters_widgets(df, columns=None):
                 )
             if user_input:
                 data = data[data[column].isin(user_input)]     
-    if st.button("subtmit_selection"):
-        st.write(data)
-        return data
-    else:
-        return df	
+        if st.button("subtmit_selection"):
+            st.write(data)
+            return data
+        else:
+            return df	
 
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
