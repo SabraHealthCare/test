@@ -202,19 +202,17 @@ def filters_widgets(df, columns=None):
     
     #widget_dict = {}
     filter_widgets = st.container()
-    data=df.copy()
     with filter_widgets:
         for column in columns:
             user_input = st.multiselect(
                     label=str(column),
-                    options=data[column].unique().tolist(),
-                    key=str(column),
-		    
+                    options=df[column].unique().tolist(),
+                    key=str(column)  
                 )
             if user_input:
-                data = data[data[column].isin(user_input)]     
+                df = df[data[column].isin(user_input)]     
                  
-        return data
+        return df
 
 
 @st.cache_data
@@ -819,8 +817,7 @@ def View_Discrepancy_Detail():
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
     
     @st.cache_data	    
-    def test(diff_BPC_PL_detail):	    
-    #if diff_BPC_PL.shape[0]>0:
+    def Diff_Detail_Process(diff_BPC_PL_detail):	    
         st.markdown("---")
         st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
         diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["Entity","Sabra_Account","Month","Sabra","Diff"], as_index=False).sum()
@@ -829,14 +826,14 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["ENTITY","Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
+        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         return diff_BPC_PL_detail
     if diff_BPC_PL.shape[0]>0:      
-        diff_BPC_PL_detail=test(diff_BPC_PL_detail)    
+        diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
-	
-        diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
-        st.write(diff_BPC_PL_detail)
-        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
+        col1,col2=st.columns(2)
+        with col1:
+            diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
