@@ -818,7 +818,9 @@ def View_Discrepancy_Detail():
     # Sabra detail accounts mapping table
     def color_coding(row):
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
-    if diff_BPC_PL.shape[0]>0:
+    @st.cache_data	    
+    def test(diff_BPC_PL_detail):	    
+    #if diff_BPC_PL.shape[0]>0:
         st.markdown("---")
         st.markdown("P&L—Sabra detail accounts mapping (for discrepancy data)") 
         diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["Entity","Sabra_Account","Month","Sabra","Diff"], as_index=False).sum()
@@ -827,7 +829,10 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["ENTITY","Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
+        return diff_BPC_PL_detail
+        diff_BPC_PL_detail=test(diff_BPC_PL_detail)    
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
+	
         diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
         st.write(diff_BPC_PL_detail)
         for i in range(diff_BPC_PL_detail.shape[0]):
