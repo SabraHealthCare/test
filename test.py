@@ -1111,9 +1111,12 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
                 un_confirmed_account=un_confirmed_account[["Index","Operator","Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
                 gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
-                gd.configure_column("Index",headerName="Select", width=50,headerCheckboxSelection = True)
+                gd.configure_column("Index",headerName="Select", width=80,headerCheckboxSelection = True)
                 gd.configure_selection(selection_mode='multiple', use_checkbox=True)
-                gd.configure_column("Tenant_Account", headerName="Tenant Account",width=150)
+                gd.configure_column("Tenant_Account", headerName="Tenant Account",width=250)
+                gd.configure_column("Sabra_Account", headerName="Sabra Account",width=200)
+                gd.configure_column("Sabra_Second_Account", headerName="Sabra Second Account",width=150)
+                gd.configure_column("Operator",width=100)
                 grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gd.build(),
 			    fit_columns_on_grid_load=True,
