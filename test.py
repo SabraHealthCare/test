@@ -1120,7 +1120,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			    #width = '100%',
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
-        
+                download_report(un_confirmed_account,"new mappings")
+		    
                 selected_row = grid_table["selected_rows"]
                 if st.button("Confirm new mappings"):
                     if selected_row:
