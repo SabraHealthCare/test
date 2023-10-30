@@ -827,7 +827,7 @@ def View_Discrepancy_Detail():
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
         diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
-	    
+        st.write(diff_BPC_PL_detail)
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
