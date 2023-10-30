@@ -214,6 +214,7 @@ def filters_widgets(df, columns=None):
             if user_input:
                 data = data[data[column].isin(user_input)]     
     if st.button("subtmit_selection"):
+        st.write(data)
         return data
     else:
         return df	
