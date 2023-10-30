@@ -1000,7 +1000,7 @@ if st.session_state["authentication_status"] is False:
     authenticator.logout('Logout', 'main')
     st.write(1,authenticator)
 #---------------operator account-----------------------
-elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
+elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     authenticator.logout('Logout', 'main') 
     st.write(2,authenticator)
     operator=st.session_state["operator"]
