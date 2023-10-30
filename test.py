@@ -196,22 +196,24 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 
 
 # Parse the df and get filter widgets based for provided columns
-def filters_widgets(df, columns=None):
+def filters_widgets(df, columns=None,loacation="vertical"):
     if not columns: #if columns not provided, use all columns to create widgets
         columns=df.columns.tolist()
     
     #widget_dict = {}
     filter_widgets = st.container()
-    with filter_widgets:
-        for column in columns:
-            user_input = st.multiselect(
-                    label=str(column),
-                    options=df[column].unique().tolist(),
-                    key=str(column)  
+if location=='Horizontal':
+    cols = st.columns(len(columns))
+    with filter_widgets:	    
+        for i, x in enumerate(cols):
+            if location=='Horizontal':
+                user_input = x.multiselect(
+                    label=str(columns[i]),
+                    options=df[columns[i]].unique().tolist(),
+                    key=str(columns[i])  
                 )
-            if user_input:
-                df = df[data[column].isin(user_input)]     
-                 
+                if user_input:
+                    df = df[df[column].isin(user_input)]               
         return df
 
 
@@ -833,7 +835,7 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
         col1,col2=st.columns(2)
         with col1:
-            diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
+            diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
@@ -1182,7 +1184,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 upload_summary["TIME"]=upload_summary["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
                 col1,col2,col3=st.columns((3,1,1))
                 with col2:
-                    upload_summary=filters_widgets(upload_summary,["Operator","TIME"])
+                    upload_summary=filters_widgets(upload_summary,["Operator","TIME"],"Horizontal")
                 with col1:
                     st.dataframe(
 			    upload_summary,
