@@ -202,7 +202,7 @@ def filters_widgets(df, columns=None):
     
     #widget_dict = {}
     filter_widgets = st.container()
-   
+    data=df.copy()
     with filter_widgets:
         for column in columns:
             user_input = st.multiselect(
@@ -212,10 +212,12 @@ def filters_widgets(df, columns=None):
 		    
                 )
             if user_input:
-                df = df[df[column].isin(user_input)]     
-    st.write(df)
-    return df
-	
+                data = data[data[column].isin(user_input)]     
+        if st.button("subtmit_selection")
+            return data
+        else:
+            return df	
+
 @st.cache_data
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account
