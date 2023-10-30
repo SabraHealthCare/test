@@ -994,14 +994,13 @@ if 'clicked' not in st.session_state:
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login', bucket_PL,config,'main')
-    st.write(1)
+
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
-    st.write(1)
 #---------------operator account-----------------------
-elif st.session_state["authentication_status"] :#and st.session_state["operator"]!="sabra":
-    authenticator.logout('Logout', 'main')
+elif st.session_state["authentication_status"] and st.session_state["operator"]!="sabra":
+    
     operator=st.session_state["operator"]
     PL_path,BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
@@ -1075,7 +1074,7 @@ elif st.session_state["authentication_status"] :#and st.session_state["operator"
 
 # ----------------for Sabra account--------------------	    
 elif st.session_state["authentication_status"] and (st.session_state["operator"]=="sabra" or st.session_state["operator"]=="Sabra"):
-    authenticator.logout('Logout', 'main')
+    
     operator_list=Read_CSV_FromS3(bucket_mapping,operator_list_path)
     menu=["Review Monthly reporting","Review New Mapping","Edit Account","Register","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
