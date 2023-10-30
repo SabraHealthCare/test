@@ -213,7 +213,7 @@ def filters_widgets(df, columns=None,location="vertical"):
                     key=str(columns[i])  
                     )
                     if user_input:
-                        df = df[df[column].isin(user_input)]               
+                        df = df[df[columns[i]].isin(user_input)]               
     return df
 
 
