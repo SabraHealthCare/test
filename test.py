@@ -974,7 +974,7 @@ def Upload_Section(uploaded_file):
 		    
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
-
+authenticator.logout('Logout', 'main')
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
 config = yaml.safe_load(config_obj["Body"])
