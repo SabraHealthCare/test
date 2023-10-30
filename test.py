@@ -1118,7 +1118,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
 			    gridOptions=gd.build(),
 			    fit_columns_on_grid_load=True,
         		    theme = "streamlit",
-                            update_mode=GridUpdateMode.SELECTION_CHANGED
+                            update_mode=GridUpdateMode.SELECTION_CHANGED)
 
 		    
                 download_report(un_confirmed_account,"new mappings")
