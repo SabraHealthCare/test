@@ -828,7 +828,6 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["ENTITY","Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
-        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         return diff_BPC_PL_detail
     if diff_BPC_PL.shape[0]>0:      
         diff_BPC_PL_detail=Diff_Detail_Process(diff_BPC_PL_detail)    
@@ -836,6 +835,7 @@ def View_Discrepancy_Detail():
         col1,col2=st.columns(2)
         with col1:
             diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"],"Horizontal")
+            diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
