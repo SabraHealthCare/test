@@ -994,7 +994,7 @@ if 'clicked' not in st.session_state:
 col1,col2=st.columns(2)
 with col1:
     authenticator.login('Login', bucket_PL,config,'main')
-authenticator.logout('Logout', 'main')    
+   
 if st.session_state["authentication_status"] is False:
     st.error('Username/password is incorrect')
 
