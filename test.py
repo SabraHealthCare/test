@@ -818,6 +818,7 @@ def View_Discrepancy_Detail():
     # Sabra detail accounts mapping table
     def color_coding(row):
     	return ['color: blue'] * len(row) if row.Tenant_Account == " Total" else ['color: black'] * len(row)
+    
     @st.cache_data	    
     def test(diff_BPC_PL_detail):	    
     #if diff_BPC_PL.shape[0]>0:
@@ -830,6 +831,7 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
         return diff_BPC_PL_detail
+    if diff_BPC_PL.shape[0]>0:      
         diff_BPC_PL_detail=test(diff_BPC_PL_detail)    
         diff_BPC_PL_detail_for_download=diff_BPC_PL_detail.copy()
 	
