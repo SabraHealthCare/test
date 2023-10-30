@@ -1109,19 +1109,30 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.write(un_confirmed_account)
             else:
                 un_confirmed_account['Index'] = range(1, len(un_confirmed_account) + 1)
-                un_confirmed_account=un_confirmed_account[["Index","Tenant_Account","Sabra_Account","Sabra_Second_Account","Operator"]]
+                un_confirmed_account=un_confirmed_account[["Index","Operator","Tenant_Account","Sabra_Account","Sabra_Second_Account"]]
                 gd = GridOptionsBuilder.from_dataframe(un_confirmed_account)
+                gb.configure_column("Index",headerName="Select", width=15)
                 gd.configure_selection(selection_mode='multiple', use_checkbox=True)
                 gd.configure_column("Index", headerCheckboxSelection = True)
                 gridoptions = gd.build()
                 grid_table = AgGrid(un_confirmed_account,
 			    gridOptions=gridoptions,
 			    fit_columns_on_grid_load=True,
-			    #width = '100%',
         		    theme = "streamlit",
                             update_mode=GridUpdateMode.SELECTION_CHANGED)
-                download_report(un_confirmed_account,"new mappings")
+
+
+
+grid = AgGrid(df,
+            gridOptions=gb.build(),
+            updateMode=GridUpdateMode.VALUE_CHANGED,
+            allow_unsafe_jscode=True)
+
+
+
+
 		    
+                download_report(un_confirmed_account,"new mappings")
                 selected_row = grid_table["selected_rows"]
                 if st.button("Confirm new mappings"):
                     if selected_row:
