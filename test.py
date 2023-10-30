@@ -836,6 +836,7 @@ def View_Discrepancy_Detail():
 	
         diff_BPC_PL_detail=filters_widgets(diff_BPC_PL_detail,["Property","Month","Sabra Account"])
         st.write(diff_BPC_PL_detail)
+        diff_BPC_PL_detail=diff_BPC_PL_detail.reset_index(drop=True)
         for i in range(diff_BPC_PL_detail.shape[0]):
             if  diff_BPC_PL_detail.loc[i,"Tenant_Account"]!=" Total":
                 diff_BPC_PL_detail.loc[i,"Property"]=""
