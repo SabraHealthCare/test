@@ -202,19 +202,19 @@ def filters_widgets(df, columns=None,loacation="vertical"):
     
     #widget_dict = {}
     filter_widgets = st.container()
-if location=='Horizontal':
-    cols = st.columns(len(columns))
-    with filter_widgets:	    
-        for i, x in enumerate(cols):
-            if location=='Horizontal':
-                user_input = x.multiselect(
+    if location=='Horizontal':
+        cols = st.columns(len(columns))
+        with filter_widgets:	    
+            for i, x in enumerate(cols):
+                if location=='Horizontal':
+                    user_input = x.multiselect(
                     label=str(columns[i]),
                     options=df[columns[i]].unique().tolist(),
                     key=str(columns[i])  
-                )
-                if user_input:
-                    df = df[df[column].isin(user_input)]               
-        return df
+                    )
+                    if user_input:
+                        df = df[df[column].isin(user_input)]               
+    return df
 
 
 @st.cache_data
