@@ -855,11 +855,12 @@ def View_Discrepancy_Detail():
         unsafe_allow_html=True )
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
-	
-        download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
-        download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
+        col1,col2=st.columns([1,2])
+        with col1:
+            download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
+        with col2:
+            download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
-
 @st.cache_data(experimental_allow_widgets=True)        
 def PL_Process_Main(entity_i,sheet_type):  
     global latest_month
