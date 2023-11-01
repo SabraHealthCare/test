@@ -85,6 +85,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
     
     # append new data to original data
+    new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
     return Save_CSV_ToS3(updated_data,bucket,key)
 
@@ -120,6 +121,7 @@ def Initial_Mapping(operator):
     # read property mapping
     entity_mapping =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
+    entity_mapping=entity_mapping.set_index("ENTITY")
     return entity_mapping,account_mapping
 
 
@@ -496,28 +498,31 @@ def Manage_Entity_Mapping(operator):
             st.write("Occupancy Sheetname")    
         with col4:
             st.write("Balance sheet Sheetname")  
-        for i in range(entity_mapping.shape[0]):
+        i=0
+        for entity_i in entity_mapping.index:
             col1,col2,col3,col4=st.columns([4,3,3,3])
             with col1:
                 st.write("")
-                st.write(entity_mapping.loc[i,"Property_Name"])
+                st.write(entity_mapping.loc[entity_i,"Property_Name"])
             with col2:
-                entity_mapping_updation.loc[i,"Sheet_Name"]=st.text_input("",placeholder =entity_mapping.loc[i,"Sheet_Name"],key="P&L"+str(i))    
+                entity_mapping_updation.loc[i,"Sheet_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name"],key="P&L"+entity_i)    
             with col3: 
-                entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[i,"Sheet_Name_Occupancy"],key="Census"+str(i))     
+                entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
             with col4:
-                entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[i,"Sheet_Name_Balance_Sheet"],key="BS"+str(i)) 
+                entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"],key="BS"+entity_i) 
+            i+=1 
         submitted = st.form_submit_button("Submit")
             
     if submitted:
-        for i in range(entity_mapping.shape[0]):
+        i=0
+        for entity_i in entity_mapping.index:
             if entity_mapping_updation.loc[i,"Sheet_Name"]:
-                entity_mapping.loc[i,"Sheet_Name"]=entity_mapping_updation.loc[i,"Sheet_Name"] 
+                entity_mapping.loc[entity_i,"Sheet_Name"]=entity_mapping_updation.loc[i,"Sheet_Name"] 
             if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
-                entity_mapping.loc[i,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
+                entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
-                entity_mapping.loc[i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
-        
+                entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
+            i+=1
         download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update account_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
@@ -570,10 +575,6 @@ def Sheet_Process(entity_i,sheet_type,sheet_name):
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
             break
         except:
-	    # if there is no sheet name for sold property in P&L, continue to process next property
-            if entity_mapping.loc[entity_i,"DATE_SOLD_PAYOFF"]==entity_mapping.loc[entity_i,"DATE_SOLD_PAYOFF"]:
-                return  pd.DataFrame(),pd.DataFrame()  
-        
             col1,col2=st.columns(2) 
             with col1: 
                 if sheet_type=="Sheet_Name":  
@@ -682,7 +683,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff","Sabra"])
-    for entity in entity_mapping["ENTITY"]:
+    for entity in entity_mapping.index:
         for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
                 try:
@@ -730,7 +731,7 @@ def View_Summary():
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-    latest_month_data=latest_month_data.merge(entity_mapping[["ENTITY","Property_Name"]], on="ENTITY",how="left")
+    latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
@@ -825,7 +826,7 @@ def View_Discrepancy_Detail():
         diff_BPC_PL_detail = (pd.concat([diff_BPC_PL_detail.groupby(["Entity","Sabra_Account","Month","Sabra","Diff"], as_index=False).sum()
                       .assign(Tenant_Account=" Total"),diff_BPC_PL_detail]).sort_values(by=["Entity","Sabra_Account","Month","Sabra","Diff"], kind='stable', ignore_index=True)[diff_BPC_PL_detail.columns])
         diff_BPC_PL_detail=diff_BPC_PL_detail.merge(BPC_Account[["BPC_Account_Name","Sabra_Account_Full_Name"]],left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
-        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["ENTITY","Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
+        diff_BPC_PL_detail=diff_BPC_PL_detail.merge(entity_mapping[["Property_Name"]],left_on="Entity", right_on="ENTITY",how="left")
         diff_BPC_PL_detail=diff_BPC_PL_detail[["Property_Name","Month","Sabra_Account_Full_Name","Tenant_Account","Sabra","P&L Value","Diff"]].\
 			rename(columns={"Property_Name":"Property","Sabra_Account_Full_Name":"Sabra Account"})
         return diff_BPC_PL_detail
@@ -866,6 +867,7 @@ def PL_Process_Main(entity_i,sheet_type):
     global latest_month
     #local sheet_name
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
+
     if True:
             PL=Sheet_Process(entity_i,sheet_type,sheet_name)
          
@@ -935,11 +937,8 @@ def Upload_Section(uploaded_file):
         
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        for entity_i in range(len(entity_mapping["ENTITY"])):
-            st.write(entity_i)
-            st.write("entity_mapping[ENTITY]",entity_mapping["ENTITY"])
+        for entity_i in entity_mapping.index:
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-                
                 sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
@@ -979,10 +978,9 @@ def Upload_Section(uploaded_file):
             
             if diff_BPC_PL.shape[0]>0:
                 percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
-                diff_BPC_PL=diff_BPC_PL.merge(BPC_Account,left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
-                diff_BPC_PL=diff_BPC_PL.merge(entity_mapping, on="ENTITY",how="left")
+                diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
+                diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
                 diff_BPC_PL['Type comments below']=""
-                diff_BPC_PL['Operator']=operator
 		    
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
