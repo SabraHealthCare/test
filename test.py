@@ -481,7 +481,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     st.stop()
 
 #@st.cache_data(experimental_allow_widgets=True)
-def Manage_Property_Mapping(operator):
+def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
     entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
@@ -1053,7 +1053,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
             ChangeWidgetFontSize('Manage Property Mapping', '25px')
-            entity_mapping=Manage_Property_Mapping(operator)
+            entity_mapping=Manage_Entity_Mapping(operator)
         with st.expander("Manage Account Mapping",expanded=True):
             ChangeWidgetFontSize('Manage Account Mapping', '25px')
             col1,col2=st.columns(2)
