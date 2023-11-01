@@ -47,7 +47,7 @@ def Read_CSV_FromS3(bucket,key):
 # no cache
 def Save_CSV_ToS3(data,bucket,key):   
     try:
-        data=data[list(filter(lambda x:"Unnamed:" not in x,data.columns))]
+        data=data[list(filter(lambda x:"Unnamed:" not in x or 'index' not in x,data.columns))]
         csv_buffer = StringIO()
         data.to_csv(csv_buffer)
         s3_resource = boto3.resource('s3')
@@ -1177,7 +1177,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=data[list(filter(lambda x:"Unnamed" not in x,data.columns))]
+                data=data[list(filter(lambda x:"Unnamed" not in x ,data.columns))]
 		
                 # summary for operator upload
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
