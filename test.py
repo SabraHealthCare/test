@@ -936,7 +936,7 @@ def Upload_Section(uploaded_file):
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         for entity_i in range(len(entity_mapping["ENTITY"])):
-            if entity_mapping.loc[entity_i,"P&L_in_separate_sheets"]=="Y":
+            if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 
                 sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
