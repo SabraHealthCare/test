@@ -890,7 +890,7 @@ def PL_Process_Main(entity_i,sheet_type):
                     if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
 
-            PL,PL_with_detail=Mapping_PL_Sabra(PL,entity_mapping.loc[entity_i,"ENTITY"])
+            PL,PL_with_detail=Mapping_PL_Sabra(PL,entity_i)
             
             max_month_cols=str(max(list(PL.columns)))
 	    # check the latest reporting month
