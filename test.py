@@ -975,7 +975,6 @@ def Upload_Section(uploaded_file):
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
 	    # save tenant P&L to S3
             Upload_File_toS3(uploaded_file,bucket_PL,PL_path)
-            
             if diff_BPC_PL.shape[0]>0:
                 percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
                 diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
