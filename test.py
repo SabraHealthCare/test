@@ -117,7 +117,7 @@ def Initial_Mapping(operator):
     account_mapping = Read_CSV_FromS3(bucket_mapping,account_mapping_filename)  
     account_mapping = account_mapping[account_mapping["Operator"]==operator]
     account_mapping["Tenant_Formated_Account"]=list(map(lambda x:x.upper().strip(),account_mapping["Tenant_Account"]))
-    account_mapping=account_mapping[["Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
+    account_mapping=account_mapping[["Operator","Sabra_Account","Sabra_Second_Account","Tenant_Account","Tenant_Formated_Account","Conversion"]] 
     # read property mapping
     entity_mapping =Read_CSV_FromS3(bucket_mapping,entity_mapping_filename)
     entity_mapping = entity_mapping[entity_mapping["Operator"]==operator]
@@ -523,8 +523,9 @@ def Manage_Entity_Mapping(operator):
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
                 entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
             i+=1
+        st.write(entity_mapping)
         download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
-        # update account_mapping in S3     
+        # update entity_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
 
@@ -880,7 +881,7 @@ def PL_Process_Main(entity_i,sheet_type):
                     st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
                     Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
                     #insert new record to the bottom line of account_mapping
-                    account_mapping.loc[len(account_mapping.index)]=[Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
+                    account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
                 Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
             #if there are duplicated accounts in P&L, ask for confirming
