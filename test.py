@@ -60,7 +60,7 @@ def Save_CSV_ToS3(data,bucket,key):
 def Upload_File_toS3(uploaded_file, bucket, key):  
     try:
         s3.upload_fileobj(uploaded_file, bucket, key)
-        st.success('{} successfully Uploaded'.format(uploaded_file.name))
+        #st.success('{} successfully Uploaded'.format(uploaded_file.name))
         return True
     except FileNotFoundError:
         st.error("File can't be uploaded.")
