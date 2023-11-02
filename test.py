@@ -93,7 +93,6 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
-        PL_path=operator+"/"+operator+"_P&L.xlsx"
         BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
@@ -107,7 +106,7 @@ def Initial_Paramaters(operator):
 
     else:
         st.stop()
-    return PL_path,BPC_pull,month_dic,year_dic
+    return BPC_pull,month_dic,year_dic
 
 
 @st.cache_resource
@@ -761,6 +760,9 @@ def View_Summary():
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     if submit_latest_month:
+        # save tenant P&L to S3
+        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+            st.write(" ")  #----------record into error report------------------------	
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
@@ -965,8 +967,7 @@ def Upload_Section(uploaded_file):
 	    # check if census data existed
 		
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
-	    # save tenant P&L to S3
-            Upload_File_toS3(uploaded_file,bucket_PL,PL_path)
+	    
             if diff_BPC_PL.shape[0]>0:
                 percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
                 diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
