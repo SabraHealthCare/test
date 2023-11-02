@@ -93,6 +93,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
 def Initial_Paramaters(operator):
     # drop down list of operator
     if operator!="Sabra":
+        PL_path=operator+"/"+operator+"_P&L.xlsx"
         BPC_pull=Read_CSV_FromS3(bucket_mapping,BPC_pull_filename)
         BPC_pull=BPC_pull[BPC_pull["Operator"]==operator]
         BPC_pull=BPC_pull.set_index(["ENTITY","ACCOUNT"])
@@ -106,7 +107,7 @@ def Initial_Paramaters(operator):
 
     else:
         st.stop()
-    return BPC_pull,month_dic,year_dic
+    return PL_path,BPC_pull,month_dic,year_dic
 
 
 @st.cache_resource
@@ -716,7 +717,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     return diff_BPC_PL,diff_BPC_PL_detail
 
 @st.cache_data(experimental_allow_widgets=True)
-def View_Summary(uploaded_file):
+def View_Summary():
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
@@ -750,21 +751,16 @@ def View_Summary(uploaded_file):
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
+	
+    # upload latest month data to AWS
+    submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["Operator"]=operator
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-    
-    # upload latest month data and P&L to AWS
-    submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
-
     if submit_latest_month:
-	# save tenant P&L to S3
-        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4]):
-            st.write(" ")  #----------record into error report------------------------	    
-			 
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
@@ -965,15 +961,20 @@ def Upload_Section(uploaded_file):
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
 
+            # if Sheet_Name_Occupancy is available, process occupancy data separately
+	    # check if census data existed
+		
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
-	    
+	    # save tenant P&L to S3
+            Upload_File_toS3(uploaded_file,bucket_PL,PL_path)
             if diff_BPC_PL.shape[0]>0:
                 percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
                 diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
                 diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
                 diff_BPC_PL['Type comments below']=""
             else:
-                percent_discrepancy_accounts=0  
+                percent_discrepancy_accounts=0
+            
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
 
@@ -1004,7 +1005,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
-    BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
+    PL_path,BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
@@ -1034,7 +1035,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
                 ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary(uploaded_file)
+                View_Summary()
 	        
 	    # 2 Discrepancy of Historic Data
             with st.expander("Discrepancy for Historic Data",expanded=True):
