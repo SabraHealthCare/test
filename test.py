@@ -1006,7 +1006,7 @@ if st.session_state["authentication_status"] is False:
 #---------------operator account-----------------------
 elif st.session_state["authentication_status"] and st.session_state["operator"]!="Sabra":
     operator=st.session_state["operator"]
-    PL_path,BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
+    BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
 
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
