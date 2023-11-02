@@ -937,13 +937,12 @@ def Upload_Section(uploaded_file):
         
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-            for entity_i in entity_mapping.index:
+        for entity_i in entity_mapping.index:
+            if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-		    
                 latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name")
 		
         
@@ -953,44 +952,13 @@ def Upload_Section(uploaded_file):
                     latest_month,PL_occ,PL_with_detail_occ=PL_Process_Main(entity_i,"Sheet_Name_Occupancy") 
                     PL=PL.combine_first(PL_occ)
                     PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
-                    #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
-		# check if balance sheet data existed   
 		
+		# check if balance sheet data existed   
                 if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name:
                         latest_month,PL_BS,PL_with_detail_BS=PL_Process_Main(entity_i,"Sheet_Name_Balance_Sheet")
                         PL=PL.combine_first(PL_BS)
-                        # remove rows with all None value
-                        #PL= PL.loc[(PL!= None).any(axis=1),:]
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-                        #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
-            elif  entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":  
-                sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
-                sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
-                sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
-                property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-		    
-                latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name")
-		
-        
-		 # check if census data existed
-                if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
-                    and sheet_name_occupancy!=sheet_name:
-                    latest_month,PL_occ,PL_with_detail_occ=PL_Process_Main(entity_i,"Sheet_Name_Occupancy") 
-                    PL=PL.combine_first(PL_occ)
-                    PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
-                    #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
-		# check if balance sheet data existed   
-		
-                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name:
-                        latest_month,PL_BS,PL_with_detail_BS=PL_Process_Main(entity_i,"Sheet_Name_Balance_Sheet")
-                        PL=PL.combine_first(PL_BS)
-                        # remove rows with all None value
-                        #PL= PL.loc[(PL!= None).any(axis=1),:]
-                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-                        #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
 
-
-                
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
@@ -1006,7 +974,9 @@ def Upload_Section(uploaded_file):
                 diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
                 diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
                 diff_BPC_PL['Type comments below']=""
-		    
+            else:
+                percent_discrepancy_accounts=0
+            
     return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
 
 
@@ -1250,16 +1220,3 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
                 if no_button:
                     st.download_button(label="Download reporting data",data=download_file,file_name="Operator reporting data.csv",mime="text/csv")
-                    
-
-  
-        
-       
-
-        
-        
-            
-
-
-
-
