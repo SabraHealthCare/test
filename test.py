@@ -66,7 +66,6 @@ def Upload_File_toS3(uploaded_file, bucket, key):
         st.error("File can't be uploaded.")
         return False   
 
-
 # Function to update the value in session state
 def clicked(button_name):
     st.session_state.clicked[button_name] = True
@@ -938,8 +937,8 @@ def Upload_Section(uploaded_file):
         
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        for entity_i in entity_mapping.index:
-            if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
+        if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
+            for entity_i in entity_mapping.index:
                 sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
@@ -964,7 +963,33 @@ def Upload_Section(uploaded_file):
                         #PL= PL.loc[(PL!= None).any(axis=1),:]
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
                         #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
-                
+            elif  entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="N":  
+                sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
+                sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
+                sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
+                property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
+		    
+                latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name")
+		
+        
+		 # check if census data existed
+                if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+                    and sheet_name_occupancy!=sheet_name:
+                    latest_month,PL_occ,PL_with_detail_occ=PL_Process_Main(entity_i,"Sheet_Name_Occupancy") 
+                    PL=PL.combine_first(PL_occ)
+                    PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
+                    #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
+		# check if balance sheet data existed   
+		
+                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name:
+                        latest_month,PL_BS,PL_with_detail_BS=PL_Process_Main(entity_i,"Sheet_Name_Balance_Sheet")
+                        PL=PL.combine_first(PL_BS)
+                        # remove rows with all None value
+                        #PL= PL.loc[(PL!= None).any(axis=1),:]
+                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
+                        #PL_with_detail= PL_with_detail.loc[(PL_with_detail!= None).any(axis=1),:]
+
+
                 
                 Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
