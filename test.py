@@ -1036,7 +1036,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
                 ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary()
+                View_Summary(uploaded_file)
 	        
 	    # 2 Discrepancy of Historic Data
             with st.expander("Discrepancy for Historic Data",expanded=True):
