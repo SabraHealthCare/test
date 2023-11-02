@@ -934,7 +934,6 @@ def Upload_Section(uploaded_file):
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
         else:
             PL_sheet_list=[]
-        
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:
@@ -945,7 +944,6 @@ def Upload_Section(uploaded_file):
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
                 latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name")
 		
-        
 		 # check if census data existed
                 if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name:
