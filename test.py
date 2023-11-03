@@ -62,8 +62,7 @@ def Upload_File_toS3(uploaded_file, bucket, key):
         s3.upload_fileobj(uploaded_file, bucket, key)
         #st.success('{} successfully Uploaded'.format(uploaded_file.name))
         return True
-    except FileNotFoundError:
-        st.error("File can't be uploaded.")
+    except:
         return False   
 
 # Function to update the value in session state
@@ -222,7 +221,7 @@ def filters_widgets(df, columns,location="Vertical"):
 def Identify_Tenant_Account_Col(PL,sheet_name,sheet_type):
     #search tenant account column in P&L, return col number of tenant account
     account_pool=account_mapping[["Sabra_Account","Tenant_Formated_Account"]].merge(BPC_Account[["BPC_Account_Name","Category"]], left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")	       
-    if sheet_type=="Sheet_Name":
+    if sheet_type=="Sheet_Name_Finance":
         account_pool=account_pool.loc[account_pool["Sabra_Account"]!="NO NEED TO MAP"]["Tenant_Formated_Account"]
     elif sheet_type=="Sheet_Name_Occupancy": 
         account_pool=account_pool.loc[account_pool["Category"]=="Patient Days"]["Tenant_Formated_Account"]	       
@@ -716,7 +715,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
     return diff_BPC_PL,diff_BPC_PL_detail
 
 @st.cache_data(experimental_allow_widgets=True)
-def View_Summary():
+def View_Summary(uploaded_file):
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
@@ -752,7 +751,9 @@ def View_Summary():
     st.write("")
 	
     # upload latest month data to AWS
-    submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
+    col1,col2=st.columns([13,20])
+    with col1:
+        submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["Operator"]=operator
     upload_latest_month["TIME"]=latest_month
@@ -763,8 +764,10 @@ def View_Summary():
         # save tenant P&L to S3
         if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
             st.write(" ")  #----------record into error report------------------------	
+        
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
-            st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+            with col2:
+                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
         else:
             st.write(" ")  #----------record into error report------------------------	
     else:
@@ -858,7 +861,7 @@ def View_Discrepancy_Detail():
         unsafe_allow_html=True )
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
-        st.write("")	    
+        st.write("")
         col1,col2=st.columns(2)
         with col1:
             download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
