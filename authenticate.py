@@ -620,7 +620,7 @@ class Authenticate:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
                                         self.save_credentials_to_yaml(bucket_PL,config)
-                                        st.write("Updated successfully")
+                                        st.success("Updated successfully")
                                         return True
                                     else:
                                         raise ResetError('New and current passwords are the same')
@@ -648,7 +648,7 @@ class Authenticate:
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
                                     self.save_credentials_to_yaml(bucket_PL,config)
-                                    st.write("Updated successfully")
+                                    st.success("Updated successfully")
                                     return True
                                 else:
                                     raise RegisterError('Username is not valid')
@@ -661,7 +661,7 @@ class Authenticate:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
                                     self.save_credentials_to_yaml(bucket_PL,config)
-                                    st.write("Updated successfully")
+                                    st.success("Updated successfully")
                                     return True
                                 else:
                                     raise RegisterError('New email is not valid')
