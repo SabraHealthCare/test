@@ -713,6 +713,7 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
 
     return diff_BPC_PL,diff_BPC_PL_detail
+	
 
 @st.cache_data(experimental_allow_widgets=True)
 def View_Summary(uploaded_file):
