@@ -858,7 +858,8 @@ def View_Discrepancy_Detail():
         unsafe_allow_html=True )
         st.markdown(diff_BPC_PL_detail.style.set_table_styles(styles).apply(color_coding, axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)	
-        col1,col2=st.columns([1,2])
+        st.write("")	    
+        col1,col2=st.columns(2)
         with col1:
             download_report(diff_BPC_PL_detail_for_download,"P&L accounts mapping for discrepancy_{}".format(operator))
         with col2:
@@ -940,21 +941,23 @@ def Upload_Section(uploaded_file):
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
-                sheet_name=str(entity_mapping.loc[entity_i,"Sheet_Name"])
+                sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
-                latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name")
+
+		# All the data is in "Sheet_Name_Finance" by default    
+                latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name_Finance")
 		
 		 # check if census data existed
                 if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
-                    and sheet_name_occupancy!=sheet_name:
+                    and sheet_name_occupancy!=sheet_name_finance:
                     latest_month,PL_occ,PL_with_detail_occ=PL_Process_Main(entity_i,"Sheet_Name_Occupancy") 
                     PL=PL.combine_first(PL_occ)
                     PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 		
 		# check if balance sheet data existed   
-                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name:
+                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
                         latest_month,PL_BS,PL_with_detail_BS=PL_Process_Main(entity_i,"Sheet_Name_Balance_Sheet")
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
@@ -963,8 +966,6 @@ def Upload_Section(uploaded_file):
                 Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
                 st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
 
-            # if Sheet_Name_Occupancy is available, process occupancy data separately
-	    # check if census data existed
 		
             diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
 	    
