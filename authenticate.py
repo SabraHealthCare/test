@@ -619,6 +619,7 @@ class Authenticate:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
                                         self._update_password(self.username, new_password)
+                                        st.success("Updated successfully")
                                         self.save_credentials_to_yaml(bucket_PL,config)
                                         st.success("Updated successfully")
                                         return True
@@ -647,7 +648,9 @@ class Authenticate:
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
+                                    st.success("Updated successfully")
                                     self.save_credentials_to_yaml(bucket_PL,config)
+                                    
                                     st.success("Updated successfully")
                                     return True
                                 else:
