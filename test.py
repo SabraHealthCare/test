@@ -730,6 +730,12 @@ def View_Summary(uploaded_file):
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+
+    missing_check=latest_month_data.groupby(["Property_Name","Category"]).sum()
+    st.write("missing_check",missing_check)
+    
+
+	
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
     latest_month_data.reset_index(drop=False,inplace=True)
     latest_month_data.rename(columns={"Sabra_Account_Full_Name":"Sabra_Account"},inplace=True) 
@@ -743,8 +749,9 @@ def View_Summary(uploaded_file):
             latest_month_data.loc[i,"Sabra_Account"]="Total - "+latest_month_data.loc[i,'Category']
         else:
             latest_month_data.loc[i,"Sabra_Account"]="        "+latest_month_data.loc[i,"Sabra_Account"]
-    
-    latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
+		
+    if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
+        latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
    
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
