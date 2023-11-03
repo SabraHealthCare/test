@@ -738,15 +738,22 @@ def View_Summary(uploaded_file):
 
 	
     if missing_check.shape[0]>0:
-        col1,col2,col3=st.columns([1,1,1])
+        st.error("No data detected for below matrix. ")
+        col1,col2,col3=st.columns([3,2,2])
+
         with col1:
-            st.error("No data detected for below matrix. ")
+            st.dataframe(missing_check["Property_Name","Category",latest_month],
+		    column_config={
+			        "Property_Name": "Property",
+			        "Category":"Sabra account (total)"},
+			    hide_index=True)
         with col2:
             st.button("I'wll fix the data and re-upload")
         with col3:
             continue_run=st.button("Continue to run")
             st.write("")#-----------------------write to error log-----------------------
-        st.dataframe(missing_check)
+        
+			    
         if not continue_run:
             st.stop()
 		
