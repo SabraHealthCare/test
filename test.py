@@ -732,9 +732,13 @@ def View_Summary(uploaded_file):
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
 
-    missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
+    #missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     #missing_check=missing_check.reset_index(drop=False)
-    missing_check=missing_check[(missing_check["Category"].isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
+    #missing_check=missing_check[(missing_check["Category"].isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
+    missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum().
+    missing_check.iloc[(missing_check.index.get_level_values('Category') .isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
+
+	
     if missing_check.shape[0]>0:
         col1,col2,col3=st.columns([1,1,1])
         with col1:
