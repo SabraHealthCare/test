@@ -733,7 +733,9 @@ def View_Summary(uploaded_file):
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
 
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum()
+    missing_check=missing_check[(missing_check["Category"].isin(['Revenue','Patient Days','Operating Expenses']))&(missing_check[latest_month])==0]
     st.write("missing_check",missing_check)
+    st.error("The above fields are zion!")
     
 
 	
