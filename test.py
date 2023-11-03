@@ -736,7 +736,7 @@ def View_Summary(uploaded_file):
     #missing_check=missing_check.reset_index(drop=False)
     missing_check=missing_check[(missing_check["Category"].isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
     if missing_check.shape[0]>0:
-        col1,col2,col3=st.columns([1,1,3])
+        col1,col2,col3=st.columns([1,1,1])
         with col1:
             st.error("No data detected for below matrix. ")
         with col2:
