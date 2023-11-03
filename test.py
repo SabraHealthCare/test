@@ -735,7 +735,7 @@ def View_Summary(uploaded_file):
     #missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     #missing_check=missing_check.reset_index(drop=False)
     #missing_check=missing_check[(missing_check["Category"].isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
-    missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum().
+    missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum()
     missing_check.iloc[(missing_check.index.get_level_values('Category') .isin(['Revenue','Patient Days','Operating Expenses',"Facility Information"]))&(missing_check[latest_month]==0)]
 
 	
