@@ -732,7 +732,7 @@ def View_Summary(uploaded_file):
     latest_month_data=latest_month_data.merge(BPC_Account, left_on="Sabra_Account", right_on="BPC_Account_Name",how="left")
     latest_month_data=latest_month_data.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
 
-    missing_check=latest_month_data.groupby(["Property_Name","Category"]).sum()
+    missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]].groupby(["Property_Name","Category","ENTITY"]).sum()
     st.write("missing_check",missing_check)
     
 
