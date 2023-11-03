@@ -744,7 +744,7 @@ def View_Summary(uploaded_file):
         with col3:
             continue_run=st.button("Continue to run")
             st.write("")#-----------------------write to error log-----------------------
-        st.markdown(missing_check)
+        st.dataframe(missing_check)
         if not continue_run:
             st.stop()
 		
