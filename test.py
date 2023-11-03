@@ -483,7 +483,7 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
 def Manage_Entity_Mapping(operator):
     global entity_mapping
     #all the properties are supposed to be in entity_mapping. 
-    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
+    entity_mapping_updation=pd.DataFrame(columns=["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"])
     number_of_property=entity_mapping.shape[0]
     with st.form(key="Mapping Properties"):
         col1,col2,col3,col4=st.columns([4,3,3,3])
@@ -502,7 +502,7 @@ def Manage_Entity_Mapping(operator):
                 st.write("")
                 st.write(entity_mapping.loc[entity_i,"Property_Name"])
             with col2:
-                entity_mapping_updation.loc[i,"Sheet_Name"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name"],key="P&L"+entity_i)    
+                entity_mapping_updation.loc[i,"Sheet_Name_Finance"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Finance"],key="P&L"+entity_i)    
             with col3: 
                 entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]=st.text_input("",placeholder =entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"],key="Census"+entity_i)     
             with col4:
@@ -513,15 +513,15 @@ def Manage_Entity_Mapping(operator):
     if submitted:
         i=0
         for entity_i in entity_mapping.index:
-            if entity_mapping_updation.loc[i,"Sheet_Name"]:
-                entity_mapping.loc[entity_i,"Sheet_Name"]=entity_mapping_updation.loc[i,"Sheet_Name"] 
+            if entity_mapping_updation.loc[i,"Sheet_Name_Finance"]:
+                entity_mapping.loc[entity_i,"Sheet_Name_Finance"]=entity_mapping_updation.loc[i,"Sheet_Name_Finance"] 
             if entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]:
                 entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"]=entity_mapping_updation.loc[i,"Sheet_Name_Occupancy"]
             if  entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"]:
                 entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"]=entity_mapping_updation.loc[i,"Sheet_Name_Balance_Sheet"] 
             i+=1
         st.write(entity_mapping)
-        download_report(entity_mapping[["Property_Name","Sheet_Name","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
+        download_report(entity_mapping[["Property_Name","Sheet_Name_Finance","Sheet_Name_Occupancy","Sheet_Name_Balance_Sheet"]],"Properties Mapping_{}".format(operator))
         # update entity_mapping in S3     
         Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)   
         return entity_mapping
@@ -575,7 +575,7 @@ def Sheet_Process(entity_i,sheet_type,sheet_name):
         except:
             col1,col2=st.columns(2) 
             with col1: 
-                if sheet_type=="Sheet_Name":  
+                if sheet_type=="Sheet_Name_Finance":  
                     st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
                 elif sheet_type=="Sheet_Name_Occupancy":
                     st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
