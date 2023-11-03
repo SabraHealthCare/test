@@ -13,6 +13,7 @@ import smtplib
 from email.mime.text import MIMEText
 bucket_PL="operatorpl"
 
+
 class Authenticate:
     """
     This class will create login, logout, register user, reset password, forgot password, 
@@ -190,6 +191,31 @@ class Authenticate:
         except Exception as e:
             st.error("Fail to send email:{}".format(e))
 
+    def Password_Validity(self, s:str):
+        l, u, d = 0, 0, 0
+        if (len(s) < 8):
+            st.error("The length of password should be greater than 8.")
+            return False
+        elif (len(s) >= 8):
+            for i in s:
+                # counting lowercase alphabets 
+                if (i.islower()):
+                    l+=1           
+                # counting uppercase alphabets
+                if (i.isupper()):
+                    u+=1           
+                # counting digits
+                if (i.isdigit()):
+                    d+=1                 
+
+        if l>=1 and u>=1 and d>=1:
+            return True
+        else:
+            st.error("Invalid Password. It should contain at least one uppercase letter, one lower letter and one number")
+            return False
+
+
+    
     def save_credentials_to_yaml(self,bucket:str,config:dict):
         s33 = boto3.resource("s3").Bucket(bucket)
         json.dump_s3 = lambda obj, f: s33.Object(key=f).put(Body=json.dumps(obj))
@@ -311,7 +337,7 @@ class Authenticate:
             The updated plain text password.
         """
         self.credentials['usernames'][username]['password'] = Hasher([password]).generate()[0]
-
+        st.success("Password updated successfully")
     def reset_password(self, username: str, form_name: str, location: str='main') -> bool:
         """
         Creates a password reset widget.
@@ -618,11 +644,10 @@ class Authenticate:
                             if len(new_password) > 0:
                                 if new_password == new_password_repeat:
                                     if self.password != new_password: 
-                                        self._update_password(self.username, new_password)
-                           
-                                        self.save_credentials_to_yaml(bucket_PL,config)
-                                        st.success("Updated successfully")
-                                        return True
+                                        if self.Password_Validity(new_password):
+                                            self._update_password(self.username, new_password)
+                                            self.save_credentials_to_yaml(bucket_PL,config)
+                                            return True                                          
                                     else:
                                         raise ResetError('New and current passwords are the same')
                                 else:
@@ -641,6 +666,7 @@ class Authenticate:
                         if field=="username":
                             if new_value not in self.credentials['usernames'] :
                                 if self.validator.validate_username(username):
+                                    st.success("Username updated successfully")
                                     self.credentials['usernames'][new_value] = self.credentials['usernames'].pop(self.username)
                                     self.username=new_value
                                     st.session_state['username'] = self.username
@@ -648,10 +674,8 @@ class Authenticate:
                                     self.token = self._token_encode()
                                     self.cookie_manager.set(self.cookie_name, self.token,
                                                         expires_at=datetime.now() + timedelta(days=self.cookie_expiry_days))
-                            
                                     self.save_credentials_to_yaml(bucket_PL,config)
-                                    
-                                    st.success("Updated successfully")
+                                    #st.success("Username updated successfully")
                                     return True
                                 else:
                                     raise RegisterError('Username is not valid')
@@ -664,7 +688,7 @@ class Authenticate:
                                 if self.validator.validate_email(new_value):
                                     self._update_entry(self.username, field, new_value)
                                     self.save_credentials_to_yaml(bucket_PL,config)
-                                    st.success("Updated successfully")
+                                    st.success("Email updated successfully")
                                     return True
                                 else:
                                     raise RegisterError('New email is not valid')
