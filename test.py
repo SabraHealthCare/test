@@ -788,7 +788,7 @@ def View_Summary(uploaded_file):
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
     st.write(BPC_pull.columns,latest_month)
-    if latest_month in BPC_pull.columns:
+    if latest_month+"00" in BPC_pull.columns:
         col1,col2,col3=st.columns([2,1,1])
         with col1:
             st.warning("{}/{} data is already in Sabra system. Do you want to update it?".format(latest_month[4:6],latest_month[0:4]))
