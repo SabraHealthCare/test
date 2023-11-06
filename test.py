@@ -563,7 +563,7 @@ def Manage_Account_Mapping(new_tenant_account):
     return Sabra_main_account_value,Sabra_second_account_value     
 
 @st.cache_data(experimental_allow_widgets=True)
-def Sheet_Process(entity_i,sheet_type,sheet_name):
+def Read_Sheet(entity_i,sheet_type,sheet_name):
     global account_mapping
     # read data from uploaded file
     count=0
@@ -901,13 +901,12 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
-def PL_Process_Main(entity_i,sheet_type):  
+def PL_Process(entity_i,sheet_type):  
     global latest_month
-    #local sheet_name
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
 
     if True:
-            PL=Sheet_Process(entity_i,sheet_type,sheet_name)
+            PL=Read_Sheet(entity_i,sheet_type,sheet_name)
          
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
@@ -965,16 +964,17 @@ def PL_Process_Main(entity_i,sheet_type):
     return latest_month,PL,PL_with_detail
 
 @st.cache_data(experimental_allow_widgets=True)  
-def Upload_Section(uploaded_file):
+def Upload_And_Process(uploaded_file):
     global PL_sheet_list,latest_month,property_name
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
+            st.write(PL_sheet_list)
         else:
             PL_sheet_list=[]
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
-        for entity_i in entity_mapping.index:
+        for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
             if entity_mapping.loc[entity_i,"Property_in_separate_sheets"]=="Y":
                 sheet_name_finance=str(entity_mapping.loc[entity_i,"Sheet_Name_Finance"])
                 sheet_name_occupancy=str(entity_mapping.loc[entity_i,"Sheet_Name_Occupancy"])
@@ -982,18 +982,18 @@ def Upload_Section(uploaded_file):
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
 		# All the data is in "Sheet_Name_Finance" by default    
-                latest_month,PL,PL_with_detail=PL_Process_Main(entity_i,"Sheet_Name_Finance")
+                latest_month,PL,PL_with_detail=PL_Process(entity_i,"Sheet_Name_Finance")
 		
 		 # check if census data existed
                 if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                    latest_month,PL_occ,PL_with_detail_occ=PL_Process_Main(entity_i,"Sheet_Name_Occupancy") 
+                    latest_month,PL_occ,PL_with_detail_occ=PL_Process(entity_i,"Sheet_Name_Occupancy") 
                     PL=PL.combine_first(PL_occ)
                     PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 		
 		# check if balance sheet data existed   
                 if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        latest_month,PL_BS,PL_with_detail_BS=PL_Process_Main(entity_i,"Sheet_Name_Balance_Sheet")
+                        latest_month,PL_BS,PL_with_detail_BS=PL_Process(entity_i,"Sheet_Name_Balance_Sheet")
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
 
@@ -1067,7 +1067,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
 	    # initial parameter
             global latest_month
             latest_month='2023'
-            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
+            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_file)
             
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
