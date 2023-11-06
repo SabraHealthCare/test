@@ -60,7 +60,6 @@ def Save_CSV_ToS3(data,bucket,key):
 def Upload_File_toS3(uploaded_file, bucket, key):  
     try:
         s3.upload_fileobj(uploaded_file, bucket, key)
-        #st.success('{} successfully Uploaded'.format(uploaded_file.name))
         return True
     except:
         return False   
@@ -720,7 +719,6 @@ def View_Summary(uploaded_file):
     global Total_PL
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
-
     def color_missing(data):
         return f'background-color: red'
 
@@ -728,8 +726,9 @@ def View_Summary(uploaded_file):
     m_str = ''
     for month in months:
         m_str += ", " + month
-    #st.write("Reporting months detected in P&L : "+m_str[1:])   
+    st.write("Reporting months detected in P&L : "+m_str[1:])   
     st.write("The reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
+    
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
     latest_month_data=Total_PL[latest_month].reset_index(drop=False)
@@ -753,7 +752,7 @@ def View_Summary(uploaded_file):
 			    hide_index=True)
        
         with col2:
-            st.button("I'll fix the data and re-upload P&L")
+            st.button("I'll fix and re-upload P&L")
             continue_run=st.button("Confirm and continue to run")
             st.write("")#-----------------------write to error log-----------------------
         		    
@@ -782,27 +781,34 @@ def View_Summary(uploaded_file):
     st.write("")
 	
     # upload latest month data to AWS
-    col1,col2=st.columns([13,20])
-    with col1:
-        submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["Operator"]=operator
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-    if submit_latest_month:
-        # save tenant P&L to S3
-        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-            st.write(" ")  #----------record into error report------------------------	
-        
-        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
-            with col2:
-                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
-        else:
-            st.write(" ")  #----------record into error report------------------------	
-    else:
+
+    if latest_month in BPC_pull.columns:
+        col1,col2,col3=st.columns([2,1,1])
+        with col1:
+            st.warning("{}/{} data is already in Sabra system. Do you want to update it?".format(latest_month[4:6],latest_month[0:4]))
+        with col2:
+            replace_button=st.button("Yes")
+        with col3:
+	    st.button("No")
+        if not replace_button:
+            st.stop()
+    elif not st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
         st.stop()
+	
+    # save tenant P&L to S3
+    if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+        st.write(" ")  #----------record into error report------------------------	
+        
+    if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
+        st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+    else:
+        st.write(" ")  #----------record into error report------------------------	
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
 
 # don't use cache
@@ -1067,7 +1073,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
             global latest_month
             latest_month='2023'
             Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_Section(uploaded_file)
-	
+            
 	    # 1 Summary
             with st.expander("Summary of P&L" ,expanded=True):
                 ChangeWidgetFontSize('Summary of P&L', '25px')
