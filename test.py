@@ -905,7 +905,7 @@ def View_Discrepancy_Detail():
 def PL_Process(entity_i,sheet_type):  
     global latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-
+    st.write("sheet_name",sheet_name)
     if True:
             PL=Read_Sheet(entity_i,sheet_type,sheet_name)
             st.write(PL)
