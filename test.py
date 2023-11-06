@@ -743,15 +743,17 @@ def View_Summary(uploaded_file):
 	
     if missing_check.shape[0]>0:
         st.error("No data detected for below matrix. ")
-        st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(f'background-color: red', subset=[latest_month]),
+        col1,col2=st.columns([1,1])
+        with col1:
+            st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Sabra account-Total"},
 			    hide_index=True)
-        col1,col2=st.columns([1,3])
-        with col1:
-            st.button("I'll fix the data and re-upload P&L")
+        #col1,col2=st.columns([1,3])
         with col2:
+            st.button("I'll fix the data and re-upload P&L")
+        #with col2:
             continue_run=st.button("Continue to run")
             st.write("")#-----------------------write to error log-----------------------
         		    
