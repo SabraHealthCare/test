@@ -791,7 +791,7 @@ def View_Summary(uploaded_file):
     if latest_month+"00" in BPC_pull.columns:
         col1,col2,col3=st.columns([2,1,1])
         with col1:
-            st.warning("{}/{} data is already in Sabra system. Do you want to update it?".format(latest_month[4:6],latest_month[0:4]))
+            st.warning("{}/{} data is already in Sabra system. Do you want to update it with above data?".format(latest_month[4:6],latest_month[0:4]))
         with col2:
             replace_button=st.button("Yes",key="replace")
         with col3:
