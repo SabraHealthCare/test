@@ -781,34 +781,29 @@ def View_Summary(uploaded_file):
     st.write("")
 	
     # upload latest month data to AWS
+    col1,col2=st.columns([13,20])
+    with col1:
+        submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
+    
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
     upload_latest_month["Operator"]=operator
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
-
-    if latest_month+"00" in BPC_pull.columns:
-        col1,col2,col3=st.columns([9,1,4])
-        with col1:
-            st.warning("{}/{} data is already in Sabra system. Do you want to update it with above data?".format(latest_month[4:6],latest_month[0:4]))
-        with col2:
-            replace_button=st.button("Yes",key="replace")
-        with col3:
-            st.button("No",key="don't replace")
-        if not replace_button:
-            st.stop()
-    elif not st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4])):
-        st.stop()
-	
-    # save tenant P&L to S3
-    if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-        st.write(" ")  #----------record into error report------------------------	
+    
+    if submit_latest_month:
+        # save tenant P&L to S3
+        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
+            st.write(" ")  #----------record into error report------------------------	
         
-    if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
-        st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+        if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
+            with col2:
+                st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
+        else:
+            st.write(" ")  #----------record into error report------------------------	
     else:
-        st.write(" ")  #----------record into error report------------------------	
+        st.stop()
     download_report(latest_month_data,"{} {}-{} Reporting".format(operator,latest_month[4:6],latest_month[0:4]))
 
 # don't use cache
