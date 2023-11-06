@@ -789,7 +789,7 @@ def View_Summary(uploaded_file):
     upload_latest_month["Latest_Upload_Time"]=str(date.today())+" "+datetime.now().strftime("%H:%M")
 
     if latest_month+"00" in BPC_pull.columns:
-        col1,col2,col3=st.columns([6,1,4])
+        col1,col2,col3=st.columns([8,1,4])
         with col1:
             st.warning("{}/{} data is already in Sabra system. Do you want to update it with above data?".format(latest_month[4:6],latest_month[0:4]))
         with col2:
