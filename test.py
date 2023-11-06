@@ -748,7 +748,8 @@ def View_Summary(uploaded_file):
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
-			        "Category":"Sabra account-Total"},
+			        "Category":"Sabra account-Total",
+		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
        
         with col2:
