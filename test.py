@@ -728,7 +728,7 @@ def View_Summary(uploaded_file):
     m_str = ''
     for month in months:
         m_str += ", " + month
-    st.write("Reporting months detected in P&L : "+m_str[1:])   
+    #st.write("Reporting months detected in P&L : "+m_str[1:])   
     st.write("The reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
@@ -742,7 +742,7 @@ def View_Summary(uploaded_file):
 
 	
     if missing_check.shape[0]>0:
-        st.error("No data detected for below accounts. ")
+        st.error("No data detected for below accounts: ")
         col1,col2=st.columns([2,3])
         with col1:
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
@@ -750,10 +750,9 @@ def View_Summary(uploaded_file):
 			        "Property_Name": "Property",
 			        "Category":"Sabra account-Total"},
 			    hide_index=True)
-        #col1,col2=st.columns([1,3])
+       
         with col2:
             st.button("I'll fix the data and re-upload P&L")
-        #with col2:
             continue_run=st.button("Confirm and continue to run")
             st.write("")#-----------------------write to error log-----------------------
         		    
@@ -776,7 +775,7 @@ def View_Summary(uploaded_file):
 		
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
         latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
-   
+    st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
     st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
