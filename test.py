@@ -798,7 +798,7 @@ def View_Summary(uploaded_file):
             st.button("No")
         if not replace_button:
             st.stop()
-    elif not st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
+    elif not st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4])):
         st.stop()
 	
     # save tenant P&L to S3
