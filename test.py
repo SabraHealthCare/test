@@ -570,6 +570,7 @@ def Read_Sheet(entity_i,sheet_type,sheet_name):
     while(True):
         try:
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
+            st.write(PL)
             break
         except:
             col1,col2=st.columns(2) 
@@ -907,7 +908,7 @@ def PL_Process(entity_i,sheet_type):
 
     if True:
             PL=Read_Sheet(entity_i,sheet_type,sheet_name)
-         
+            st.write(PL)
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
@@ -969,7 +970,7 @@ def Upload_And_Process(uploaded_file):
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
-            st.write(PL_sheet_list)
+            
         else:
             PL_sheet_list=[]
         Total_PL=pd.DataFrame()
