@@ -721,9 +721,7 @@ def View_Summary(uploaded_file):
     def highlight_total(df):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
 
-    def color_missing(val):
-    color = 'red' if val else 'red'
-    return f'background-color: {color}'
+   
 
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
     m_str = ''
