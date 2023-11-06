@@ -742,8 +742,8 @@ def View_Summary(uploaded_file):
 
 	
     if missing_check.shape[0]>0:
-        st.error("No data detected for below matrix. ")
-        col1,col2=st.columns([1,1])
+        st.error("No data detected for below accounts. ")
+        col1,col2=st.columns([2,3])
         with col1:
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
@@ -754,7 +754,7 @@ def View_Summary(uploaded_file):
         with col2:
             st.button("I'll fix the data and re-upload P&L")
         #with col2:
-            continue_run=st.button("Continue to run")
+            continue_run=st.button("Confirm and continue to run")
             st.write("")#-----------------------write to error log-----------------------
         		    
         if not continue_run:
