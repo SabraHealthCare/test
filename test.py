@@ -722,7 +722,7 @@ def View_Summary(uploaded_file):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
 
     def color_missing(data):
-        return f'background-color: red'  
+        return ['background-color: red']  
 
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
     m_str = ''
