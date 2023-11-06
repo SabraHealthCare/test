@@ -722,7 +722,8 @@ def View_Summary(uploaded_file):
         return ['color: blue']*len(df) if df.Sabra_Account.startswith("Total - ")  else ''*len(df)
 
     def color_missing(data):
-        return ['background-color: red']  
+        color = 'red' 
+        return f'background-color: {color}'
 
     months=map(lambda x:x[4:6]+"/"+x[0:4],Total_PL.columns)
     m_str = ''
@@ -743,7 +744,7 @@ def View_Summary(uploaded_file):
 	
     if missing_check.shape[0]>0:
         st.error("No data detected for below matrix. ")
-        st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.apply(color_missing, subset=[latest_month],axis=0),
+        st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
 			        "Property_Name": "Property",
 			        "Category":"Sabra account-Total"},
