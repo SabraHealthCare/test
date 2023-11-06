@@ -585,12 +585,13 @@ def Read_Sheet(entity_i,sheet_type,sheet_name):
                 with st.form(key=str(count)):                
                     sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
                     submitted = st.form_submit_button("Submit")
+                    count+=1
             else:
                 with st.form(key=str(count)):     
                     sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
                     submitted = st.form_submit_button("Submit")
+                    count+=1
             if submitted:   
-                count+=1
                 continue
             else:
                 st.stop()
