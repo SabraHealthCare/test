@@ -793,9 +793,9 @@ def View_Summary(uploaded_file):
         with col1:
             st.warning("{}/{} data is already in Sabra system. Do you want to update it?".format(latest_month[4:6],latest_month[0:4]))
         with col2:
-            replace_button=st.button("Yes")
+            replace_button=st.button("Yes",key="replace")
         with col3:
-            st.button("No")
+            st.button("No",key="don't replace")
         if not replace_button:
             st.stop()
     elif not st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4])):
