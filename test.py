@@ -570,7 +570,6 @@ def Read_Sheet(entity_i,sheet_type,sheet_name):
     while(True):
         try:
             PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-            st.write(PL)
             break
         except:
             col1,col2=st.columns(2) 
@@ -905,10 +904,8 @@ def View_Discrepancy_Detail():
 def PL_Process(entity_i,sheet_type):  
     global latest_month
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    st.write("sheet_name",sheet_name)
     if True:
             PL=Read_Sheet(entity_i,sheet_type,sheet_name)
-            st.write(PL)
             # mapping new tenant accounts
             new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
