@@ -818,8 +818,7 @@ def View_Summary(uploaded_file):
 def View_Discrepancy(percent_discrepancy_accounts): 
     global diff_BPC_PL
     if diff_BPC_PL.shape[0]>0:
-        st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for each discrepancy in below table.".format(percent_discrepancy_accounts*100))
-        diff_BPC_PL=filters_widgets(diff_BPC_PL,["Property_Name","TIME","Sabra_Account_Full_Name"],"Horizontal")   
+        st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for discrepancy in below table.".format(percent_discrepancy_accounts*100))
         edited_diff_BPC_PL = st.data_editor(
 	diff_BPC_PL,
 	width = 1200,
@@ -843,19 +842,17 @@ def View_Discrepancy(percent_discrepancy_accounts):
             		required =False)
 		}) 
 
+                                
+        download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff"]],"discrepancy_{}".format(operator))
         col1,col2=st.columns([1,3]) 
-        with col1:
+        with col1:    
             submit_com=st.button("Submit comments")
         if submit_com:
-            with col2:  
-                with st.empty():
+            with st.empty():
+                with col2:
                     st.markdown("✔️ :green[Comments uploaded]")
-                    time.sleep(1)
                     st.write(" ")
                 Update_File_inS3(bucket_PL,discrepancy_path,edited_diff_BPC_PL,operator,latest_month)
-
-            with col1:                        
-                download_report(edited_diff_BPC_PL[["Property_Name","TIME","Sabra_Account_Full_Name","Sabra","P&L","Diff","Type comments below"]],"Discrepancy review_{}".format(operator))
     else:
         st.success("All previous data in P&L ties with Sabra data")
   
