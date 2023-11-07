@@ -196,7 +196,7 @@ def ChangeWidgetFontSize(wgt_txt, wch_font_size = '12px'):
 # Parse the df and get filter widgets based for provided columns
 def filters_widgets(df, columns,location="Vertical"):
     filter_widgets = st.container()
-    with filter_widgets:
+    with filter_widgets.form(key="data_filters"):
         if location=='Horizontal':
             cols = st.columns(len(columns))   
             for i, x in enumerate(cols):
@@ -205,15 +205,22 @@ def filters_widgets(df, columns,location="Vertical"):
                     label=str(columns[i]),
                     options=df[columns[i]].unique().tolist(),
                     key=str(columns[i]))
+                    if user_input:
+                        df = df[df[columns[i]].isin(user_input)]  
         else:  
             for column in columns:
                 user_input = st.multiselect(
                     label=str(column),
                     options=df[column].unique().tolist(),
                     key=str(column))
-        if user_input:
-            df = df[df[columns[i]].isin(user_input)]   
-    return df
+                if user_input:
+                    df = df[df[columns[i]].isin(user_input)]                      
+        submit_button = st.form_submit_button("Apply Filters")
+        if submit_button:
+            return df
+        else:
+            return df
+
 
 
 @st.cache_data
