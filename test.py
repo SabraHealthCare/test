@@ -819,6 +819,7 @@ def View_Discrepancy(percent_discrepancy_accounts):
     global diff_BPC_PL
     if diff_BPC_PL.shape[0]>0:
         st.error("{0:.1f}% P&L data doesn't tie to Sabra data.  Please leave comments for each discrepancy in below table.".format(percent_discrepancy_accounts*100))
+        diff_BPC_PL=filters_widgets(diff_BPC_PL,["Property_Name","TIME","Sabra_Account_Full_Name"],"Horizontal")   
         edited_diff_BPC_PL = st.data_editor(
 	diff_BPC_PL,
 	width = 1200,
