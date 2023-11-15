@@ -69,14 +69,16 @@ def clicked(button_name):
     st.session_state.clicked[button_name] = True
 	
 # For updating account_mapping, entity_mapping, latest_month_data, only for operator use
-def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  # how = replace, append...
+def Update_File_inS3(bucket,key,new_data,operator,month=None):  # replace original data
     original_file =s3.get_object(Bucket=bucket, Key=key)
     if int(original_file["ContentLength"])<=2:  # empty file
         original_data=pd.DataFrame()
     else:
         original_data=pd.read_csv(BytesIO(original_file['Body'].read()),header=0)
+        original_data=original_data[new_data.columns]
         if month:
 	    # remove original data by operator and month 
+            #st.write(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)])
             original_data = original_data.drop(original_data[(original_data['Operator'] == operator)&(original_data['TIME'] == month)].index)
         elif not month:
             original_data = original_data.drop(original_data[original_data['Operator'] == operator].index)
@@ -84,6 +86,7 @@ def Update_File_inS3(bucket,key,new_data,operator,month=None,how = "replace"):  
     # append new data to original data
     new_data=new_data.reset_index(drop=False)
     updated_data = pd.concat([original_data,new_data]).reset_index(drop=True)
+    
     return Save_CSV_ToS3(updated_data,bucket,key)
 
 
@@ -379,10 +382,10 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     search_row_size=min(15,PL_row_size)
     month_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
     year_table=pd.DataFrame(0,index=range(search_row_size), columns=range(PL_col_size))
-    
+
     for row_i in range(search_row_size):
         for col_i in range(PL_col_size):
-            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])
+            month_table.iloc[row_i,col_i],year_table.iloc[row_i,col_i]=Get_Month_Year(PL.iloc[row_i,col_i])       
     year_count=[]        
     month_count=[]
     max_len=0
@@ -402,36 +405,43 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
     year_sort_index = np.argsort(np.array(year_count))
     for month_index_i in range(-1,-4,-1): # only check three of the most possible rows
         #month_sort_index[-1] is the index number of month_count in which has max month count
-        #month_sort_index[i] is also the index/row number of PL
-        if month_count[month_sort_index[month_index_i]]>1:
-            month_row=list(month_table.iloc[month_sort_index[month_index_i],])
-           
+        #month_row_index is also the index/row number of PL
+        month_row_index=month_sort_index[month_index_i]
+        if month_count[month_row_index]>1:
+            month_row=list(month_table.iloc[month_row_index,])
+
 	    # if True, it is the correct month row
             if Month_continuity_check(month_row):
-		    
-                for year_index_i in range(-1,-4,-1):
-                    year_row=list(year_table.iloc[year_sort_index[year_index_i],])
-		     # if month and year are not in the same places in the columns, year_row is not the correct one
+                
+                for year_index_i in range(0,-4,-1):
+                    if year_index_i==0:
+                        #in most case,year and month are in the same row, so first check month row
+                        year_row_index=month_row_index
+                    elif year_sort_index[year_index_i]!=month_row_index:  
+                        year_row_index=year_sort_index[year_index_i]
+                        #month row and year row is supposed to be adjacent
+                        if abs(year_row_index-month_row_index)>2:
+                            continue
+                    
+                    year_row=list(year_table.iloc[year_row_index,])
+		            # if month and year are not in the same places in the columns, year_row is not the correct one
                     if not all([year_row[i]==month_row[i] if month_row[i]==0 else year_row[i]!=0 for i in range(len(month_row))]):
                         continue
+            
                     # check validation of year
-                    if Year_continuity_check(year_row) \
-                        and year_count[year_sort_index[year_index_i]]==month_count[month_sort_index[month_index_i]]:
-                       
-                        PL_date_header=year_table.iloc[year_sort_index[year_index_i],].apply(lambda x:str(int(x)))+\
-                        month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                        
-                        return PL_date_header,month_sort_index[month_index_i]
+                    if Year_continuity_check(year_row) and year_count[year_row_index]==month_count[month_row_index]:
+                        PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+\
+                        month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                        return PL_date_header,month_row_index
                     
                     # all the year rows are not valid, add year to month
                     else:
                         continue
 
-		# all the year rows are not valid, add year to month
-                year_table.iloc[year_sort_index[year_index_i],]=Add_year_to_header(list(month_table.iloc[month_sort_index[month_index_i],]))
-                PL_date_header=year_table.iloc[year_sort_index[year_index_i],].apply(lambda x:str(int(x)))+\
-                month_table.iloc[month_sort_index[month_index_i],].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
-                original=PL.iloc[month_sort_index[month_index_i],]
+		        # all the year rows are not valid, add year to month
+                year_table.iloc[year_row_index,]=Add_year_to_header(list(month_table.iloc[month_row_index,]))
+                PL_date_header=year_table.iloc[year_row_index,].apply(lambda x:str(int(x)))+month_table.iloc[month_row_index,].apply(lambda x:"" if x==0 else "0"+str(int(x)) if x<10 else str(int(x)))
+                original_header=PL.iloc[month_row_index,]
                 
                 d_str = ''
                 for i in range(len(PL_date_header)):
@@ -439,13 +449,13 @@ def Identify_Month_Row(PL,tenantAccount_col_no,sheet_name):
                             continue
                         else:
                             date=str(PL_date_header[i][4:6])+"/"+str(PL_date_header[i][0:4])
-                            d_str +=",  "+str(original[i])+" — "+ date
+                            d_str +=",  "+str(original_header[i])+" — "+ date
                 
                 st.warning("Warning: Fail to identify 'year' in the month header of sheet '"+sheet_name+"'. Filled year as:")
                 st.markdown(d_str[1:])
                 return PL_date_header,month_sort_index[month_index_i]
                         
-            # month is not continuous, check next one
+            # month is not continuous, check next
             else:
                 continue
                 
@@ -549,9 +559,11 @@ def Manage_Account_Mapping(new_tenant_account):
         elif len(Sabra_main_account['checked'])>1:
             st.warning("Only one to one mapping is allowed.")
             st.stop()
-        elif Sabra_main_account['checked']==[]:
-            st.warning("Please select Sabra main account for '{}'".format(new_tenant_account[i]))
+        elif Sabra_main_account['checked']==[] and Sabra_second_account['checked']==[]:
+            st.warning("Please select Sabra account for '{}'".format(new_tenant_account))
             st.stop()
+        elif Sabra_main_account['checked']==[]:
+            Sabra_main_account_value=''
             
         if Sabra_second_account['checked']==[]:
             Sabra_second_account_value=''
@@ -569,79 +581,9 @@ def Manage_Account_Mapping(new_tenant_account):
         st.success("Successfully mapped '{}' to '{}'".format(new_tenant_account,Sabra_main_account_value))
     return Sabra_main_account_value,Sabra_second_account_value     
 
-@st.cache_data(experimental_allow_widgets=True)
-def Read_Sheet(entity_i,sheet_type,sheet_name):
-    global account_mapping
-    # read data from uploaded file
-    count=0
-    while(True):
-        try:
-            PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
-            break
-        except:
-            col1,col2=st.columns(2) 
-            with col1: 
-                if sheet_type=="Sheet_Name_Finance":  
-                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                elif sheet_type=="Sheet_Name_Occupancy":
-                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
-                elif sheet_type=="Sheet_Name_Balance_Sheet":
-                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
-		    
-            if len(PL_sheet_list)>0:
-                with st.form(key=str(count)):                
-                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            else:
-                with st.form(key=str(count)):     
-                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
-                    submitted = st.form_submit_button("Submit")
-                    count+=1
-            if submitted:   
-                continue
-            else:
-                st.stop()
-    if count>0:
-        # update sheet name in entity_mapping
-        entity_mapping.loc[entity_i,sheet_type]=sheet_name  
-        # update entity_mapping in S3     
-        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
-
-    # Start checking process
-    st.write("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********" )  
-    tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
-    if tenantAccount_col_no==None:
-        st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
-        st.stop()    
-    date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
-  
-    if len(date_header[0])==1 and date_header[0]==[0]:
-        st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
-        st.stop()     
-    PL.columns=date_header[0]
-
-    #set tenant_account as index of PL
-    PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
-
-	
-    #remove row above date row and remove column without date col name
-    PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
-    
-    #remove rows with nan tenant account
-    nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
-    PL.drop(nan_index, inplace=True)
-    #set index as str ,strip
-    PL.index=map(lambda x:str(x).strip(),PL.index)
-    PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
-    # remove columns with all nan/0
-    PL=PL.loc[:,(PL!= 0).any(axis=0)]
-    # remove rows with all nan/0 value
-    PL=PL.loc[(PL!= 0).any(axis=1),:]
-    return PL
 
 @st.cache_data
-def Mapping_PL_Sabra(PL,entity):
+def Map_PL_Sabra(PL,entity):
     # remove no need to map from account_mapping
     main_account_mapping=account_mapping.loc[list(map(lambda x:x==x and x.upper()!='NO NEED TO MAP',account_mapping["Sabra_Account"])),:]
 
@@ -670,7 +612,9 @@ def Mapping_PL_Sabra(PL,entity):
                 elif conversion=="/monthdays":		
                     PL.loc[i,month]=before_conversion/monthrange(int(str(month)[0:4]), int(str(month)[4:6]))[1]
                 elif conversion[0]=="*":
-                    PL.loc[i,month]= before_conversion*float(conversion.split("*")[0])
+                    PL.loc[i,month]= before_conversion*float(conversion.split("*")[1])
+
+
     PL=PL.drop(["Tenant_Formated_Account","Conversion"], axis=1)
     
     PL_with_detail=copy.copy(PL)
@@ -684,12 +628,14 @@ def Mapping_PL_Sabra(PL,entity):
     return PL,PL_with_detail
     
 @st.cache_data
-def Compare_PL_Sabra(Total_PL,PL_with_detail):
+def Compare_PL_Sabra(Total_PL,PL_with_detail,latest_month):
     PL_with_detail=PL_with_detail.reset_index(drop=False)
     diff_BPC_PL=pd.DataFrame(columns=["TIME","ENTITY","Sabra_Account","Sabra","P&L","Diff (Sabra-P&L)"])
     diff_BPC_PL_detail=pd.DataFrame(columns=["Entity","Sabra_Account","Tenant_Account","Month","P&L Value","Diff (Sabra-P&L)","Sabra"])
     for entity in entity_mapping.index:
-        for matrix in BPC_Account.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+        for matrix in BPC_Account["BPC_Account_Name"]:#.loc[(BPC_Account["Category"]!="Balance Sheet")]["BPC_Account_Name"]: 
+            #if matrix =='T_CASH_AND_EQUIV':
+               #continue
             for timeid in [t for t in Total_PL.columns.sort_values() if t<latest_month][-2:]: # only compare two months
                 try:
                     BPC_value=int(BPC_pull.loc[entity,matrix][timeid+'00'])
@@ -718,8 +664,14 @@ def Compare_PL_Sabra(Total_PL,PL_with_detail):
                     if diff_detail_records.shape[0]==0:
                         diff_detail_records=pd.DataFrame({"Entity":entity,"Sabra_Account":matrix,"Tenant_Account":"Miss mapping accounts","Month":timeid,"Sabra":BPC_value,"Diff (Sabra-P&L)":diff,"P&L Value":0},index=[0])   
                     diff_BPC_PL_detail=pd.concat([diff_BPC_PL_detail,diff_detail_records])
-
-    return diff_BPC_PL,diff_BPC_PL_detail
+    if diff_BPC_PL.shape[0]>0:
+        percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
+        diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
+        diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
+        diff_BPC_PL['Type comments below']=""
+    else:
+        percent_discrepancy_accounts=0
+    return diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts
 	
 
 @st.cache_data(experimental_allow_widgets=True)
@@ -735,7 +687,7 @@ def View_Summary(uploaded_file):
     for month in months:
         m_str += ", " + month
     st.write("Reporting months detected in P&L : "+m_str[1:])   
-    st.write("The reporting month is:  "+latest_month[4:6]+"/"+latest_month[0:4])
+    st.write("The reporting month is "+latest_month[4:6]+"/"+latest_month[0:4])
     
     Total_PL.index=Total_PL.index.set_names(["ENTITY", "Sabra_Account"]) 
     Total_PL=Total_PL.fillna(0)
@@ -746,11 +698,10 @@ def View_Summary(uploaded_file):
     missing_check=latest_month_data[["Property_Name","Category","ENTITY",latest_month]][latest_month_data["Category"].\
 	    isin(['Revenue','Patient Days','Operating Expenses',"Facility Information","Balance Sheet"])].groupby(["Property_Name","Category","ENTITY"]).sum().reset_index(drop=False)
     missing_check=missing_check[missing_check[latest_month]==0]
-
 	
     if missing_check.shape[0]>0:
         st.error("No data detected for below accounts: ")
-        col1,col2=st.columns([2,3])
+        col1,col2=st.columns([2,1])
         with col1:
             st.dataframe(missing_check[["Property_Name","Category",latest_month]].style.applymap(color_missing, subset=[latest_month]),
 		    column_config={
@@ -758,13 +709,12 @@ def View_Summary(uploaded_file):
 			        "Category":"Sabra account-Total",
 		                 latest_month:latest_month[4:6]+"/"+latest_month[0:4]},
 			    hide_index=True)
-       
         with col2:
             st.button("I'll fix and re-upload P&L")
-            continue_run=st.button("Confirm and continue to run")
+            continue_run=st.button("Confirm and continue to run", on_click=clicked, args=["continue_button"]) 
             st.write("")#-----------------------write to error log-----------------------
         		    
-        if not continue_run:
+        if not st.session_state.clicked["continue_button"]:
             st.stop()
 		
     latest_month_data = latest_month_data.pivot(index=["Sabra_Account_Full_Name","Category"], columns="Property_Name", values=latest_month)
@@ -781,10 +731,14 @@ def View_Summary(uploaded_file):
         else:
             latest_month_data.loc[i,"Sabra_Account"]="        "+latest_month_data.loc[i,"Sabra_Account"]
 		
+    entity_columns=latest_month_data.drop(["Sabra_Account","Category"],axis=1).columns	
     if len(latest_month_data.columns)>3:  # if there are more than one property, add total column
-        latest_month_data["Total"] = latest_month_data.drop(["Sabra_Account","Category"],axis=1).sum(axis=1)
+        latest_month_data["Total"] = latest_month_data[entity_columns].sum(axis=1)
+        latest_month_data=latest_month_data[["Sabra_Account","Total"]+list(entity_columns)]
+    else:
+        latest_month_data=latest_month_data[["Sabra_Account"]+list(entity_columns)]
     st.markdown("{} {}/{} reporting data:".format(operator,latest_month[4:6],latest_month[0:4]))      
-    st.markdown(latest_month_data.drop(["Category"],axis=1).style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
+    st.markdown(latest_month_data.style.set_table_styles(styles).apply(highlight_total,axis=1).map(left_align)
 		.format(precision=0,thousands=",").hide(axis="index").to_html(),unsafe_allow_html=True)
     st.write("")
 	
@@ -794,7 +748,7 @@ def View_Summary(uploaded_file):
         submit_latest_month=st.button("Confirm and upload {} {}-{} data".format(operator,latest_month[4:6],latest_month[0:4]))
     
     upload_latest_month=Total_PL[latest_month].reset_index(drop=False)
-    upload_latest_month["Operator"]=operator
+    upload_latest_month=upload_latest_month.merge(entity_mapping[["Operator","GEOGRAPHY","LEASE_NAME","FACILITY_TYPE","INV_TYPE"]].reset_index(drop=False),on="ENTITY",how="left")
     upload_latest_month["TIME"]=latest_month
     upload_latest_month=upload_latest_month.rename(columns={latest_month:"Amount"})
     upload_latest_month["EPM_Formula"]=None      # None EPM_Formula means the data is not uploaded yet
@@ -802,9 +756,6 @@ def View_Summary(uploaded_file):
     
     if submit_latest_month:
         # save tenant P&L to S3
-        if not Upload_File_toS3(uploaded_file,bucket_PL,"{}/{}_P&L_{}-{}".format(operator,operator,latest_month[4:6],latest_month[0:4])):
-            st.write(" ")  #----------record into error report------------------------	
-        
         if Update_File_inS3(bucket_PL,monthly_reporting_path,upload_latest_month,operator,latest_month): 
             with col2:
                 st.success("{} {} reporting data was uploaded to Sabra system successfully!".format(operator,latest_month[4:6]+"/"+latest_month[0:4]))
@@ -907,21 +858,87 @@ def View_Discrepancy_Detail():
             download_report(Total_PL_detail.reset_index(drop=False),"Full P&L accounts mapping_{}".format(operator))
    
 @st.cache_data(experimental_allow_widgets=True)        
-def PL_Process(entity_i,sheet_type):  
-    global latest_month
+def Read_Clean_PL(entity_i,sheet_type,PL_sheet_list,uploaded_file):  
+    global latest_month,account_mapping
     sheet_name=str(entity_mapping.loc[entity_i,sheet_type])
-    if True:
-            PL=Read_Sheet(entity_i,sheet_type,sheet_name)
-            # mapping new tenant accounts
-            new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
+    
+    # read data from uploaded file
+    count=0
+    while(True):
+        try:
+            PL = pd.read_excel(uploaded_file,sheet_name=sheet_name,header=None)
+            break
+        except:
+            col1,col2=st.columns(2) 
+            with col1: 
+                if sheet_type=="Sheet_Name_Finance":  
+                    st.warning("Please provide sheet name of P&L data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                elif sheet_type=="Sheet_Name_Occupancy":
+                    st.warning("Please provide sheet name of Occupancy data for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+                elif sheet_type=="Sheet_Name_Balance_Sheet":
+                    st.warning("Please provide sheet name of Balance Sheet data in for property {}. ".format(entity_mapping.loc[entity_i,"Property_Name"]))
+		    
+            if len(PL_sheet_list)>0:
+                with st.form(key=str(count)):                
+                    sheet_name=st.selectbox(entity_mapping.loc[entity_i,"Property_Name"],[""]+PL_sheet_list)
+                    submitted = st.form_submit_button("Submit")
+                    count+=1
+            else:
+                with st.form(key=str(count)):     
+                    sheet_name = st.text_input(entity_mapping.loc[entity_i,"Property_Name"])
+                    submitted = st.form_submit_button("Submit")
+                    count+=1
+            if submitted:   
+                continue
+            else:
+                st.stop()
+		    
+    if count>0:
+        # update sheet name in entity_mapping
+        entity_mapping.loc[entity_i,sheet_type]=sheet_name  
+        # update entity_mapping in S3     
+        Update_File_inS3(bucket_mapping,entity_mapping_filename,entity_mapping,operator)    
+
+    # Start checking process
+    with st.spinner("********Start to check property—'"+property_name+"' in sheet '"+sheet_name+"'********"):
+        tenantAccount_col_no=Identify_Tenant_Account_Col(PL,sheet_name,sheet_type)
+        if tenantAccount_col_no==None:
+            st.error("Fail to identify tenant account column in sheet '{}'".format(sheet_name))
+            st.stop()    
+        date_header=Identify_Month_Row(PL,tenantAccount_col_no,sheet_name)
+  
+        if len(date_header[0])==1 and date_header[0]==[0]:
+            st.error("Fail to identify month/year header in sheet '{}', please add it and re-upload.".format(sheet_name))
+            st.stop()     
+        PL.columns=date_header[0]
+
+        #set tenant_account as index of PL
+        PL=PL.set_index(PL.iloc[:,tenantAccount_col_no].values)
+	
+        #remove row above date row and remove column without date col name
+        PL=PL.iloc[date_header[1]+1:,PL.columns!='0']
+    
+        #remove rows with nan tenant account
+        nan_index=list(filter(lambda x:x=="nan" or x=="" or x==" " or x!=x ,PL.index))
+        PL.drop(nan_index, inplace=True)
+        #set index as str ,strip
+        PL.index=map(lambda x:str(x).strip(),PL.index)
+        PL=PL.map(lambda x: 0 if (x!=x) or (type(x)==str) or x==" " else x)
+        # remove columns with all nan/0
+        PL=PL.loc[:,(PL!= 0).any(axis=0)]
+        # remove rows with all nan/0 value
+        PL=PL.loc[(PL!= 0).any(axis=1),:]
+
+        # mapping new tenant accounts
+        new_tenant_account_list=list(filter(lambda x:x.upper().strip() not in list(account_mapping["Tenant_Formated_Account"]),PL.index))
             
-            if len(new_tenant_account_list)>0:
-                st.warning("Please complete mapping for below P&L accounts:")
-                for i in range(len(new_tenant_account_list)):
-                    st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
-                    Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
-                    #insert new record to the bottom line of account_mapping
-                    account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
+        if len(new_tenant_account_list)>0:
+            st.warning("Please complete mapping for below P&L accounts:")
+            for i in range(len(new_tenant_account_list)):
+                st.markdown("## Map **'{}'** to Sabra account".format(new_tenant_account_list[i])) 
+                Sabra_main_account_value,Sabra_second_account_value=Manage_Account_Mapping(new_tenant_account_list[i])
+                #insert new record to the bottom line of account_mapping
+                account_mapping.loc[len(account_mapping.index)]=[operator,Sabra_main_account_value,Sabra_second_account_value,new_tenant_account_list[i],new_tenant_account_list[i].upper(),"N"]           
                 Update_File_inS3(bucket_mapping,account_mapping_filename,account_mapping,operator) 
             
             #if there are duplicated accounts in P&L, ask for confirming
@@ -930,52 +947,52 @@ def PL_Process(entity_i,sheet_type):
                 for dup in dup_tenant_account:
                     if dup.upper() not in list(account_mapping[account_mapping["Sabra_Account"]=="NO NEED TO MAP"]["Tenant_Formated_Account"]):
                         st.warning("Warning: There are more than one '{}' accounts in sheet '{}'. They will be summed up by default.".format(dup,sheet_name))
-
-            PL,PL_with_detail=Mapping_PL_Sabra(PL,entity_i)
-            
-            max_month_cols=str(max(list(PL.columns)))
-	    # check the latest reporting month
-            if latest_month=="2023":	    
-                latest_month=max_month_cols
-                col4,col5,col6=st.columns([2,1,2])
-                with col4:
-                    st.warning("The latest reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
-                with col5:		
-                    st.button('Yes', on_click=clicked, args=["yes_button"])         
-                with col6:
-                    st.button("No", on_click=clicked, args=["no_button"])       
-                if st.session_state.clicked["no_button"]:
-                    col1,col2=st.columns(2)
-                    with col1:
-                        with st.form("latest_month", clear_on_submit=True):
-                            st.write("Please select reporting month for the uploading data" )  
-                            col3,col4=st.columns(2)
-                            with col3:
-                                year = st.selectbox('Year', range(2023, date.today().year+1))
-                            with col4:
-                                month = st.selectbox('Month', range(1, 13))
-                            confirm_month=st.form_submit_button("Submit")
-                        if confirm_month:
-                            if month<10:
-                                latest_month=str(year)+"0"+str(month)
-                            else:
-                                latest_month=str(year)+str(month)
-                        else:
-                            st.stop()
-                elif not st.session_state.clicked["yes_button"]:
-                    st.stop()	
+        
+        # Map PL accounts and Sabra account
+        PL,PL_with_detail=Map_PL_Sabra(PL,entity_i)  
+    return PL,PL_with_detail
 	
-    return latest_month,PL,PL_with_detail
+@st.cache_data(experimental_allow_widgets=True) 
+def Check_Reporting_Month(PL):	
+    latest_month=str(max(list(PL.columns)))
+    col4,col5,col6=st.columns([5,1,8])
+    with col4:  
+        st.warning("The reporting month is: {}/{}. Is it true?".format(latest_month[4:6],latest_month[0:4])) 
+    with col5:		
+        st.button('Yes', on_click=clicked, args=["yes_button"])         
+    with col6:
+        st.button("No", on_click=clicked, args=["no_button"])       
+    if st.session_state.clicked["yes_button"]:
+        return latest_month
+    elif st.session_state.clicked["no_button"]:
+        with st.form("latest_month"):
+            st.write("Please select reporting month:" )  
+            col3,col4=st.columns(2)
+            with col3:
+                year = st.selectbox('Year', range(2023, date.today().year+1))
+            with col4:
+                month = st.selectbox('Month', range(1, 13),index=date.today().month-2)
+            confirm_month=st.form_submit_button("Submit")
+        if confirm_month:
+            if month<10:
+                latest_month=str(year)+"0"+str(month)
+            else:
+                latest_month=str(year)+str(month)
+            return latest_month
+        else:
+            st.stop()
+    else:
+        st.stop()
 
 @st.cache_data(experimental_allow_widgets=True)  
-def Upload_And_Process(uploaded_file):
-    global PL_sheet_list,latest_month,property_name
+def Upload_And_Process(uploaded_file,file_type):
+    global latest_month,property_name  # property_name is currently processed entity
     if True:
         if uploaded_file.name[-5:]=='.xlsx':
             PL_sheet_list=load_workbook(uploaded_file).sheetnames
-            
         else:
             PL_sheet_list=[]
+		
         Total_PL=pd.DataFrame()
         Total_PL_detail=pd.DataFrame()
         for entity_i in entity_mapping.index:   # entity_i is the entity code for each property
@@ -985,39 +1002,30 @@ def Upload_And_Process(uploaded_file):
                 sheet_name_balance=str(entity_mapping.loc[entity_i,"Sheet_Name_Balance_Sheet"])
                 property_name=str(entity_mapping.loc[entity_i,"Property_Name"])
 
-		# All the data is in "Sheet_Name_Finance" by default    
-                latest_month,PL,PL_with_detail=PL_Process(entity_i,"Sheet_Name_Finance")
-		
-		 # check if census data existed
-                if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
+		# ****Finance and BS in one excel****
+                if file_type=="Finance" and BS_separate_excel=="N": 
+                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+		    
+                    # check if census data in another sheet
+                    if sheet_name_occupancy!='nan' and sheet_name_occupancy==sheet_name_occupancy and sheet_name_occupancy!="" and sheet_name_occupancy!=" "\
                     and sheet_name_occupancy!=sheet_name_finance:
-                    latest_month,PL_occ,PL_with_detail_occ=PL_Process(entity_i,"Sheet_Name_Occupancy") 
-                    PL=PL.combine_first(PL_occ)
-                    PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
+                        PL_occ,PL_with_detail_occ=Read_Clean_PL(entity_i,"Sheet_Name_Occupancy",PL_sheet_list,uploaded_file) 
+                        PL=PL.combine_first(PL_occ)
+                        PL_with_detail=PL_with_detail.combine_first(PL_with_detail_occ)
 		
-		# check if balance sheet data existed   
-                if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
-                        latest_month,PL_BS,PL_with_detail_BS=PL_Process(entity_i,"Sheet_Name_Balance_Sheet")
+		    # check if balance sheet data existed   
+                    if sheet_name_balance!='nan' and sheet_name_balance==sheet_name_balance and sheet_name_balance!="" and sheet_name_balance!=" " and sheet_name_balance!=sheet_name_finance:
+                        PL_BS,PL_with_detail_BS=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
                         PL=PL.combine_first(PL_BS)
                         PL_with_detail=PL_with_detail.combine_first(PL_with_detail_BS)
-
-                Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
-                Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
-                st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
-
-		
-            diff_BPC_PL,diff_BPC_PL_detail=Compare_PL_Sabra(Total_PL,Total_PL_detail)
-	    
-            if diff_BPC_PL.shape[0]>0:
-                percent_discrepancy_accounts=diff_BPC_PL.shape[0]/(BPC_Account.shape[0]*len(Total_PL.columns))
-                diff_BPC_PL=diff_BPC_PL.merge(BPC_Account[["Category","Sabra_Account_Full_Name","BPC_Account_Name"]],left_on="Sabra_Account",right_on="BPC_Account_Name",how="left")        
-                diff_BPC_PL=diff_BPC_PL.merge(entity_mapping[["Property_Name"]], on="ENTITY",how="left")
-                diff_BPC_PL['Type comments below']=""
-            else:
-                percent_discrepancy_accounts=0
-            
-    return Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month
-
+                elif file_type=="Finance" and BS_separate_excel=="Y": 
+                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Finance",PL_sheet_list,uploaded_file)
+                elif file_type=="BS" and BS_separate_excel=="Y": 
+                    PL,PL_with_detail=Read_Clean_PL(entity_i,"Sheet_Name_Balance_Sheet",PL_sheet_list,uploaded_file)
+            Total_PL=pd.concat([Total_PL,PL], ignore_index=False, sort=False)
+            Total_PL_detail=pd.concat([Total_PL_detail,PL_with_detail], ignore_index=False, sort=False)
+            #st.success("Property {} checked.".format(entity_mapping.loc[entity_i,"Property_Name"]))
+    return Total_PL,Total_PL_detail
 
 #----------------------------------website widges------------------------------------
 config_obj = s3.get_object(Bucket=bucket_PL, Key="config.yaml")
@@ -1032,7 +1040,7 @@ authenticator = Authenticate(
     )
 # set button status
 if 'clicked' not in st.session_state:
-    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
+    st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
 
 # login widget
 col1,col2=st.columns(2)
@@ -1048,41 +1056,74 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]!
     operator=st.session_state["operator"]
     BPC_pull,month_dic,year_dic=Initial_Paramaters(operator)
     entity_mapping,account_mapping=Initial_Mapping(operator)
-
     menu=["Upload P&L","Manage Mapping","Instructions","Edit Account","Logout"]
     choice=st.sidebar.selectbox("Menu", menu)
-	
     if choice=="Upload P&L":
-        st.subheader("Upload {} P&L:".format(operator))
-        col1,col2=st.columns(2) 
-        with col1:
-            with st.form("my-form", clear_on_submit=True):
-                uploaded_file=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False)
-                submitted = st.form_submit_button("Upload")
+        global latest_month
+        latest_month='2023'
+        if all(entity_mapping["BS_separate_excel"]=="Y"):
+            BS_separate_excel="Y"
+        else:
+            BS_separate_excel="N"
+         
+       
+        with st.form("upload_form", clear_on_submit=True):
+            col1,col2=st.columns(2)
+            with col1:
+                st.subheader("Upload {} P&L:".format(operator))
+                uploaded_finance=st.file_uploader(":star: :red[XLSX recommended] :star:",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="Finance_upload")
+            with col2:
+                if BS_separate_excel=="Y":
+                    st.subheader("Upload Balance Sheet:")
+                    uploaded_BS=st.file_uploader("",type={"xlsx","xlsm","xls"},accept_multiple_files=False,key="BS_upload")
+            submitted = st.form_submit_button("Upload")
+        if submitted:
+	    # clear cache for every upload
+            st.cache_data.clear()
+            st.cache_resource.clear()
+            st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False,"continue_button":False}
 
-            if submitted:
-		# clear cache for every upload
-                st.cache_data.clear()
-                st.cache_resource.clear()
-                st.session_state.clicked = {"yes_button":False,"no_button":False,"forgot_password_button":False,"forgot_username_button":False}
-                st.write("{} uploaded.".format(uploaded_file.name))
-            
-        if uploaded_file:
-	    # initial parameter
-            global latest_month
-            latest_month='2023'
-            Total_PL,Total_PL_detail,diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts,latest_month=Upload_And_Process(uploaded_file)
-            
-	    # 1 Summary
-            with st.expander("Summary of P&L" ,expanded=True):
-                ChangeWidgetFontSize('Summary of P&L', '25px')
-                View_Summary(uploaded_file)
+        if uploaded_finance:
+            with col1:
+                st.markdown("✔️ :green[P&L selected]")
+        else:
+            st.write("P&L wasn't upload.")
+            st.stop()
+        if BS_separate_excel=="Y" and uploaded_BS:
+            with col2:
+                st.markdown("✔️ :green[Balance sheet selected]")
+        elif BS_separate_excel=="Y" and not uploaded_BS:
+            st.write("Balance sheet wasn't upload.")
+            st.stop()
+
+        if BS_separate_excel=="N":  # Finance/BS are in one excel
+            with st.spinner('Wait for P&L process'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+        elif BS_separate_excel=="Y":     # Finance/BS are in different excel  
+            # process Finance 
+            with st.spinner('Wait for P&L process'):
+                Total_PL,Total_PL_detail=Upload_And_Process(uploaded_finance,"Finance")
+	    # process BS 
+            with st.spinner('Wait for Balance Sheet process'):
+                Total_BL,Total_BL_detail=Upload_And_Process(uploaded_BS,"BS")
+	    # combine Finance and BS
+            Total_PL=Total_PL.combine_first(Total_BL)
+            Total_PL_detail=Total_PL_detail.combine_first(Total_BL_detail)
+        
+        with st.spinner('Wait for data checking'):    
+            latest_month=Check_Reporting_Month(Total_PL)    
+            diff_BPC_PL,diff_BPC_PL_detail,percent_discrepancy_accounts=Compare_PL_Sabra(Total_PL,Total_PL_detail,latest_month)
+
+	# 1 Summary
+        with st.expander("Summary of P&L" ,expanded=True):
+            ChangeWidgetFontSize('Summary of P&L', '25px')
+            View_Summary(uploaded_finance)
 	        
-	    # 2 Discrepancy of Historic Data
-            with st.expander("Discrepancy for Historic Data",expanded=True):
-                ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
-                View_Discrepancy(percent_discrepancy_accounts)
-                View_Discrepancy_Detail()
+        # 2 Discrepancy of Historic Data
+        with st.expander("Discrepancy for Historic Data",expanded=True):
+            ChangeWidgetFontSize('Discrepancy for Historic Data', '25px')
+            View_Discrepancy(percent_discrepancy_accounts)
+            View_Discrepancy_Detail()
                
     elif choice=="Manage Mapping":
         with st.expander("Manage Property Mapping" ,expanded=True):
@@ -1211,7 +1252,7 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.success("there is no un-uploaded data")
             else:
                 data=pd.read_csv(BytesIO(data_obj['Body'].read()),header=0)
-                data=data[list(filter(lambda x:"Unnamed" not in x ,data.columns))]
+                data=data[list(filter(lambda x:"Unnamed" not in x and 'index' not in x ,data.columns))]
 		
                 # summary for operator upload
                 upload_summary=data[["Operator","TIME","Latest_Upload_Time"]].drop_duplicates(["Operator","TIME","Latest_Upload_Time"]) 
@@ -1229,13 +1270,18 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                 st.write("")
                 st.write("")
                 st.subheader("Download reporting data")    
-                # create EPM formula for download data
+                
+		# create EPM formula for download data
                 col_size=data.shape[1]
                 row_size=data.shape[0]
                 col_name_list=list(data.columns)
                 time_col_letter=colnum_letter(col_name_list.index("TIME"))
                 entity_col_letter=colnum_letter(col_name_list.index("ENTITY"))
                 account_col_letter=colnum_letter(col_name_list.index("Sabra_Account"))
+                facility_col_letter=colnum_letter(col_name_list.index("FACILITY_TYPE"))
+                state_col_letter=colnum_letter(col_name_list.index("GEOGRAPHY"))
+                leasename_col_letter=colnum_letter(col_name_list.index("LEASE_NAME"))
+                inv_col_letter=colnum_letter(col_name_list.index("INV_TYPE"))
                 data_col_letter=colnum_letter(col_name_list.index("Amount"))
                 uploud_data=data.copy()
                 uploud_data["TIME"]=uploud_data["TIME"].apply(lambda x: "{}.{}".format(str(x)[0:4],month_abbr[int(str(x)[4:6])]))
@@ -1243,8 +1289,8 @@ elif st.session_state["authentication_status"] and st.session_state["operator"]=
                     if uploud_data.loc[r-2,"EPM_Formula"]=="Uploaded":
                         continue
                     else:
-                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
-		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r)
+                        formula="""=@EPMSaveData({}{},"finance",{}{},{}{},{}{},{}{},{}{},{}{},{}{},"D_INPUT","F_NONE","USD","PERIODIC","ACTUAL")""".\
+		         format(data_col_letter,r,time_col_letter,r,entity_col_letter,r,account_col_letter,r,facility_col_letter,r,state_col_letter,r,leasename_col_letter,r,inv_col_letter,r)
                         uploud_data.loc[r-2,"EPM_Formula"]=formula
                 download_file=uploud_data.to_csv(index=False).encode('utf-8')
 
