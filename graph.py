@@ -17,7 +17,7 @@ from msgraph.generated.models.recipient import Recipient
 from msgraph.generated.models.email_address import EmailAddress
 
 class Graph:
-    settings: SectionPSectionProxyroxy
+    settings: SectionProxy
     device_code_credential: DeviceCodeCredential
     user_client: GraphServiceClient
 
