@@ -157,18 +157,12 @@ yarl==1.9.2
     # via aiohttp
 zipp==3.17.0
     # via importlib-metadata
-pandas
-numpy
-xlwt
-pyodbc
-datetime
-openpyxl
+
 #xlrd
 streamlit
 #gcsfs
 #pyodbc
-s3fs
-boto3
+
 streamlit_modal
 streamlit_authenticator
 streamlit_tree_select
