@@ -20,12 +20,13 @@ async def main():
     azure_settings = config['azure']
 
     graph: Graph = Graph(azure_settings)
+    st.write("Graph",Graph)
 
-    await greet_user(graph)
-    await display_access_token(graph)
-    await list_inbox(graph)
-    await send_mail(graph)
-    await make_graph_call(graph)
+    greet_user(graph)
+    display_access_token(graph)
+    list_inbox(graph)
+    send_mail(graph)
+    make_graph_call(graph)
            
 
 
