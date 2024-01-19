@@ -17,7 +17,7 @@ from msgraph.generated.models.recipient import Recipient
 from msgraph.generated.models.email_address import EmailAddress
 
 class Graph:
-    settings: SectionProxy
+    settings: SectionPSectionProxyroxy
     device_code_credential: DeviceCodeCredential
     user_client: GraphServiceClient
 
@@ -49,7 +49,7 @@ class Graph:
             query_parameters=query_params
         )
 
-        user = await self.user_client.me.get(request_configuration=request_config)
+        user = self.user_client.me.get(request_configuration=request_config)
         return user
     # </GetUserSnippet>
 
